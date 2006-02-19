@@ -1,22 +1,21 @@
 GCC = g++
-CFLAGS = -g -Weffc++ -Wall -pedantic -Wextra
+CFLAGS = -g #-Weffc++ -Wall -pedantic -Wextra
+
+SDL_LIBS = $(shell sdl-config --libs)
+SDL_FLAGS = $(shell sdl-config --cflags)
+
+OBJECTS = bbc.o Brainblast.o Brick.o Puzzle.o
 
 all: Brainblast
 
-Brainblast: bbc.o Brainblast.o Puzzle.o Brick.o
-	$(GCC) `sdl-config --libs` bbc.o Brainblast.o Brick.o Puzzle.o -o Brainblast
+Brainblast: $(OBJECTS)
+	$(GCC) -o Brainblast bbc.o Brainblast.o Brick.o Puzzle.o  ../../kyra/engine/libkyra.a $(SDL_LIBS) 
 
-Brainblast.o: Brainblast.cpp Brainblast.h
-	$(GCC) $(CFLAGS) -c `sdl-config --cflags` Brainblast.cpp 
+$(OBJECTS): %.o: %.cpp
+	$(GCC) $(CFLAGS) $(SDL_FLAGS) -c $<
 
-bbc.o: bbc.cpp bbc.h
-	$(GCC) $(CFLAGS) -c bbc.cpp
-
-Brick.o: Brick.cpp Brick.h
-	$(GCC) $(CFLAGS) -c Brick.cpp
-
-Puzzle.o: Puzzle.cpp Puzzle.h Brick.o
-	$(GCC) $(CFLAGS) -c Puzzle.cpp
+remake: 
+	make clean; make
 
 clean:
-	rm -rf *.o Brainblast *~
+	rm -rfv *.o Brainblast *~
