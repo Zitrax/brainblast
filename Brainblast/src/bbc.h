@@ -1,3 +1,8 @@
+/* -*- Mode: c++; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4; c-file-style:"stroustrup" -*-
+ *
+ * @date 2006
+ * @author Daniel Bengtsson
+ */
 // -*- mode: C++; -*-
 
 #ifndef BBC_H
@@ -6,7 +11,7 @@
 #include <iostream>
 #include <string>
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 // Should change to use C++ versions of these
 #define max(a,b) (((a) > (b)) ? (a) : (b))

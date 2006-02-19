@@ -1,3 +1,8 @@
+/* -*- Mode: c++; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4; c-file-style:"stroustrup" -*-
+ *
+ * @date 2006
+ * @author Daniel Bengtsson
+ */
 // -*- mode: C++; -*-
 
 #ifndef BRAINBLAST_H
@@ -7,7 +12,8 @@
 
 #include <stdlib.h>
 #include <fstream>
-#include <SDL/SDL.h>
+#include <SDL.h>
+#include "../../kyra/engine/kyra.h" 
 #include <assert.h>
 #include "bbc.h"
 #include "Puzzle.h"
@@ -62,7 +68,9 @@ private:
     SDL_Rect*    m_field1;
     SDL_Rect*    m_field2;
 
-    Brick** bricks;
+    Brick**      m_bricks;
+
+	KrEngine*    m_engine;
 
     const Uint32 red, blue, black, green, white, yellow, cyan, magenta;
 
@@ -81,6 +89,7 @@ private:
 
     //! Sets up a new game
     void initGame(int lvl=1);
+    void initGameKyra();
 
     //! Used to clean up for all pointers
     void cleanup();

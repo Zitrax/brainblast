@@ -1,7 +1,23 @@
+/* -*- Mode: c++; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4; c-file-style:"stroustrup" -*-
+ *
+ * @date 2006
+ * @author Daniel Bengtsson
+ */
 #include "Brainblast.h"
+
+#include "../images/bb.h"
+
+using namespace grinliz;
 
 int main(int argc, char *argv[])
 {
+    const SDL_version* sdlVersion = SDL_Linked_Version();
+	if ( sdlVersion->minor < 2 )
+	{
+		printf( "ERROR: SDL version must be at least 1.2.0" );
+		exit( 254 );
+	}
+
     Brainblast* bb = new Brainblast();
     bb->startGame();
     zap(bb);
@@ -11,7 +27,8 @@ Brainblast::Brainblast() : m_currentLvl(0),
                            m_screen( SDL_SetVideoMode( VIDEOX, VIDEOY, VIDEOBITS, SDL_HWSURFACE ) ),
                            m_field1(0),
                            m_field2(0),
-                           bricks(0),
+                           m_bricks(0),
+						   m_engine(0),
                            red( SDL_MapRGB(m_screen->format, 0xff, 0x00, 0x00) ),
                            blue( SDL_MapRGB(m_screen->format, 0x00, 0x00, 0xff) ),
                            black( SDL_MapRGB(m_screen->format, 0x00, 0x00, 0x00) ),
@@ -23,16 +40,16 @@ Brainblast::Brainblast() : m_currentLvl(0),
 {
     if(bbc::debug) std::cerr << "Brainblast::Brainblast()\n";
 
-    if(SDL_Init(SDL_INIT_VIDEO) < 0)
+    if(SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER) < 0)
     {
-        printf("Can't init SDL:  %s\n", SDL_GetError());
+        printf("ERROR: Can't init SDL:  %s\n", SDL_GetError());
         exit(1);
     }
     atexit(SDL_Quit); 
 
     if(m_screen == NULL)
     {
-        printf("Can't set video mode: %s\n", SDL_GetError());
+        printf("ERROR: Can't set video mode: %s\n", SDL_GetError());
         exit(1);
     }   
 
@@ -50,7 +67,8 @@ Brainblast::Brainblast(const Brainblast& bb) : m_currentLvl(0),
                                                m_screen(0),
                                                m_field1(0),
                                                m_field2(0),
-                                               bricks(0),
+                                               m_bricks(0),
+											   m_engine(0),
                                                red(bb.red),
                                                blue(bb.blue),
                                                black(bb.black),
@@ -71,7 +89,7 @@ Brainblast::Brainblast(const Brainblast& bb) : m_currentLvl(0),
     m_field2 = new SDL_Rect( *bb.m_field2 );
 
     for(int i=0; i<NOF_BRICK_TYPES; i++)
-        bricks[i] = new Brick( *bb.bricks[i] );
+        m_bricks[i] = new Brick( *bb.m_bricks[i] );
 }
 
 // Assignment operator
@@ -88,9 +106,13 @@ Brainblast::operator=(const Brainblast& bb)
     m_field1 = new SDL_Rect( *bb.m_field1 );
     m_field2 = new SDL_Rect( *bb.m_field2 );
 
-    bricks = new Brick*[NOF_BRICK_TYPES];
+    m_bricks = new Brick*[NOF_BRICK_TYPES];
     for(int i=0; i<NOF_BRICK_TYPES; i++)
-        bricks[i] = new Brick( *bb.bricks[i] );
+        m_bricks[i] = new Brick( *bb.m_bricks[i] );
+
+	// Do we really need to copy ?
+	if( bb.m_engine )
+		m_engine = new KrEngine( *bb.m_engine );
 
     // Correct ?
     return *this;
@@ -106,9 +128,10 @@ Brainblast::~Brainblast()
 void
 Brainblast::cleanup()
 {
-    for(int i=0; i<NOF_BRICK_TYPES; i++)
-        zap( bricks[i] );
-    zapArr( bricks );
+    if( m_bricks )
+        for(int i=0; i<NOF_BRICK_TYPES; i++)
+            zap( m_bricks[i] );
+    zapArr( m_bricks );
     
     // m_screen is deleted by SDL_Quit
     // zap( m_screen );
@@ -116,6 +139,8 @@ Brainblast::cleanup()
     zap( m_currentLvl );
 
     zap(m_field1); zap(m_field2);
+
+	zap( m_engine );
 }
 
 bool
@@ -162,7 +187,7 @@ Brainblast::makeLevel(int lvl)
                 if(bbc::debug) std::cerr << val << " ";
                 if( i%2 == 0 ) tmp = val;
                 else  
-                    m_currentLvl->setSolutionBrickWithIdx(bricks[val],tmp-1);
+                    m_currentLvl->setSolutionBrickWithIdx(m_bricks[val],tmp-1);
             }
             i++;
         }
@@ -184,7 +209,7 @@ Brainblast::createBricks()
   
     char* filebase = "../images/brick%03d.bmp";
 
-    bricks = new Brick*[NOF_BRICK_TYPES];
+    m_bricks = new Brick*[NOF_BRICK_TYPES];
 
     for(int i=0; i<NOF_BRICK_TYPES; i++) 
     {
@@ -193,7 +218,7 @@ Brainblast::createBricks()
         // What is the equivalency for this in C++ ?
         sprintf(filename, filebase, i);
         cout << filename << "\n";
-        bricks[i] = new Brick(filename, i);
+        m_bricks[i] = new Brick(filename, i);
     }
 
     free(filename);
@@ -328,8 +353,45 @@ Brainblast::checkSolution(Puzzle* puzzle)
 void 
 Brainblast::startGame()
 {
-    initGame();
+    initGameKyra();
     eventLoop();
+}
+
+#define SDL_TIMER_EVENT ( SDL_USEREVENT + 0 )
+const int TIMER_INTERVAL = 80;
+Uint32 TimerCallback(Uint32 interval)
+{
+	SDL_Event event;
+	event.type = SDL_TIMER_EVENT;
+
+	SDL_PeepEvents( &event, 1, SDL_ADDEVENT, 0 );
+	return TIMER_INTERVAL;
+}
+
+void 
+Brainblast::initGameKyra()
+{
+    Random random;
+    KrEngine* engine = new KrEngine( m_screen );
+    engine->Draw(); 
+
+	// Load the dat file.
+	// The dat file was carefully created in the sprite
+	// editor. Loading allows us access to the 
+	// MAGE, PARTICLE, and CARPET.
+	if ( !engine->Vault()->LoadDatFile( "../images/bb.dat" ) )
+	{
+		printf( "Error loading the tutorial dat file\n" );
+		exit( 255 );
+	}
+
+	// Get the PAPRICE resource
+	KrSpriteResource* papriceRes = engine->Vault()->GetSpriteResource( BB_PAPRICE );
+	GLASSERT( papriceRes );
+	// Create the paprice sprite and add it to the tree
+	KrSprite* paprice = new KrSprite( papriceRes );
+	paprice->SetPos( VIDEOX, VIDEOY / 2 );
+	engine->Tree()->AddNode( 0, paprice );
 }
 
 void
@@ -360,21 +422,39 @@ Brainblast::initGame(int lvl)
 int Brainblast::eventLoop()
 {
     SDL_Event event;
-    int running = 1;
-    
-    while(running && SDL_WaitEvent(&event)) {
-            printf("Event: %i\n", event.type);
-            switch(event.type){
-            case SDL_KEYDOWN:
-            case SDL_KEYUP:
-                handleKeyEvent(&event.key);
-                break;
-            case SDL_QUIT:
-                printf("Quit\n");
-                running = 0;
-                break;
-            }
-    }
+	bool done = false;
+    // Start timing!
+	SDL_SetTimer( TIMER_INTERVAL, TimerCallback );
+    while( !done && SDL_WaitEvent(&event) )
+	{
+		if ( event.type == SDL_QUIT )
+			break;
+        
+		switch(event.type)
+		{
+        case SDL_KEYDOWN:
+        {
+            done = true;
+        }
+        break;
+        
+        case SDL_TIMER_EVENT:
+        {
+//             paprice->DoStep();
+//             if ( paprice->X() < 0 )
+//             {
+//                 paprice->SetPos( VIDEOX, paprice->Y() );
+//             }
+//             printf("pos = %i,%i\n", paprice->X(), paprice->Y());
+            m_engine->Draw();
+        }
+        break;
+        
+        default:
+            break;
+		}
+        
+	}
     
     return 0;
 }

@@ -1,3 +1,8 @@
+/* -*- Mode: c++; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4; c-file-style:"stroustrup" -*-
+ *
+ * @date 2006
+ * @author Daniel Bengtsson
+ */
 // -*- mode: C++; -*-
 
 #ifndef PUZZLE_H
