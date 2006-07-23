@@ -29,13 +29,13 @@ Brainblast::Brainblast() : m_currentLvl(0),
                            m_field2(0),
                            m_bricks(0),
 						   m_engine(0),
-                           red( SDL_MapRGB(m_screen->format, 0xff, 0x00, 0x00) ),
-                           blue( SDL_MapRGB(m_screen->format, 0x00, 0x00, 0xff) ),
-                           black( SDL_MapRGB(m_screen->format, 0x00, 0x00, 0x00) ),
-                           green( SDL_MapRGB(m_screen->format, 0x00, 0xff, 0x00) ),
-                           white( SDL_MapRGB(m_screen->format, 0xff, 0xff, 0xff) ),
-                           yellow( SDL_MapRGB(m_screen->format, 0xff, 0xff, 0x00) ),
-                           cyan( SDL_MapRGB(m_screen->format, 0x00, 0xff, 0xff) ),
+                           red    ( SDL_MapRGB(m_screen->format, 0xff, 0x00, 0x00) ),
+                           blue   ( SDL_MapRGB(m_screen->format, 0x00, 0x00, 0xff) ),
+                           black  ( SDL_MapRGB(m_screen->format, 0x00, 0x00, 0x00) ),
+                           green  ( SDL_MapRGB(m_screen->format, 0x00, 0xff, 0x00) ),
+                           white  ( SDL_MapRGB(m_screen->format, 0xff, 0xff, 0xff) ),
+                           yellow ( SDL_MapRGB(m_screen->format, 0xff, 0xff, 0x00) ),
+                           cyan   ( SDL_MapRGB(m_screen->format, 0x00, 0xff, 0xff) ),
                            magenta( SDL_MapRGB(m_screen->format, 0xff, 0x00, 0xff) )
 {
     if(bbc::debug) std::cerr << "Brainblast::Brainblast()\n";
@@ -100,7 +100,7 @@ Brainblast::operator=(const Brainblast& bb)
     // assigning the new ones
     cleanup();
 
-    m_screen = new SDL_Surface( *bb.m_screen );
+    m_screen     = new SDL_Surface( *bb.m_screen );
     m_currentLvl = new Puzzle( *bb.m_currentLvl );
 
     m_field1 = new SDL_Rect( *bb.m_field1 );
@@ -358,7 +358,7 @@ Brainblast::startGame()
 }
 
 #define SDL_TIMER_EVENT ( SDL_USEREVENT + 0 )
-const int TIMER_INTERVAL = 80;
+const int TIMER_INTERVAL = 40;
 Uint32 TimerCallback(Uint32 interval)
 {
 	SDL_Event event;
@@ -371,27 +371,29 @@ Uint32 TimerCallback(Uint32 interval)
 void 
 Brainblast::initGameKyra()
 {
-    Random random;
-    KrEngine* engine = new KrEngine( m_screen );
-    engine->Draw(); 
+    Random random(time(0));
+    m_engine = new KrEngine( m_screen );
+    m_engine->Draw(); 
 
 	// Load the dat file.
 	// The dat file was carefully created in the sprite
 	// editor. Loading allows us access to the 
 	// MAGE, PARTICLE, and CARPET.
-	if ( !engine->Vault()->LoadDatFile( "../images/bb.dat" ) )
+	if ( !m_engine->Vault()->LoadDatFile( "../images/bb.dat" ) )
 	{
-		printf( "Error loading the tutorial dat file\n" );
+		printf( "Error loading the sprites file.\n" );
 		exit( 255 );
 	}
 
 	// Get the PAPRICE resource
-	KrSpriteResource* papriceRes = engine->Vault()->GetSpriteResource( BB_PAPRICE );
+	KrSpriteResource* papriceRes = m_engine->Vault()->GetSpriteResource( BB_PAPRICE );
 	GLASSERT( papriceRes );
+
 	// Create the paprice sprite and add it to the tree
 	KrSprite* paprice = new KrSprite( papriceRes );
-	paprice->SetPos( VIDEOX, VIDEOY / 2 );
-	engine->Tree()->AddNode( 0, paprice );
+	paprice->SetNodeId(BB_PAPRICE);
+	paprice->SetPos( random.Rand(VIDEOX), 0);
+	m_engine->Tree()->AddNode( 0, paprice );
 }
 
 void
@@ -421,6 +423,8 @@ Brainblast::initGame(int lvl)
 
 int Brainblast::eventLoop()
 {
+	assert(m_engine);
+
     SDL_Event event;
 	bool done = false;
     // Start timing!
@@ -440,13 +444,22 @@ int Brainblast::eventLoop()
         
         case SDL_TIMER_EVENT:
         {
-//             paprice->DoStep();
-//             if ( paprice->X() < 0 )
-//             {
-//                 paprice->SetPos( VIDEOX, paprice->Y() );
-//             }
-//             printf("pos = %i,%i\n", paprice->X(), paprice->Y());
-            m_engine->Draw();
+			KrSprite* paprice = static_cast<KrSprite*>(m_engine->Tree()->FindNodeById( BB_PAPRICE ));
+			if( paprice )
+			{
+//				paprice->DoStep();
+				Rectangle2I rect;
+				Rectangle2I screen;
+				screen.Set(0,-100,VIDEOX,VIDEOY);
+				paprice->QueryBoundingBox(&rect);
+				if( screen.Contains(rect) )
+				{
+					paprice->SetPos( paprice->X(), paprice->Y()+3 );
+				}
+				printf("pos = %i,%i\n", paprice->X(), paprice->Y());
+			}
+			m_engine->Draw();
+
         }
         break;
         
