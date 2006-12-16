@@ -3,11 +3,14 @@
  * @date 2006
  * @author Daniel Bengtsson
  */
+
 #include "Brainblast.h"
+#include "BrainSprite.h"
 
 #include "../images/bb.h"
 
 using namespace grinliz;
+using namespace brain;
 
 int main(int argc, char *argv[])
 {
@@ -38,7 +41,7 @@ Brainblast::Brainblast() : m_currentLvl(0),
                            cyan   ( SDL_MapRGB(m_screen->format, 0x00, 0xff, 0xff) ),
                            magenta( SDL_MapRGB(m_screen->format, 0xff, 0x00, 0xff) )
 {
-    if(bbc::debug) std::cerr << "Brainblast::Brainblast()\n";
+    if(bbc::debug) std::cerr << "Brainblast::Brainblast() Videomode(" << VIDEOX << "," << VIDEOY << ")\n";
 
     if(SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER) < 0)
     {
@@ -150,8 +153,9 @@ Brainblast::makeLevel(int lvl)
 
     if(lvl == 0) 
     {
-        m_currentLvl = new Puzzle(PWIDTH,PHEIGHT);
-        placeBricksRandom();
+        m_currentLvl = new Puzzle();
+        // placeBricksRandom();
+#warning "Should implement placeBricksRandom"
         return true;
     }
 
@@ -173,14 +177,14 @@ Brainblast::makeLevel(int lvl)
         }
     
         // Parse Level File
-        int val; int i=0; int tmp;
+        int val; int i=0; int tmp; int width=0; int height=0;
         while( in >> val ) 
         { 
-            if( i==0 ) { PWIDTH = val; }
+            if( i==0 ) { width = val; }
             else if ( i==1 ) 
             { 
-                PHEIGHT = val; 
-                m_currentLvl = new Puzzle( PHEIGHT, PWIDTH );
+                height = val; 
+                m_currentLvl = new Puzzle( height, width );
             }
             else 
             {
@@ -318,14 +322,6 @@ Brainblast::drawBrickAtIdx(SDL_Surface* s, Puzzle* p, SDL_Rect* dim, int idx, bo
 }
 
 void
-Brainblast::placeBricksRandom(int numberOfBricks)
-{
-  
-    // Make a permutation of the placement
-
-}
-
-void
 Brainblast::drawAllBricks(SDL_Surface* s, Puzzle* p, SDL_Rect* dim, bool solution)
 {
     if(bbc::debug) std::cerr << "Brainblast::drawAllBricks()\n";
@@ -390,7 +386,7 @@ Brainblast::initGameKyra()
 	GLASSERT( papriceRes );
 
 	// Create the paprice sprite and add it to the tree
-	KrSprite* paprice = new KrSprite( papriceRes );
+	BrainSprite* paprice = new BrainSprite( papriceRes );
 	paprice->SetNodeId(BB_PAPRICE);
 	paprice->SetPos( random.Rand(VIDEOX), 0);
 	m_engine->Tree()->AddNode( 0, paprice );
@@ -406,19 +402,19 @@ Brainblast::initGame(int lvl)
 
 //    SDL_WM_ToggleFullScreen(m_screen);
 
-    drawAllBricks(m_screen, m_currentLvl, m_field1, true);
-    drawBoard(m_screen, m_field1, m_currentLvl, PWIDTH, PHEIGHT);
+//     drawAllBricks(m_screen, m_currentLvl, m_field1, true);
+//     drawBoard(m_screen, m_field1, m_currentLvl, PWIDTH, PHEIGHT);
 
-    drawAllBricks(m_screen, m_currentLvl, m_field2, true);
-    drawBoard(m_screen, m_field2, m_currentLvl, PWIDTH, PHEIGHT);
+//     drawAllBricks(m_screen, m_currentLvl, m_field2, true);
+//     drawBoard(m_screen, m_field2, m_currentLvl, PWIDTH, PHEIGHT);
   
-    SDL_Delay(3000); 
+//     SDL_Delay(3000); 
 
-    drawAllBricks(m_screen, m_currentLvl, m_field1);
-    drawBoard(m_screen, m_field1, m_currentLvl, PWIDTH, PHEIGHT);
+//     drawAllBricks(m_screen, m_currentLvl, m_field1);
+//     drawBoard(m_screen, m_field1, m_currentLvl, PWIDTH, PHEIGHT);
 
-    drawAllBricks(m_screen, m_currentLvl, m_field2);
-    drawBoard(m_screen, m_field2, m_currentLvl, PWIDTH, PHEIGHT);
+//     drawAllBricks(m_screen, m_currentLvl, m_field2);
+//     drawBoard(m_screen, m_field2, m_currentLvl, PWIDTH, PHEIGHT);
 }
 
 int Brainblast::eventLoop()
@@ -444,18 +440,12 @@ int Brainblast::eventLoop()
         
         case SDL_TIMER_EVENT:
         {
-			KrSprite* paprice = static_cast<KrSprite*>(m_engine->Tree()->FindNodeById( BB_PAPRICE ));
+			static int t = 0;
+			const float a = 1.01;
+			BrainSprite* paprice = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_PAPRICE ));
 			if( paprice )
 			{
-//				paprice->DoStep();
-				Rectangle2I rect;
-				Rectangle2I screen;
-				screen.Set(0,-100,VIDEOX,VIDEOY);
-				paprice->QueryBoundingBox(&rect);
-				if( screen.Contains(rect) )
-				{
-					paprice->SetPos( paprice->X(), paprice->Y()+3 );
-				}
+				paprice->move();
 				printf("pos = %i,%i\n", paprice->X(), paprice->Y());
 			}
 			m_engine->Draw();

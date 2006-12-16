@@ -21,22 +21,20 @@
 
 using namespace std;
 
+namespace brain
+{
+
 //! The total number of different brick types (different symbols)
-const int NOF_BRICK_TYPES = 5;
-
-//! The width in number of bricks of the puzzle (X)
-int PWIDTH = 5;
-
-//! The height in number of bricks of the puzzle (Y)
-int PHEIGHT = 5;
-
+	const int NOF_BRICK_TYPES = 5;
+	
 //! The vide mode to use
-const int VIDEOX = 640;
-const int VIDEOY = 480;
-const int VIDEOBITS = 32;
-
+	const int VIDEOX = 640;
+	const int VIDEOY = 480;
+	const int VIDEOBITS = 32;
+	
 //! Margin to be used in board/field layout
-int MARGIN = 10;
+	const int MARGIN = 10;
+}
 
 int main(int argc, char *argv[]);
 
@@ -84,8 +82,6 @@ private:
     void drawBrickAtIdx(SDL_Surface* s, Puzzle* p, SDL_Rect* dim, int idx, bool solution=false);
 
     void drawAllBricks(SDL_Surface* s, Puzzle* p, SDL_Rect* dim, bool solution=false);
-
-    void placeBricksRandom(int numberOfBricks = (PWIDTH*PHEIGHT)/2);
 
     //! Sets up a new game
     void initGame(int lvl=1);

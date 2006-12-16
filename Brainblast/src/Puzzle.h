@@ -9,12 +9,13 @@
 #define PUZZLE_H
 
 #include "Brick.h"
+#include "Field.h"
 
-class Puzzle
+class Puzzle : public Field
 {
  public:
 
-  Puzzle(int width_, int height_);
+  Puzzle(int width=5, int height=5);
   Puzzle(const Puzzle& pz);
   ~Puzzle();
 
@@ -32,11 +33,8 @@ class Puzzle
 
  private:
   
-  unsigned int m_width;
-  unsigned int m_height;
-
-  Brick** solution;
-  Brick** current;
+  Brick** m_solution;
+  Brick** m_current;
 
 };
 
