@@ -77,7 +77,7 @@ private:
 
     void createBricks();
 
-    void drawBoard(SDL_Surface* s, SDL_Rect* dim, Puzzle* p, int xTiles, int yTiles);
+    void drawBoard(SDL_Surface* s, SDL_Rect* dim, Puzzle* p);
 
     void drawBrickAtIdx(SDL_Surface* s, Puzzle* p, SDL_Rect* dim, int idx, bool solution=false);
 

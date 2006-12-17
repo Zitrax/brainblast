@@ -26,6 +26,9 @@ public:
 
     void move();
 
+    void left() { SetPos(X()-5,Y()); }
+    void right() { SetPos(X()+5,Y()); }
+
 private:
 
     int m_speed;

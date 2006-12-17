@@ -229,7 +229,7 @@ Brainblast::createBricks()
 }
 
 void
-Brainblast::drawBoard(SDL_Surface* s, SDL_Rect* dim, Puzzle* p, int xTiles, int yTiles)
+Brainblast::drawBoard(SDL_Surface* s, SDL_Rect* dim, Puzzle* p)
 {
     if(bbc::debug) std::cerr << "Brainblast::drawBoard()\n";
 
@@ -249,10 +249,10 @@ Brainblast::drawBoard(SDL_Surface* s, SDL_Rect* dim, Puzzle* p, int xTiles, int 
 //   int xSpace = dim->w / p->getWidth();
 //   int ySpace = dim->h / p->getHeight();
 
-    for(int i=0; i<=yTiles; i++)     
+    for(int i=0; i<=p->getHeight(); i++)     
         bbc::line(s, dim->x, dim->y+i*ySpace, dim->x+dim->w, dim->y+i*ySpace, magenta);
 
-    for(int i=0; i<=xTiles; i++) 
+    for(int i=0; i<=p->getWidth(); i++) 
         bbc::line(s, dim->x+i*xSpace, dim->y, dim->x+i*xSpace, dim->y+dim->h, yellow);
 
     /* Unlock the screen if needed */
@@ -349,6 +349,7 @@ Brainblast::checkSolution(Puzzle* puzzle)
 void 
 Brainblast::startGame()
 {
+	// initGame();
     initGameKyra();
     eventLoop();
 }
@@ -390,6 +391,17 @@ Brainblast::initGameKyra()
 	paprice->SetNodeId(BB_PAPRICE);
 	paprice->SetPos( random.Rand(VIDEOX), 0);
 	m_engine->Tree()->AddNode( 0, paprice );
+
+	// Get the STAR resource
+	KrSpriteResource* starRes = m_engine->Vault()->GetSpriteResource( BB_STAR );
+	GLASSERT( starRes );
+
+	// Create the paprice sprite and add it to the tree
+	BrainSprite* star = new BrainSprite( starRes );
+	star->SetNodeId(BB_STAR);
+	star->SetPos( random.Rand(VIDEOX), 0);
+	m_engine->Tree()->AddNode( 0, star );
+
 }
 
 void
@@ -400,21 +412,21 @@ Brainblast::initGame(int lvl)
     if( !makeLevel(lvl) )
         exit(1);
 
-//    SDL_WM_ToggleFullScreen(m_screen);
+    SDL_WM_ToggleFullScreen(m_screen);
 
-//     drawAllBricks(m_screen, m_currentLvl, m_field1, true);
-//     drawBoard(m_screen, m_field1, m_currentLvl, PWIDTH, PHEIGHT);
+    drawAllBricks(m_screen, m_currentLvl, m_field1, true);
+    drawBoard(m_screen, m_field1, m_currentLvl);
 
-//     drawAllBricks(m_screen, m_currentLvl, m_field2, true);
-//     drawBoard(m_screen, m_field2, m_currentLvl, PWIDTH, PHEIGHT);
+    drawAllBricks(m_screen, m_currentLvl, m_field2, true);
+    drawBoard(m_screen, m_field2, m_currentLvl);
   
-//     SDL_Delay(3000); 
+    SDL_Delay(3000); 
 
-//     drawAllBricks(m_screen, m_currentLvl, m_field1);
-//     drawBoard(m_screen, m_field1, m_currentLvl, PWIDTH, PHEIGHT);
+    drawAllBricks(m_screen, m_currentLvl, m_field1);
+    drawBoard(m_screen, m_field1, m_currentLvl);
 
-//     drawAllBricks(m_screen, m_currentLvl, m_field2);
-//     drawBoard(m_screen, m_field2, m_currentLvl, PWIDTH, PHEIGHT);
+    drawAllBricks(m_screen, m_currentLvl, m_field2);
+    drawBoard(m_screen, m_field2, m_currentLvl);
 }
 
 int Brainblast::eventLoop()
@@ -425,6 +437,9 @@ int Brainblast::eventLoop()
 	bool done = false;
     // Start timing!
 	SDL_SetTimer( TIMER_INTERVAL, TimerCallback );
+
+	bool keysHeld[323] = {false};
+
     while( !done && SDL_WaitEvent(&event) )
 	{
 		if ( event.type == SDL_QUIT )
@@ -433,20 +448,23 @@ int Brainblast::eventLoop()
 		switch(event.type)
 		{
         case SDL_KEYDOWN:
-        {
-            done = true;
-        }
-        break;
-        
+			keysHeld[event.key.keysym.sym] = true;
+			break;
+			
+		case SDL_KEYUP:
+			keysHeld[event.key.keysym.sym] = false;
+			break;
+			
         case SDL_TIMER_EVENT:
         {
 			static int t = 0;
 			const float a = 1.01;
 			BrainSprite* paprice = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_PAPRICE ));
-			if( paprice )
+			BrainSprite* star = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_STAR ));
+			if( paprice && star )
 			{
 				paprice->move();
-				printf("pos = %i,%i\n", paprice->X(), paprice->Y());
+				star->move();
 			}
 			m_engine->Draw();
 
@@ -456,7 +474,19 @@ int Brainblast::eventLoop()
         default:
             break;
 		}
-        
+
+		if( keysHeld[SDLK_ESCAPE] )
+			done = true;
+		if( keysHeld[SDLK_LEFT] )
+		{
+			BrainSprite* star = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_STAR ));
+			star->left();
+		}
+		if( keysHeld[SDLK_RIGHT] )
+		{
+			BrainSprite* star = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_STAR ));
+			star->right();
+		}
 	}
     
     return 0;
