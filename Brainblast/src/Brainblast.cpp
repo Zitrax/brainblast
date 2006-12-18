@@ -349,6 +349,8 @@ Brainblast::checkSolution(Puzzle* puzzle)
 void 
 Brainblast::startGame()
 {
+//     SDL_WM_ToggleFullScreen(m_screen);
+//     SDL_Delay(3000); 
 	// initGame();
     initGameKyra();
     eventLoop();
@@ -401,7 +403,6 @@ Brainblast::initGameKyra()
 	star->SetNodeId(BB_STAR);
 	star->SetPos( random.Rand(VIDEOX), 0);
 	m_engine->Tree()->AddNode( 0, star );
-
 }
 
 void
@@ -486,6 +487,11 @@ int Brainblast::eventLoop()
 		{
 			BrainSprite* star = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_STAR ));
 			star->right();
+		}
+		if( keysHeld[SDLK_UP] )
+		{
+			BrainSprite* star = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_STAR ));
+			star->jump();
 		}
 	}
     
