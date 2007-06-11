@@ -3,4 +3,5 @@
 
 #pragma GCC system_header
 
-#include "../../kyra/engine/kyra.h"
+#include "Kyra/kyra.h"
+

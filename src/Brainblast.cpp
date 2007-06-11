@@ -8,6 +8,8 @@
 
 #include "../images/bb.h"
 
+#include "grinliz/glrandom.h"
+
 using namespace grinliz;
 using namespace brain;
 
@@ -366,7 +368,7 @@ Uint32 TimerCallback(Uint32 /*interval*/)
 bool 
 Brainblast::initGameKyra()
 {
-    Random random(time(0));
+	Random random(time(0));
     m_engine = new KrEngine( m_screen );
     m_engine->Draw(); 
 

@@ -5,14 +5,19 @@ CFLAGS   += -I../include
 
 SDL_LIBS  = $(shell sdl-config --libs)
 SDL_FLAGS = $(shell sdl-config --cflags)
-KYRALIB   = ../../kyra/engine/libkyra.a
+KYRALIB   = /usr/local/lib/libkyra.a
+IMAGES    = ../images
 
 OBJECTS = bbc.o Brainblast.o Brick.o Puzzle.o Field.o BrainSprite.o main.o
 
 all: Brainblast
 
+$(IMAGES)/bb.h:
+	cd $(IMAGES) && \
+	krencoder -pBB_ bb.h bricks.xml
+
 Brainblast: $(OBJECTS)
-	$(GCC) -o Brainblast $(OBJECTS) $(KYRALIB) $(SDL_LIBS) 
+	$(GCC) -o $@ $(OBJECTS) $(KYRALIB) -lengine $(SDL_LIBS) 
 
 $(OBJECTS): %.o: %.cpp
 	$(GCC) $(CFLAGS) $(SDL_FLAGS) -c $<
@@ -21,7 +26,9 @@ remake:
 	make clean; make
 
 clean:
-	rm -rfv *.o Brainblast *~
+	rm -rfv *.o Brainblast *~ \
+	$(IMAGES)/bb.h $(IMAGES)/bb.dat
+
 # DO NOT DELETE
 
 bbc.o: bbc.h
