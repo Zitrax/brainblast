@@ -1,0 +1,3 @@
+To relocate the svn url you can issue the following command:
+
+svn switch --relocate svn+ssh://192.168.1.5/svn/projects/Brainblast svn+ssh://192.168.1.2/svn/projects/Brainblast
