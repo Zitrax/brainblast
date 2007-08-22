@@ -5,7 +5,6 @@ CFLAGS   += -I../include
 
 SDL_LIBS  = $(shell sdl-config --libs)
 SDL_FLAGS = $(shell sdl-config --cflags)
-KYRALIB   = /usr/local/lib/libkyra.a
 IMAGES    = ../images
 
 OBJECTS = bbc.o Brainblast.o Brick.o Puzzle.o Field.o BrainSprite.o main.o
@@ -17,7 +16,7 @@ $(IMAGES)/bb.h:
 	krencoder -pBB_ bb.h bricks.xml
 
 Brainblast: $(OBJECTS)
-	$(GCC) -o $@ $(OBJECTS) $(KYRALIB) -lengine $(SDL_LIBS) 
+	$(GCC) -o $@ $(OBJECTS) -lkyra -lengine $(SDL_LIBS) 
 
 $(OBJECTS): %.o: %.cpp
 	$(GCC) $(CFLAGS) $(SDL_FLAGS) -c $<
