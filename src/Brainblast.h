@@ -56,7 +56,7 @@ public:
 
     Brainblast& operator=(const Brainblast& bb);
 
-	static BrainBlast* instance() { return s_instance; }
+	static Brainblast* instance() { return s_instance; }
 
     //! Check if a solution is correct
     bool checkSolution(Puzzle* puzzle);
@@ -73,7 +73,7 @@ public:
 	
 private:
 
-	static BrainBlast* s_instance;
+	static Brainblast* s_instance;
 
     Puzzle* m_currentLvl;
 

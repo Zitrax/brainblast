@@ -13,8 +13,9 @@
 using namespace grinliz;
 using namespace brain;
 
-Brainblast::Brainblast() : s_instance(this),
-						   m_currentLvl(0),
+Brainblast* Brainblast::s_instance;
+
+Brainblast::Brainblast() : m_currentLvl(0),
                            m_screen( SDL_SetVideoMode( VIDEOX, VIDEOY, VIDEOBITS, SDL_HWSURFACE ) ),
                            m_field1(0),
                            m_field2(0),
@@ -31,6 +32,8 @@ Brainblast::Brainblast() : s_instance(this),
                            magenta( SDL_MapRGB(m_screen->format, 0xff, 0x00, 0xff) )
 {
     if(bbc::debug) std::cerr << "Brainblast::Brainblast() Videomode(" << VIDEOX << "," << VIDEOY << ")\n";
+
+	s_instance = this;
 
     if(SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER) < 0)
     {
