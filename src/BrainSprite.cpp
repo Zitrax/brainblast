@@ -33,21 +33,36 @@ void BrainSprite::move()
         m_y_speed = -0.5*m_y_speed;
         
         if( fabs(m_y_speed) < 4.0 )
-	  {
-	    m_jumping = false;
+        {
+            m_jumping = false;
             m_y_speed = 0;
-	  }
+        }
     }
-
+    
     fprintf(stderr,"\rv=%f",m_y_speed);
 }
 
 void BrainSprite::jump()
 {
-  if( !m_jumping ) 
+    if( !m_jumping ) 
     {
-      m_jumping=true;
-      m_y_speed = -20; 
+        m_jumping=true;
+        m_y_speed = -20; 
     }
 }
  
+
+void BrainSprite::pickUp(BrainSprite* bs)
+{
+    if( !m_carrying )
+    {
+        m_carrying = true;
+        bs->SetPos(-30,-30);
+    }
+}
+
+
+void BrainSprite::drop()
+{
+    m_carrying = false;
+}

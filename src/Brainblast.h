@@ -31,8 +31,8 @@ namespace brain
 	const int NOF_BRICK_TYPES = 5;
 	
 //! The vide mode to use
-	const int VIDEOX = 640;
-	const int VIDEOY = 480;
+	const int VIDEOX = 1024;
+	const int VIDEOY = 768;
 	const int VIDEOBITS = 32;
 	
 //! Margin to be used in board/field layout
@@ -56,6 +56,8 @@ public:
 
     Brainblast& operator=(const Brainblast& bb);
 
+	static BrainBlast* instance() { return s_instance; }
+
     //! Check if a solution is correct
     bool checkSolution(Puzzle* puzzle);
 
@@ -64,7 +66,15 @@ public:
 
 	void createStar();
 
+	/**
+	 * 
+	 */
+	BrainSprite* reparentSprite(BrainSprite* bs, BrainSprite* parent);
+	
 private:
+
+	static BrainBlast* s_instance;
+
     Puzzle* m_currentLvl;
 
     SDL_Surface* m_screen;

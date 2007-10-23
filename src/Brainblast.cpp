@@ -13,7 +13,8 @@
 using namespace grinliz;
 using namespace brain;
 
-Brainblast::Brainblast() : m_currentLvl(0),
+Brainblast::Brainblast() : s_instance(this),
+						   m_currentLvl(0),
                            m_screen( SDL_SetVideoMode( VIDEOX, VIDEOY, VIDEOBITS, SDL_HWSURFACE ) ),
                            m_field1(0),
                            m_field2(0),
@@ -424,7 +425,7 @@ Brainblast::initGame(int lvl)
 		return false;
 	}
 
-    SDL_WM_ToggleFullScreen(m_screen);
+//    SDL_WM_ToggleFullScreen(m_screen);
 
     drawAllBricks(m_screen, m_currentLvl, m_field1, true);
     drawBoard(m_screen, m_field1, m_currentLvl);
@@ -473,7 +474,7 @@ int Brainblast::eventLoop()
         {
 // 			static int t = 0;
 // 			const float a = 1.01;
-// 			BrainSprite* paprice = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_PAPRICE ));
+ 			BrainSprite* paprice = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_PAPRICE ));
 // 			BrainSprite* star = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_STAR ));
 // 			if( paprice && star )
 // 			{
@@ -485,6 +486,21 @@ int Brainblast::eventLoop()
 			std::vector<BrainSprite*>::iterator end = m_sprites.end();
 			for(it = m_sprites.begin(); it!=end; ++it)
 				(*it)->move();
+
+			m_engine->Tree()->Walk();
+
+			// Detect collisions
+			std::vector<KrImage*> collides;
+			if( m_engine->Tree()->CheckAllCollision(paprice,&collides) )
+			{
+				//printf("Collision!\n");
+				std::vector<KrImage*>::iterator cit;
+				std::vector<KrImage*>::iterator cend = collides.end();
+				for(cit = collides.begin(); cit != cend; ++cit)
+				{
+					paprice->pickUp(reparentSprite((BrainSprite*)*cit,paprice));
+				}
+			}
 
 			m_engine->Draw();
 
@@ -524,6 +540,16 @@ void Brainblast::handleKeyEvent(SDL_KeyboardEvent* key)
     assert(key);
     
     printf( "%s\n", SDL_GetKeyName(key->keysym.sym));
+}
+
+BrainSprite* Brainblast::reparentSprite(BrainSprite* bs, BrainSprite* parent)
+{
+	BrainSprite* clone = static_cast<BrainSprite*>(bs->Clone());
+	m_engine->Tree()->AddNode(parent,clone);
+    m_sprites.erase(find(m_sprites.begin(),m_sprites.end(),bs));
+    m_sprites.push_back(clone);
+    m_engine->Tree()->DeleteNode(bs);
+	return clone;
 }
 
 /* Definition of a level file ...
