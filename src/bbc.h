@@ -13,6 +13,8 @@
 
 #include <wSDL.h>
 
+class Brainblast;
+
 // Should change to use C++ versions of these
 #define max(a,b) (((a) > (b)) ? (a) : (b))
 #define min(a,b) (((a) < (b)) ? (a) : (b))
@@ -30,6 +32,8 @@ namespace bbc{
   enum{ERROR, NOTUSED};
 
   extern bool ERRFLAG;
+
+  extern Brainblast* bb;
 
   struct error{
     std::string msg;

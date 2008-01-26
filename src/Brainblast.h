@@ -95,10 +95,9 @@ private:
     void createBricks();
 
     void drawBoard(SDL_Surface* s, SDL_Rect* dim, Puzzle* p);
-
     void drawBrickAtIdx(SDL_Surface* s, Puzzle* p, SDL_Rect* dim, int idx, bool solution=false);
-
     void drawAllBricks(SDL_Surface* s, Puzzle* p, SDL_Rect* dim, bool solution=false);
+	void drawBoards();
 
     //! Sets up a new game
     bool initGame(int lvl=1);

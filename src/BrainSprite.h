@@ -3,22 +3,26 @@
 #define BRAINSPRITE_H
 
 #include <wkyra.h>
+#include <string>
+#include <iostream>
 
 class BrainSprite : public KrSprite
 {
 public:
-    BrainSprite(KrSpriteResource* res) : 
+BrainSprite(KrSpriteResource* res, std::string name) : 
         KrSprite(res), 
+        m_name(name),
         m_x_speed(0.0),
         m_y_speed(1.0),
         m_time(0),
         m_acc(1.0),
         m_jumping(true),
-        m_carrying(false){}
-    virtual ~BrainSprite(){}
+        m_child(0){}
+        virtual ~BrainSprite(){std::cout << "BrainSprite destroyed " << m_name << "\n"; }
     
-//     int speed() const { return m_speed; }
-//     void setSpeed(int speed) { m_speed=speed;}
+    int speedX() const { return m_x_speed; }
+    int speedY() const { return m_y_speed; }
+    void setSpeed(int x, int y) { m_x_speed=x; m_y_speed=y; }
     void stop() { m_x_speed=0; m_y_speed=0; }
     
     int time() const { return m_time; }
@@ -29,8 +33,8 @@ public:
     
     void move();
     
-    void left() { SetPos(X()-5,Y()); }
-    void right() { SetPos(X()+5,Y()); }
+    void left()  { m_x_speed = -5; }
+    void right() { m_x_speed =  5; }
 
     void jump();
 
@@ -40,8 +44,13 @@ public:
      */
     void pickUp(BrainSprite* bs);
     void drop();
+    bool isCarrying() {return m_child!=0;}
+
+    KrImNode* Clone();
 
 private:
+
+    std::string m_name;
 
     double m_x_speed;
     double m_y_speed;
@@ -50,7 +59,8 @@ private:
     double m_acc;
 
     bool m_jumping;
-    bool m_carrying;
+
+    BrainSprite* m_child;
 
 };
 

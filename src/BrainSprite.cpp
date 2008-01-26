@@ -7,7 +7,7 @@ using namespace brain;
 
 void BrainSprite::move()
 {
-    if( m_x_speed!=0 && m_y_speed!=0 ) return;
+//    if( m_x_speed!=0 && m_y_speed!=0 ) return;
 
     m_time++;
 
@@ -36,10 +36,12 @@ void BrainSprite::move()
         {
             m_jumping = false;
             m_y_speed = 0;
+            m_x_speed = 0;
         }
     }
-    
-    fprintf(stderr,"\rv=%f",m_y_speed);
+
+    if( m_name == "paprice" )
+        fprintf(stderr,"\rv=%f (%i)(%p)(%s)",m_y_speed,m_child!=0,this,m_name.c_str());
 }
 
 void BrainSprite::jump()
@@ -50,19 +52,41 @@ void BrainSprite::jump()
         m_y_speed = -20; 
     }
 }
- 
+
 
 void BrainSprite::pickUp(BrainSprite* bs)
 {
-    if( !m_carrying )
+    if( !m_child )
     {
-        m_carrying = true;
-        bs->SetPos(-30,-30);
+        bs->DeltaPos(-30,-30);
+        m_child = bs;
     }
 }
 
-
 void BrainSprite::drop()
 {
-    m_carrying = false;
+    if( m_child ) {
+        BrainSprite* clone = bbc::bb->reparentSprite(m_child,0);
+        clone->SetPos(X()-30,Y()-30);
+        clone->setAcc(m_acc);
+        clone->setSpeed(m_x_speed,m_y_speed);
+        m_child = 0;
+    }
+}
+
+KrImNode* BrainSprite::Clone()
+{
+    BrainSprite* clone = new BrainSprite( SpriteResource(), "cloned" );
+ 	clone->SetAction( GetAction()->Id() );
+ 	clone->SetFrame( Frame() );
+
+    // Local variables
+    clone->m_x_speed  = this->m_x_speed;
+    clone->m_y_speed  = this->m_y_speed;
+    clone->m_time     = this->m_time;
+    clone->m_acc      = this->m_acc;
+    clone->m_jumping  = this->m_jumping;
+    clone->m_child    = this->m_child;
+
+	return clone;
 }

@@ -228,7 +228,7 @@ Brainblast::createBricks()
 void
 Brainblast::drawBoard(SDL_Surface* s, SDL_Rect* dim, Puzzle* p)
 {
-    if(bbc::debug) std::cerr << "Brainblast::drawBoard()\n";
+//    if(bbc::debug) std::cerr << "Brainblast::drawBoard()\n";
 
     assert(s); 
     assert(dim);
@@ -267,7 +267,7 @@ Brainblast::drawBoard(SDL_Surface* s, SDL_Rect* dim, Puzzle* p)
 void
 Brainblast::drawBrickAtIdx(SDL_Surface* s, Puzzle* p, SDL_Rect* dim, int idx, bool solution)
 {
-    if(bbc::debug) std::cerr << "Brainblast::drawBrickAtIdx(" << idx << ")\n";
+//    if(bbc::debug) std::cerr << "Brainblast::drawBrickAtIdx(" << idx << ")\n";
     
     assert(s);
     assert(p);
@@ -321,7 +321,7 @@ Brainblast::drawBrickAtIdx(SDL_Surface* s, Puzzle* p, SDL_Rect* dim, int idx, bo
 void
 Brainblast::drawAllBricks(SDL_Surface* s, Puzzle* p, SDL_Rect* dim, bool solution)
 {
-    if(bbc::debug) std::cerr << "Brainblast::drawAllBricks()\n";
+//    if(bbc::debug) std::cerr << "Brainblast::drawAllBricks()\n";
   
     assert(s); 
     assert(p);
@@ -391,7 +391,7 @@ Brainblast::initGameKyra()
 	GLASSERT( papriceRes );
 
 	// Create the paprice sprite and add it to the tree
-	BrainSprite* paprice = new BrainSprite( papriceRes );
+	BrainSprite* paprice = new BrainSprite( papriceRes, "paprice" );
 	paprice->SetNodeId(BB_PAPRICE);
 	paprice->SetPos( random.Rand(VIDEOX), 0);
 	m_engine->Tree()->AddNode( 0, paprice );
@@ -410,7 +410,7 @@ void Brainblast::createStar()
 	GLASSERT( starRes );
 
 	// Create the paprice sprite and add it to the tree
-	BrainSprite* star = new BrainSprite( starRes );
+	BrainSprite* star = new BrainSprite( starRes, "star" );
 	star->SetNodeId(BB_STAR);
 	star->SetPos( random.Rand(VIDEOX), 0);
 	m_engine->Tree()->AddNode( 0, star );
@@ -438,13 +438,18 @@ Brainblast::initGame(int lvl)
   
     SDL_Delay(3000); 
 
-    drawAllBricks(m_screen, m_currentLvl, m_field1);
-    drawBoard(m_screen, m_field1, m_currentLvl);
-
-    drawAllBricks(m_screen, m_currentLvl, m_field2);
-    drawBoard(m_screen, m_field2, m_currentLvl);
+	drawBoards();
 
 	return true;
+}
+
+void Brainblast::drawBoards()
+{
+    drawAllBricks(m_screen, m_currentLvl, m_field1);
+    drawBoard(m_screen, m_field1, m_currentLvl);
+	
+    drawAllBricks(m_screen, m_currentLvl, m_field2);
+    drawBoard(m_screen, m_field2, m_currentLvl);
 }
 
 int Brainblast::eventLoop()
@@ -467,6 +472,7 @@ int Brainblast::eventLoop()
 		{
         case SDL_KEYDOWN:
 			keysHeld[event.key.keysym.sym] = true;
+			printf( "%s\n", SDL_GetKeyName(event.key.keysym.sym));
 			break;
 			
 		case SDL_KEYUP:
@@ -484,6 +490,8 @@ int Brainblast::eventLoop()
 // 				paprice->move();
 // 				star->move();
 // 			}
+
+			drawBoards();
 			
 			std::vector<BrainSprite*>::iterator it;
 			std::vector<BrainSprite*>::iterator end = m_sprites.end();
@@ -493,15 +501,17 @@ int Brainblast::eventLoop()
 			m_engine->Tree()->Walk();
 
 			// Detect collisions
-			std::vector<KrImage*> collides;
-			if( m_engine->Tree()->CheckAllCollision(paprice,&collides) )
-			{
-				//printf("Collision!\n");
-				std::vector<KrImage*>::iterator cit;
-				std::vector<KrImage*>::iterator cend = collides.end();
-				for(cit = collides.begin(); cit != cend; ++cit)
-				{
-					paprice->pickUp(reparentSprite((BrainSprite*)*cit,paprice));
+			if(!paprice->isCarrying() && keysHeld[SDLK_p] ) {
+				std::vector<KrImage*> collides;
+				if( m_engine->Tree()->CheckAllCollision(paprice,&collides) )
+				{  
+					printf("Collision!\n");
+					std::vector<KrImage*>::iterator cit;
+					std::vector<KrImage*>::iterator cend = collides.end();
+					for(cit = collides.begin(); cit != cend; ++cit)
+					{
+						paprice->pickUp(reparentSprite((BrainSprite*)*cit,paprice));
+					}
 				}
 			}
 
@@ -533,6 +543,11 @@ int Brainblast::eventLoop()
 		}
 		if( keysHeld[SDLK_F1] )
 			createStar();
+		if( keysHeld[SDLK_d] ) 
+		{
+			BrainSprite* paprice = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_PAPRICE ));
+			paprice->drop();
+		}
 	}
     
     return 0;
@@ -549,8 +564,11 @@ BrainSprite* Brainblast::reparentSprite(BrainSprite* bs, BrainSprite* parent)
 {
 	BrainSprite* clone = static_cast<BrainSprite*>(bs->Clone());
 	m_engine->Tree()->AddNode(parent,clone);
-    m_sprites.erase(find(m_sprites.begin(),m_sprites.end(),bs));
-    m_sprites.push_back(clone);
+	std::vector<BrainSprite*>::iterator it = find(m_sprites.begin(),m_sprites.end(),bs);
+	if( it != m_sprites.end() )
+		m_sprites.erase(find(m_sprites.begin(),m_sprites.end(),bs));
+	if( !parent )
+		m_sprites.push_back(clone);
     m_engine->Tree()->DeleteNode(bs);
 	return clone;
 }
