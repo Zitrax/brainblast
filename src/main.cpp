@@ -15,7 +15,7 @@ int main(int /*argc*/, char* /*argv*/ [])
 		exit( 254 );
 	}
 	
-	bbc::bb = new Brainblast();
-	bbc::bb->startGame();
-    zap(bbc::bb);
+	Brainblast* bb = new Brainblast();
+	bb->startGame();
+    zap(bb);
 }

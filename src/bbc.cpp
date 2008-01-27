@@ -9,7 +9,6 @@ namespace bbc {
   
   int debug = 1;
   bool ERRFLAG = false;
-  Brainblast* bb = 0;
 
   //----------------------------------------------------------
 

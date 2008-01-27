@@ -66,7 +66,7 @@ void BrainSprite::pickUp(BrainSprite* bs)
 void BrainSprite::drop()
 {
     if( m_child ) {
-        BrainSprite* clone = bbc::bb->reparentSprite(m_child,0);
+        BrainSprite* clone = Brainblast::instance()->reparentSprite(m_child,0);
         clone->SetPos(X()-30,Y()-30);
         clone->setAcc(m_acc);
         clone->setSpeed(m_x_speed,m_y_speed);

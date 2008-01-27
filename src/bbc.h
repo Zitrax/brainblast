@@ -33,8 +33,6 @@ namespace bbc{
 
   extern bool ERRFLAG;
 
-  extern Brainblast* bb;
-
   struct error{
     std::string msg;
     error(std::string s) : msg(s){}

@@ -15,7 +15,8 @@ using namespace brain;
 
 Brainblast* Brainblast::s_instance;
 
-Brainblast::Brainblast() : m_currentLvl(0),
+Brainblast::Brainblast() : m_sound(new BrainSound),
+						   m_currentLvl(0),
                            m_screen( SDL_SetVideoMode( VIDEOX, VIDEOY, VIDEOBITS, SDL_HWSURFACE ) ),
                            m_field1(0),
                            m_field2(0),
@@ -449,9 +450,16 @@ Brainblast::initGame(int lvl)
     drawAllBricks(m_screen, m_currentLvl, m_field2, true);
     drawBoard(m_screen, m_field2, m_currentLvl);
   
-    SDL_Delay(3000); 
+    SDL_Delay(1000); 
 
 	drawBoards();
+
+	// Start music
+	if( !(m_sound->initializeSound() &&
+		  m_sound->loadMusic("../music/sneakerfox_-_autumn_colors.mp3") &&
+		  m_sound->playMusic()) )
+		printf("ERROR: Could not start music\n");
+	
 
 	return true;
 }
@@ -486,6 +494,10 @@ int Brainblast::eventLoop()
         case SDL_KEYDOWN:
 			keysHeld[event.key.keysym.sym] = true;
 			printf( "%s\n", SDL_GetKeyName(event.key.keysym.sym));
+
+			if( event.key.keysym.sym == SDLK_m )
+				m_sound->toggleMusic();
+
 			break;
 			
 		case SDL_KEYUP:

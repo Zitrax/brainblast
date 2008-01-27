@@ -20,6 +20,7 @@
 #include "Puzzle.h"
 #include "Brick.h"
 #include "BrainSprite.h"
+#include "BrainSound.h"
 
 using namespace std;
 
@@ -73,6 +74,8 @@ public:
 private:
 
 	static Brainblast* s_instance;
+
+	BrainSound* m_sound;
 
     Puzzle* m_currentLvl;
 
