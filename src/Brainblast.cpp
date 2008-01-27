@@ -21,6 +21,8 @@ Brainblast::Brainblast() : m_currentLvl(0),
                            m_field2(0),
                            m_bricks(0),
 						   m_engine(0),
+						   m_bgTree(0),
+						   m_fgTree(0),
 						   m_sprites(0),
                            red    ( SDL_MapRGB(m_screen->format, 0xff, 0x00, 0x00) ),
                            blue   ( SDL_MapRGB(m_screen->format, 0x00, 0x00, 0xff) ),
@@ -69,6 +71,8 @@ Brainblast::Brainblast(const Brainblast& bb) : m_currentLvl(0),
                                                m_field2(0),
                                                m_bricks(0),
 											   m_engine(0),
+											   m_bgTree(0),
+											   m_fgTree(0),
 											   m_sprites(0),
                                                red(bb.red),
                                                blue(bb.blue),
@@ -79,6 +83,7 @@ Brainblast::Brainblast(const Brainblast& bb) : m_currentLvl(0),
                                                cyan(bb.cyan),
                                                magenta(bb.magenta)
 {
+#warning "Whats the point of this really?"
   
     m_currentLvl = new Puzzle( *bb.m_currentLvl );
     assert( m_currentLvl );
@@ -97,6 +102,7 @@ Brainblast::Brainblast(const Brainblast& bb) : m_currentLvl(0),
 Brainblast&
 Brainblast::operator=(const Brainblast& bb)
 {
+#warning "Whats the point of this really?"
     // Important to clean up the old memory before
     // assigning the new ones
     cleanup();
@@ -138,9 +144,11 @@ Brainblast::cleanup()
     // zap( m_screen );
 
     zap( m_currentLvl );
-    zap(m_field1); 
-	zap(m_field2);
+    zap( m_field1 ); 
+	zap( m_field2 );
 	zap( m_engine );
+	zap( m_bgTree );
+	zap( m_fgTree );
 }
 
 bool
@@ -372,7 +380,8 @@ Uint32 TimerCallback(Uint32 /*interval*/)
 bool 
 Brainblast::initGameKyra()
 {
-	Random random(time(0));
+	srand(time(0));
+
     m_engine = new KrEngine( m_screen );
     m_engine->Draw(); 
 
@@ -383,9 +392,16 @@ Brainblast::initGameKyra()
 	if ( !m_engine->Vault()->LoadDatFile( "../images/bb.dat" ) )
 	{
 		printf( "Error loading the sprites file.\n" );
-		return false;
-	}
+		return false;	}
 
+	// Add background and foreground trees
+	KrImNode* m_bgTree = new KrImNode;
+	KrImNode* m_fgTree = new KrImNode;
+	m_engine->Tree()->AddNode(0, m_bgTree);
+	m_engine->Tree()->AddNode(0, m_fgTree);
+	m_bgTree->SetZDepth(1);
+	m_fgTree->SetZDepth(2);
+	
 	// Get the PAPRICE resource
 	KrSpriteResource* papriceRes = m_engine->Vault()->GetSpriteResource( BB_PAPRICE );
 	GLASSERT( papriceRes );
@@ -393,8 +409,8 @@ Brainblast::initGameKyra()
 	// Create the paprice sprite and add it to the tree
 	BrainSprite* paprice = new BrainSprite( papriceRes, "paprice" );
 	paprice->SetNodeId(BB_PAPRICE);
-	paprice->SetPos( random.Rand(VIDEOX), 0);
-	m_engine->Tree()->AddNode( 0, paprice );
+	paprice->SetPos( rand()%VIDEOX, 0);
+	m_engine->Tree()->AddNode( m_fgTree, paprice );
 	m_sprites.push_back(paprice);
 
 	return true;
@@ -402,9 +418,6 @@ Brainblast::initGameKyra()
 
 void Brainblast::createStar()
 {
-	// static, otherwise the seed is the same too often
-    static Random random(time(0));
-
 	// Get the STAR resource
 	KrSpriteResource* starRes = m_engine->Vault()->GetSpriteResource( BB_STAR );
 	GLASSERT( starRes );
@@ -412,8 +425,8 @@ void Brainblast::createStar()
 	// Create the paprice sprite and add it to the tree
 	BrainSprite* star = new BrainSprite( starRes, "star" );
 	star->SetNodeId(BB_STAR);
-	star->SetPos( random.Rand(VIDEOX), 0);
-	m_engine->Tree()->AddNode( 0, star );
+	star->SetPos( rand()%VIDEOX, 0);
+	m_engine->Tree()->AddNode( m_bgTree, star );
 	m_sprites.push_back(star);
 }
 
@@ -501,17 +514,18 @@ int Brainblast::eventLoop()
 			m_engine->Tree()->Walk();
 
 			// Detect collisions
-			if(!paprice->isCarrying() && keysHeld[SDLK_p] ) {
+			if(!paprice->isCarrying() && keysHeld[SDLK_UP] ) {
 				std::vector<KrImage*> collides;
 				if( m_engine->Tree()->CheckAllCollision(paprice,&collides) )
 				{  
 					printf("Collision!\n");
-					std::vector<KrImage*>::iterator cit;
-					std::vector<KrImage*>::iterator cend = collides.end();
-					for(cit = collides.begin(); cit != cend; ++cit)
-					{
-						paprice->pickUp(reparentSprite((BrainSprite*)*cit,paprice));
-					}
+					paprice->pickUp(reparentSprite((BrainSprite*)*collides.begin(),paprice));
+// 					std::vector<KrImage*>::iterator cit;
+// 					std::vector<KrImage*>::iterator cend = collides.end();
+// 					for(cit = collides.begin(); cit != cend; ++cit)
+// 					{
+// 						paprice->pickUp(reparentSprite((BrainSprite*)*cit,paprice));
+// 					}
 				}
 			}
 
@@ -536,14 +550,14 @@ int Brainblast::eventLoop()
 			BrainSprite* paprice = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_PAPRICE ));
 			paprice->right();
 		}
-		if( keysHeld[SDLK_UP] )
-		{
-			BrainSprite* paprice = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_PAPRICE ));
-			paprice->jump();
-		}
+// 		if( keysHeld[SDLK_UP] )
+// 		{
+// 			BrainSprite* paprice = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_PAPRICE ));
+// 			paprice->jump();
+// 		}
 		if( keysHeld[SDLK_F1] )
 			createStar();
-		if( keysHeld[SDLK_d] ) 
+		if( keysHeld[SDLK_DOWN] ) 
 		{
 			BrainSprite* paprice = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_PAPRICE ));
 			paprice->drop();

@@ -1,3 +1,8 @@
+/* -*- Mode: c++; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4; c-file-style:"stroustrup" -*-
+ *
+ * @date 2006-2008
+ * @author Daniel Bengtsson
+ */
 
 #ifndef BRAINSPRITE_H
 #define BRAINSPRITE_H
@@ -19,10 +24,13 @@ BrainSprite(KrSpriteResource* res, std::string name) :
         m_jumping(true),
         m_child(0){}
         virtual ~BrainSprite(){std::cout << "BrainSprite destroyed " << m_name << "\n"; }
+
+    BrainSprite(const BrainSprite&);
+    BrainSprite& operator=(const BrainSprite&);
     
-    int speedX() const { return m_x_speed; }
-    int speedY() const { return m_y_speed; }
-    void setSpeed(int x, int y) { m_x_speed=x; m_y_speed=y; }
+    double speedX() const { return m_x_speed; }
+    double speedY() const { return m_y_speed; }
+    void setSpeed(double x, double y) { m_x_speed=x; m_y_speed=y; }
     void stop() { m_x_speed=0; m_y_speed=0; }
     
     int time() const { return m_time; }

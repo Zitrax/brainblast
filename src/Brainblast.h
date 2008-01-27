@@ -3,7 +3,6 @@
  * @date 2006-2008
  * @author Daniel Bengtsson
  */
-// -*- mode: C++; -*-
 
 #ifndef BRAINBLAST_H
 #define BRAINBLAST_H
@@ -84,6 +83,9 @@ private:
     Brick**      m_bricks;
 
 	KrEngine*    m_engine;
+
+	KrImNode*    m_bgTree;
+	KrImNode*    m_fgTree;
 
 	std::vector<BrainSprite*> m_sprites;
 
