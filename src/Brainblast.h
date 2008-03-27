@@ -58,13 +58,15 @@ public:
 
 	static Brainblast* instance() { return s_instance; }
 
+	KrEngine* engine() const { return m_engine; }
+
     //! Check if a solution is correct
     bool checkSolution(Puzzle* puzzle);
 
     //! Start a new game
     bool startGame();
 
-	void createStar();
+	BrainSprite* createStar();
 
 	/**
 	 * 
@@ -98,6 +100,7 @@ private:
     bool makeLevel(int lvl);
 
     void createBricks();
+	bool createBoards();
 
     void drawBoard(SDL_Surface* s, SDL_Rect* dim, Puzzle* p);
     void drawBrickAtIdx(SDL_Surface* s, Puzzle* p, SDL_Rect* dim, int idx, bool solution=false);

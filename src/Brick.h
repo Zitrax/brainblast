@@ -41,6 +41,8 @@ public:
     // Operators
     Brick& operator=(const Brick& br);
 
+	int id() const { return m_brickID; }
+
     SDL_Surface* getPixmap() const;
     KrSprite*    getSprite() const;
 

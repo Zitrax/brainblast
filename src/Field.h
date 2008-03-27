@@ -11,8 +11,8 @@ public:
         m_height(height){}
     virtual ~Field() {}
 
-    int width() const { return m_width; }
-    int height() const { return m_height; }
+    unsigned int  width() const { return m_width; }
+    unsigned int height() const { return m_height; }
     
     KrImage* brickAtIdx(int idx);
 

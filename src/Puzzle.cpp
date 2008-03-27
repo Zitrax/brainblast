@@ -5,10 +5,16 @@
  */
 #include "Puzzle.h"
 
-Puzzle::Puzzle(int width, int height) 
-    : Field(width,height), 
-	  m_solution(0), 
-	  m_current(0) 
+#undef min // Stupid! It seems something else has defined min
+#include "Brainblast.h"
+
+Puzzle::Puzzle(int width, int height, SDL_Rect rect)
+  : Field(width,height), 
+	m_rect(rect),
+	m_solution(0), 
+	m_current(0),
+	m_solution_tree(0),
+	m_background_tree(0)
 {
     if(bbc::debug) std::cerr << "Puzzle::Puzzle(" << m_width << "," << m_height << ")\n";
 
@@ -25,13 +31,26 @@ Puzzle::Puzzle(int width, int height)
 
 Puzzle::Puzzle(const Puzzle& pz): Field(pz.m_width,pz.m_height),
                                   m_solution(0),
-                                  m_current(0)
+                                  m_current(0),
+								  m_solution_tree(0),
+								  m_background_tree(0)
 {
 
     for( uint i=0; i<m_width*m_height; i++) {
         m_solution[i] = new Brick(*pz.m_solution[i]);
         m_current[i]  = new Brick(*pz.m_current[i]); 
     }
+	// Todo: Is this correct ?
+	if( pz.m_solution_tree ) {
+		m_solution_tree = pz.m_solution_tree->Clone();
+		Brainblast::instance()->engine()->Tree()->AddNode(0, m_solution_tree);
+		m_solution_tree->SetZDepth(5);
+	}
+	if( pz.m_background_tree ) {
+		m_background_tree = pz.m_background_tree->Clone();
+		Brainblast::instance()->engine()->Tree()->AddNode(0, m_background_tree);
+		m_background_tree->SetZDepth(15);
+	}
 
 }
 
@@ -45,7 +64,18 @@ Puzzle::operator=(const Puzzle& pz)
         m_solution[i] = new Brick(*pz.m_solution[i]);
         m_current[i]  = new Brick(*pz.m_current[i]); 
     }
-
+	// Todo: Is this correct ?
+	if( pz.m_solution_tree ) {
+		m_solution_tree = pz.m_solution_tree->Clone();
+		Brainblast::instance()->engine()->Tree()->AddNode(0, m_solution_tree);
+		m_solution_tree->SetZDepth(5);
+	}
+	if( pz.m_background_tree ) {
+		m_background_tree = pz.m_background_tree->Clone();
+		Brainblast::instance()->engine()->Tree()->AddNode(0, m_background_tree);
+		m_background_tree->SetZDepth(15);
+	}
+	
     return *this;
 }
 
@@ -55,6 +85,8 @@ Puzzle::~Puzzle()
 
     zapArr(m_solution);
     zapArr(m_current);
+
+	assert("make sure solution are cleaned"==0);
 }
 
 bool
@@ -68,12 +100,6 @@ Puzzle::checkSolution()
 
     return true;
 }
-
-unsigned int
-Puzzle::getWidth() const { return m_width; }
-
-unsigned int
-Puzzle::getHeight() const { return m_height; }
 
 Brick*
 Puzzle::getCurrentBrickWithIdx(int idx) const
@@ -98,5 +124,57 @@ void
 Puzzle::setSolutionBrickWithIdx(Brick* b, int idx)
 {
     if(bbc::debug) std::cerr << "Puzzle::setSolutionBrickWithIdx(" << b << "," << idx << ")\n";
+
+	KrSprite* s = b->getSprite();
+	if( s )
+	{
+		if( !m_solution_tree ) {
+			m_solution_tree = new KrImNode;
+			Brainblast::instance()->engine()->Tree()->AddNode(0, m_solution_tree);
+			m_solution_tree->SetZDepth(5);
+		}
+		KrSprite* sprite = s->Clone()->ToSprite(); 
+		b = new Brick(sprite,b->id());
+		Brainblast::instance()->engine()->Tree()->AddNode(m_solution_tree, sprite);
+	}
+
     m_solution[idx] = b;
 }
+
+void
+Puzzle::setBackgroundTile(KrTile* tile)
+{
+	// Delete old tree if existing
+	if( m_background_tree )
+		Brainblast::instance()->engine()->Tree()->DeleteNode(m_background_tree);
+	// Create new tree and insert in the global tree
+	m_background_tree = new KrImNode;
+	Brainblast::instance()->engine()->Tree()->AddNode(0, m_background_tree);
+	m_solution_tree->SetZDepth(15);
+	
+	// Create and position all bg tiles
+	for(int x=0;x<m_width;x++)
+	{
+		int xspace = m_rect.w/m_width;
+		
+		for(int y=0;y<m_height;y++)
+		{
+			int yspace = m_rect.h/m_height;
+			
+			KrTile* ctile = tile->Clone()->ToTile();
+			Brainblast::instance()->engine()->Tree()->AddNode(m_background_tree, ctile);
+			ctile->SetPos(x*xspace+xspace/2,y*yspace+yspace/2);
+		}
+	}
+}
+
+// int 
+// Puzzle::getXCoord(int x) const
+// {
+// }
+
+// int 
+// Puzzle::getYCoord(int y) const
+// {
+	
+// }

@@ -116,6 +116,7 @@ void Brick::setPos( uint x, uint y )
 {
     m_X = x;
     m_Y = y;
+	if( m_sprite ) { m_sprite->SetPos(x,y); }
 }
 
 void Brick::move( uint x, uint y )
