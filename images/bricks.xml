@@ -1,0 +1,33 @@
+<Definition filename="../images/bricks.bmp" Transparent0="#000000">
+    <Tile name="WOOD" x="196" y="382" size="45" />
+    <Sprite name="BLUEDOT">
+        <Action name="NONE">
+            <Frame x="278" y="325" width="30" height="32" hotspotx="292" hotspoty="341" deltax="0" deltay="0" />
+        </Action>
+    </Sprite>
+    <Sprite name="MESS">
+        <Action name="NONE">
+            <Frame x="181" y="323" width="71" height="58" hotspotx="218" hotspoty="350" deltax="0" deltay="0" />
+        </Action>
+    </Sprite>
+    <Sprite name="GIMP">
+        <Action name="NONE">
+            <Frame x="271" y="254" width="61" height="50" hotspotx="299" hotspoty="277" deltax="0" deltay="0" />
+        </Action>
+    </Sprite>
+    <Sprite name="LEAVES">
+        <Action name="NONE">
+            <Frame x="180" y="257" width="79" height="64" hotspotx="180" hotspoty="257" deltax="0" deltay="0" />
+        </Action>
+    </Sprite>
+    <Sprite name="PAPRICE">
+        <Action name="NONE">
+            <Frame x="251" y="181" width="54" height="64" hotspotx="278" hotspoty="212" deltax="0" deltay="0" />
+        </Action>
+    </Sprite>
+    <Sprite name="STAR">
+        <Action name="NONE">
+            <Frame x="181" y="182" width="65" height="67" hotspotx="213" hotspoty="215" deltax="0" deltay="0" />
+        </Action>
+    </Sprite>
+</Definition>
