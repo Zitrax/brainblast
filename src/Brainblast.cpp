@@ -16,7 +16,8 @@ using namespace brain;
 Brainblast* Brainblast::s_instance;
 
 Brainblast::Brainblast() : m_sound(new BrainSound),
-						   m_currentLvl(0),
+						   m_currentLvl1(0),
+						   m_currentLvl2(0),
                            m_screen( SDL_SetVideoMode( VIDEOX, VIDEOY, VIDEOBITS, SDL_HWSURFACE ) ),
                            m_field1(0),
                            m_field2(0),
@@ -66,7 +67,8 @@ Brainblast::Brainblast() : m_sound(new BrainSound),
 }
 
 // Copy constructor
-Brainblast::Brainblast(const Brainblast& bb) : m_currentLvl(0),
+Brainblast::Brainblast(const Brainblast& bb) : m_currentLvl1(0),
+											   m_currentLvl2(0),
                                                m_screen(0),
                                                m_field1(0),
                                                m_field2(0),
@@ -86,8 +88,10 @@ Brainblast::Brainblast(const Brainblast& bb) : m_currentLvl(0),
 {
 #warning "Whats the point of this really?"
   
-    m_currentLvl = new Puzzle( *bb.m_currentLvl );
-    assert( m_currentLvl );
+    m_currentLvl1 = new Puzzle( *bb.m_currentLvl1 );
+    m_currentLvl2 = new Puzzle( *bb.m_currentLvl2 );
+    assert( m_currentLvl1 );
+    assert( m_currentLvl2 );
 
     m_screen = new SDL_Surface( *bb.m_screen );
     assert( m_screen );
@@ -108,8 +112,9 @@ Brainblast::operator=(const Brainblast& bb)
     // assigning the new ones
     cleanup();
 
-    m_screen     = new SDL_Surface( *bb.m_screen );
-    m_currentLvl = new Puzzle( *bb.m_currentLvl );
+    m_screen      = new SDL_Surface( *bb.m_screen );
+    m_currentLvl1 = new Puzzle( *bb.m_currentLvl1 );
+    m_currentLvl2 = new Puzzle( *bb.m_currentLvl2 );
 
     m_field1 = new SDL_Rect( *bb.m_field1 );
     m_field2 = new SDL_Rect( *bb.m_field2 );
@@ -129,7 +134,7 @@ Brainblast::operator=(const Brainblast& bb)
 Brainblast::~Brainblast()
 {
     if(bbc::debug) std::cerr << "Brainblast::~Brainblast()\n";
-  
+ 
     cleanup();
 }
 
@@ -144,7 +149,8 @@ Brainblast::cleanup()
     // m_screen is deleted by SDL_Quit
     // zap( m_screen );
 
-    zap( m_currentLvl );
+    zap( m_currentLvl1 );
+    zap( m_currentLvl2 );
     zap( m_field1 ); 
 	zap( m_field2 );
 	zap( m_engine );
@@ -159,7 +165,8 @@ Brainblast::makeLevel(int lvl)
 
     if(lvl == 0) 
     {
-        m_currentLvl = new Puzzle(5,5,*m_field1);
+        m_currentLvl1 = new Puzzle(5,5,*m_field1);
+        m_currentLvl2 = new Puzzle(5,5,*m_field2);
         // placeBricksRandom();
 #warning "Should implement placeBricksRandom"
         return true;
@@ -190,14 +197,17 @@ Brainblast::makeLevel(int lvl)
             else if ( i==1 ) 
             { 
                 height = val; 
-                m_currentLvl = new Puzzle( height, width, *m_field1 );
+                m_currentLvl1 = new Puzzle( height, width, *m_field1 );
+                m_currentLvl2 = new Puzzle( height, width, *m_field2 );
             }
             else 
             {
                 if(bbc::debug) std::cerr << val << " ";
                 if( i%2 == 0 ) tmp = val;
-                else  
-                    m_currentLvl->setSolutionBrickWithIdx(m_bricks[val],tmp-1);
+                else  {
+                    m_currentLvl1->setSolutionBrickWithIdx(m_bricks[val],tmp-1);
+                    m_currentLvl2->setSolutionBrickWithIdx(m_bricks[val],tmp-1);
+				}
             }
             i++;
         }
@@ -219,8 +229,19 @@ Brainblast::createBricks()
 
     for(int i=0; i<NOF_BRICK_TYPES; i++) 
     {
-		KrSprite* b = new KrSprite(m_engine->Vault()->GetSpriteResource( i+1 ));
-        m_bricks[i] = new Brick(b, i);
+		if(bbc::debug) std::cerr << "Brainblast::createBricks() Creating brick " << i+1 << "\n";
+
+		GlSListIterator<KrResource*> rit = m_engine->Vault()->GetResourceIterator();
+		for(rit.Begin(); !rit.Done(); rit.Next())
+		{
+			KrSpriteResource* sr = rit.Current()->ToSpriteResource();
+			if( sr )
+			{
+				KrSprite* b = new KrSprite(sr);
+				m_bricks[i] = new Brick(b, i);
+				
+			}
+		}
     }
 }
 
@@ -235,7 +256,8 @@ Brainblast::createBoards()
 		return false;
 	KrTile* tile = new KrTile(tileRes);
 
-	m_currentLvl->setBackgroundTile(tile);
+	m_currentLvl1->setBackgroundTile(tile);
+	m_currentLvl2->setBackgroundTile(tile);
 
 	return true;
 }
@@ -244,6 +266,8 @@ void
 Brainblast::drawBoard(SDL_Surface* s, SDL_Rect* dim, Puzzle* p)
 {
 //    if(bbc::debug) std::cerr << "Brainblast::drawBoard()\n";
+
+	return;
 
     assert(s); 
     assert(dim);
@@ -279,76 +303,6 @@ Brainblast::drawBoard(SDL_Surface* s, SDL_Rect* dim, Puzzle* p)
     SDL_Flip(m_screen);
 }
 
-void
-Brainblast::drawBrickAtIdx(SDL_Surface* s, Puzzle* p, SDL_Rect* dim, int idx, bool solution)
-{
-    if(bbc::debug) std::cerr << "Brainblast::drawBrickAtIdx(" << idx << ")" << " " << dim << "\n";
-    
-    assert(s);
-    assert(p);
-    assert(dim);
-    
-    /* Lock the screen, if needed */
-    if(SDL_MUSTLOCK(m_screen)) 
-    {
-        if(SDL_LockSurface(m_screen) < 0) 
-            return;
-    }
-    
-    Brick* b = solution ? 
-        p->getSolutionBrickWithIdx(idx) :
-        p->getCurrentBrickWithIdx(idx);
-
-    // This is the space for each cell in the puzzle
-    int xSpace = bbc::round(static_cast<double>(dim->w) / p->width ());
-    int ySpace = bbc::round(static_cast<double>(dim->h) / p->height());
-  
-    // If there was a brick, draw it
-    if(b) 
-    {
-        // Find the coordinate of the current brick
-        // @todo Should probably be moved to the brick class
-        uint x = bbc::round(dim->x + (idx%p->width()  + 0.5)*xSpace - b->getWidth() /2.0);
-        uint y = bbc::round(dim->y + (idx/p->height() + 0.5)*ySpace - b->getHeight()/2.0);
-        if(bbc::debug) std::cerr << "x = " << x << ", y = " << y << "\n";
-        b->setPos(x, y);
-        b->draw(m_screen);      
-    }
-    else
-    {
-        SDL_Rect destination;
-        destination.x = dim->x + (idx%p->width())*xSpace;
-        destination.y = dim->y + (idx/p->height())*ySpace;
-        destination.h = ySpace;
-        destination.w = xSpace;
-
-//        SDL_FillRect(m_screen, &destination, black);
-    }
-
-    /* Unlock the screen if needed */
-    if(SDL_MUSTLOCK(m_screen)) 
-    {
-        SDL_UnlockSurface(m_screen);
-    }
-  
-}
-
-void
-Brainblast::drawAllBricks(SDL_Surface* s, Puzzle* p, SDL_Rect* dim, bool solution)
-{
-//    if(bbc::debug) std::cerr << "Brainblast::drawAllBricks()\n";
-  
-	// TODO: Do we need this anymore
-
-    assert(s); 
-    assert(p);
-    assert(dim);
-
-    for(uint i=0; i<(p->width()*p->height()); i++)
-        drawBrickAtIdx(s, p, dim, i, solution);
-  
-}
-
 bool
 Brainblast::checkSolution(Puzzle* puzzle)
 {
@@ -363,8 +317,6 @@ Brainblast::checkSolution(Puzzle* puzzle)
 bool
 Brainblast::startGame()
 {
-//     SDL_WM_ToggleFullScreen(m_screen);
-
     if( !initGameKyra() )
 		return false;
 
@@ -414,7 +366,7 @@ Brainblast::initGameKyra()
 	
 	// Get the PAPRICE resource
 	KrSpriteResource* papriceRes = m_engine->Vault()->GetSpriteResource( BB_PAPRICE );
-	GLASSERT( papriceRes );
+	assert( papriceRes );
 
 	// Create the paprice sprite and add it to the tree
 	BrainSprite* paprice = new BrainSprite( papriceRes, "paprice" );
@@ -458,35 +410,18 @@ Brainblast::initGame(int lvl)
 		return false;		
 	}
 
-//    SDL_WM_ToggleFullScreen(m_screen);
+    // SDL_WM_ToggleFullScreen(m_screen);
 
-    drawAllBricks(m_screen, m_currentLvl, m_field1, true);
-    drawBoard(m_screen, m_field1, m_currentLvl);
-
-    drawAllBricks(m_screen, m_currentLvl, m_field2, true);
-    drawBoard(m_screen, m_field2, m_currentLvl);
-  
     SDL_Delay(1000); 
-
-	drawBoards();
 
 	// Start music
 	if( !(m_sound->initializeSound() &&
-		  m_sound->loadMusic("../music/sneakerfox_-_autumn_colors.mp3") &&
+		  m_sound->loadMusic("../music/Instant Remedy - Outrun.mp3") &&
 		  m_sound->playMusic()) )
 		printf("ERROR: Could not start music\n");
 	
 
 	return true;
-}
-
-void Brainblast::drawBoards()
-{
-    drawAllBricks(m_screen, m_currentLvl, m_field1);
-    drawBoard(m_screen, m_field1, m_currentLvl);
-	
-    drawAllBricks(m_screen, m_currentLvl, m_field2);
-    drawBoard(m_screen, m_field2, m_currentLvl);
 }
 
 int Brainblast::eventLoop()
@@ -532,8 +467,6 @@ int Brainblast::eventLoop()
 // 				star->move();
 // 			}
 
-//			drawBoards();
-			
 			std::vector<BrainSprite*>::iterator it;
 			std::vector<BrainSprite*>::iterator end = m_sprites.end();
 			for(it = m_sprites.begin(); it!=end; ++it)

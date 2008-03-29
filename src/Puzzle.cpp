@@ -16,7 +16,8 @@ Puzzle::Puzzle(int width, int height, SDL_Rect rect)
 	m_solution_tree(0),
 	m_background_tree(0)
 {
-    if(bbc::debug) std::cerr << "Puzzle::Puzzle(" << m_width << "," << m_height << ")\n";
+    if(bbc::debug) std::cerr << "Puzzle::Puzzle(" << m_width << "," << m_height << "," 
+							 << rect.x << "," << rect.y << "," << rect.w << "," << rect.h << ")\n";
 
     m_solution = new Brick*[m_width*m_height];
     m_current  = new Brick*[m_width*m_height];
@@ -86,7 +87,7 @@ Puzzle::~Puzzle()
     zapArr(m_solution);
     zapArr(m_current);
 
-	assert("make sure solution are cleaned"==0);
+	//assert("make sure solution are cleaned"==0);
 }
 
 bool
@@ -130,12 +131,17 @@ Puzzle::setSolutionBrickWithIdx(Brick* b, int idx)
 	{
 		if( !m_solution_tree ) {
 			m_solution_tree = new KrImNode;
+			assert(Brainblast::instance()->engine()->Tree());
 			Brainblast::instance()->engine()->Tree()->AddNode(0, m_solution_tree);
 			m_solution_tree->SetZDepth(5);
 		}
 		KrSprite* sprite = s->Clone()->ToSprite(); 
 		b = new Brick(sprite,b->id());
 		Brainblast::instance()->engine()->Tree()->AddNode(m_solution_tree, sprite);
+		int xspace = m_rect.w/m_width;
+		int yspace = m_rect.h/m_height;
+		b->setPos(m_rect.x + (idx%m_width)*xspace+xspace/2,
+				  m_rect.y + (idx/m_height)*yspace+yspace/2);
 	}
 
     m_solution[idx] = b;
@@ -163,7 +169,8 @@ Puzzle::setBackgroundTile(KrTile* tile)
 			
 			KrTile* ctile = tile->Clone()->ToTile();
 			Brainblast::instance()->engine()->Tree()->AddNode(m_background_tree, ctile);
-			ctile->SetPos(x*xspace+xspace/2,y*yspace+yspace/2);
+			ctile->SetPos(m_rect.x + x*xspace+xspace/2-ctile->Size()/2,
+						  m_rect.y + y*yspace+yspace/2-ctile->Size()/2);
 		}
 	}
 }

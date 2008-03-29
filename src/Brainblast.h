@@ -36,7 +36,7 @@ namespace brain
 	const int VIDEOBITS = 32;
 	
 //! Margin to be used in board/field layout
-	const int MARGIN = 10;
+	const int MARGIN = 0;
 }
 
 int main(int argc, char *argv[]);
@@ -79,7 +79,8 @@ private:
 
 	BrainSound* m_sound;
 
-    Puzzle* m_currentLvl;
+    Puzzle* m_currentLvl1;
+	Puzzle* m_currentLvl2;
 
     SDL_Surface* m_screen;
     SDL_Rect*    m_field1;
@@ -103,8 +104,6 @@ private:
 	bool createBoards();
 
     void drawBoard(SDL_Surface* s, SDL_Rect* dim, Puzzle* p);
-    void drawBrickAtIdx(SDL_Surface* s, Puzzle* p, SDL_Rect* dim, int idx, bool solution=false);
-    void drawAllBricks(SDL_Surface* s, Puzzle* p, SDL_Rect* dim, bool solution=false);
 	void drawBoards();
 
     //! Sets up a new game
