@@ -11,7 +11,7 @@ OBJECTS = bbc.o Brainblast.o Brick.o Puzzle.o Field.o BrainSprite.o BrainSound.o
 
 all: Brainblast
 
-$(IMAGES)/bb.h:
+$(IMAGES)/bb.h: ../images/bricks.xml
 	cd $(IMAGES) && \
 	krencoder -pBB_ bb.h bricks.xml
 
