@@ -26,9 +26,11 @@ public:
 	Brick* getCurrentBrickWithIdx(int idx) const;
 	Brick* getSolutionBrickWithIdx(int idx) const;
 	void setCurrentBrickWithIdx(Brick* b, int idx);
-	void setSolutionBrickWithIdx(Brick* b, int idx);
+	void setSolutionBrickWithIdx(const Brick* const b, int idx);
 	
 	void setBackgroundTile(KrTile* tile);
+
+	void setVisibleSolution(bool visible) { m_solution_tree->SetVisible(visible); }
 	
 //  	int getXCoord(int x) const;
 // 	int getYCoord(int y) const;

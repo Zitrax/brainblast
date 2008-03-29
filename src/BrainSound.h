@@ -27,6 +27,9 @@ public:
 
 private:
 
+    BrainSound(const BrainSound& bb);
+    BrainSound& operator=(const BrainSound& bb);
+
 	Mix_Music* m_music;
 
 };

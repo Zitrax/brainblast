@@ -22,9 +22,11 @@ Brainblast::Brainblast() : m_sound(new BrainSound),
                            m_field1(0),
                            m_field2(0),
                            m_bricks(0),
+						   m_total_bricks(0),
 						   m_engine(0),
 						   m_bgTree(0),
 						   m_fgTree(0),
+						   m_start_time(0),
 						   m_sprites(0),
                            red    ( SDL_MapRGB(m_screen->format, 0xff, 0x00, 0x00) ),
                            blue   ( SDL_MapRGB(m_screen->format, 0x00, 0x00, 0xff) ),
@@ -41,14 +43,14 @@ Brainblast::Brainblast() : m_sound(new BrainSound),
 
     if(SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER) < 0)
     {
-        printf("ERROR: Can't init SDL:  %s\n", SDL_GetError());
+        printf("=== ERROR: Can't init SDL:  %s ===\n", SDL_GetError());
         exit(1);
     }
     atexit(SDL_Quit); 
 
     if(m_screen == NULL)
     {
-        printf("ERROR: Can't set video mode: %s\n", SDL_GetError());
+        printf("=== ERROR: Can't set video mode: %s ===\n", SDL_GetError());
         exit(1);
     }   
 
@@ -66,70 +68,6 @@ Brainblast::Brainblast() : m_sound(new BrainSound),
 	m_field2->h = m_field1->h;
 }
 
-// Copy constructor
-Brainblast::Brainblast(const Brainblast& bb) : m_currentLvl1(0),
-											   m_currentLvl2(0),
-                                               m_screen(0),
-                                               m_field1(0),
-                                               m_field2(0),
-                                               m_bricks(0),
-											   m_engine(0),
-											   m_bgTree(0),
-											   m_fgTree(0),
-											   m_sprites(0),
-                                               red(bb.red),
-                                               blue(bb.blue),
-                                               black(bb.black),
-                                               green(bb.green),
-                                               white(bb.white),
-                                               yellow(bb.yellow),
-                                               cyan(bb.cyan),
-                                               magenta(bb.magenta)
-{
-#warning "Whats the point of this really?"
-  
-    m_currentLvl1 = new Puzzle( *bb.m_currentLvl1 );
-    m_currentLvl2 = new Puzzle( *bb.m_currentLvl2 );
-    assert( m_currentLvl1 );
-    assert( m_currentLvl2 );
-
-    m_screen = new SDL_Surface( *bb.m_screen );
-    assert( m_screen );
-
-    m_field1 = new SDL_Rect( *bb.m_field1 );
-    m_field2 = new SDL_Rect( *bb.m_field2 );
-
-    for(int i=0; i<NOF_BRICK_TYPES; i++)
-        m_bricks[i] = new Brick( *bb.m_bricks[i] );
-}
-
-// Assignment operator
-Brainblast&
-Brainblast::operator=(const Brainblast& bb)
-{
-#warning "Whats the point of this really?"
-    // Important to clean up the old memory before
-    // assigning the new ones
-    cleanup();
-
-    m_screen      = new SDL_Surface( *bb.m_screen );
-    m_currentLvl1 = new Puzzle( *bb.m_currentLvl1 );
-    m_currentLvl2 = new Puzzle( *bb.m_currentLvl2 );
-
-    m_field1 = new SDL_Rect( *bb.m_field1 );
-    m_field2 = new SDL_Rect( *bb.m_field2 );
-
-    m_bricks = new Brick*[NOF_BRICK_TYPES];
-    for(int i=0; i<NOF_BRICK_TYPES; i++)
-        m_bricks[i] = new Brick( *bb.m_bricks[i] );
-
-	// Do we really need to copy ?
-	if( bb.m_engine )
-		m_engine = new KrEngine( *bb.m_engine );
-
-    // Correct ?
-    return *this;
-}
 
 Brainblast::~Brainblast()
 {
@@ -142,7 +80,7 @@ void
 Brainblast::cleanup()
 {
     if( m_bricks )
-        for(int i=0; i<NOF_BRICK_TYPES; i++)
+        for(int i=0; i<m_total_bricks; i++)
             zap( m_bricks[i] );
     zapArr( m_bricks );
     
@@ -205,6 +143,12 @@ Brainblast::makeLevel(int lvl)
                 if(bbc::debug) std::cerr << val << " ";
                 if( i%2 == 0 ) tmp = val;
                 else  {
+					if( !(val<m_total_bricks && val>=0) )
+					{
+						std::cerr << "=== ERROR: Level file contain invalid brick type (" << val << ") ===\n";
+						return false;
+					}
+					
                     m_currentLvl1->setSolutionBrickWithIdx(m_bricks[val],tmp-1);
                     m_currentLvl2->setSolutionBrickWithIdx(m_bricks[val],tmp-1);
 				}
@@ -225,24 +169,20 @@ Brainblast::createBricks()
 {
     if(bbc::debug) std::cerr << "Brainblast::createBricks()\n";
 
-    m_bricks = new Brick*[NOF_BRICK_TYPES];
+    m_bricks = new Brick*[MAX_NOF_BRICK_TYPES];
 
-    for(int i=0; i<NOF_BRICK_TYPES; i++) 
-    {
-		if(bbc::debug) std::cerr << "Brainblast::createBricks() Creating brick " << i+1 << "\n";
-
-		GlSListIterator<KrResource*> rit = m_engine->Vault()->GetResourceIterator();
-		for(rit.Begin(); !rit.Done(); rit.Next())
+	GlSListIterator<KrResource*> rit = m_engine->Vault()->GetResourceIterator();
+	for(rit.Begin(); !rit.Done(); rit.Next())
+	{
+		KrSpriteResource* sr = rit.Current()->ToSpriteResource();
+		if( sr )
 		{
-			KrSpriteResource* sr = rit.Current()->ToSpriteResource();
-			if( sr )
-			{
-				KrSprite* b = new KrSprite(sr);
-				m_bricks[i] = new Brick(b, i);
-				
-			}
+			KrSprite* b = new KrSprite(sr);
+			m_bricks[m_total_bricks] = new Brick(b, m_total_bricks);
+			m_total_bricks++;
+			assert(m_total_bricks<MAX_NOF_BRICK_TYPES);
 		}
-    }
+	}
 }
 
 bool
@@ -323,6 +263,8 @@ Brainblast::startGame()
 	if( !initGame() )
 		return false;
 
+	time(&m_start_time);
+
     eventLoop();
 
 	return true;
@@ -400,25 +342,25 @@ Brainblast::initGame(int lvl)
 
     if( !makeLevel(lvl) )
 	{
-		printf("ERROR: Can't make level\n");
+		printf("=== ERROR: Can't make level ===\n");
 		return false;
 	}
 
 	if( !createBoards() )
 	{
-		printf("ERROR: Can't create boards\n");
+		printf("=== ERROR: Can't create boards ===\n");
 		return false;		
 	}
 
     // SDL_WM_ToggleFullScreen(m_screen);
 
-    SDL_Delay(1000); 
+    //SDL_Delay(1000); 
 
 	// Start music
 	if( !(m_sound->initializeSound() &&
 		  m_sound->loadMusic("../music/Instant Remedy - Outrun.mp3") &&
 		  m_sound->playMusic()) )
-		printf("ERROR: Could not start music\n");
+		printf("=== ERROR: Could not start music === \n");
 	
 
 	return true;
@@ -446,8 +388,12 @@ int Brainblast::eventLoop()
 			keysHeld[event.key.keysym.sym] = true;
 			printf( "%s\n", SDL_GetKeyName(event.key.keysym.sym));
 
+			// M = TOGGLE SOUND
 			if( event.key.keysym.sym == SDLK_m )
 				m_sound->toggleMusic();
+			// F = TOGGLE FULLSCREEN
+			else if( event.key.keysym.sym == SDLK_f )
+				SDL_WM_ToggleFullScreen(m_screen);
 
 			break;
 			
@@ -488,6 +434,12 @@ int Brainblast::eventLoop()
 // 						paprice->pickUp(reparentSprite((BrainSprite*)*cit,paprice));
 // 					}
 				}
+			}
+
+			if( difftime(time(0),m_start_time) > 5.0 )
+			{
+				m_currentLvl1->setVisibleSolution(false);
+				m_currentLvl2->setVisibleSolution(false);
 			}
 
 			m_engine->Draw();

@@ -31,6 +31,7 @@ Puzzle::Puzzle(int width, int height, SDL_Rect rect)
 }
 
 Puzzle::Puzzle(const Puzzle& pz): Field(pz.m_width,pz.m_height),
+								  m_rect(pz.m_rect),
                                   m_solution(0),
                                   m_current(0),
 								  m_solution_tree(0),
@@ -122,9 +123,9 @@ Puzzle::setCurrentBrickWithIdx(Brick* b, int idx)
 }
 
 void
-Puzzle::setSolutionBrickWithIdx(Brick* b, int idx)
+Puzzle::setSolutionBrickWithIdx(const Brick* const b, int idx)
 {
-    if(bbc::debug) std::cerr << "Puzzle::setSolutionBrickWithIdx(" << b << "," << idx << ")\n";
+    if(bbc::debug) std::cerr << "Puzzle::setSolutionBrickWithIdx(" << b << "," << idx << "," << b->getSprite()->NodeId() << ")\n";
 
 	KrSprite* s = b->getSprite();
 	if( s )
@@ -136,15 +137,14 @@ Puzzle::setSolutionBrickWithIdx(Brick* b, int idx)
 			m_solution_tree->SetZDepth(5);
 		}
 		KrSprite* sprite = s->Clone()->ToSprite(); 
-		b = new Brick(sprite,b->id());
+		Brick* nb = new Brick(sprite,b->id());
 		Brainblast::instance()->engine()->Tree()->AddNode(m_solution_tree, sprite);
 		int xspace = m_rect.w/m_width;
 		int yspace = m_rect.h/m_height;
-		b->setPos(m_rect.x + (idx%m_width)*xspace+xspace/2,
-				  m_rect.y + (idx/m_height)*yspace+yspace/2);
+		nb->setPos(m_rect.x + (idx%m_width)*xspace+xspace/2,
+				   m_rect.y + (idx/m_height)*yspace+yspace/2);
+		m_solution[idx] = nb;
 	}
-
-    m_solution[idx] = b;
 }
 
 void

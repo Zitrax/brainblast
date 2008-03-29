@@ -28,7 +28,7 @@ namespace brain
 {
 
 //! The total number of different brick types (different symbols)
-	const int NOF_BRICK_TYPES = 5;
+	const int MAX_NOF_BRICK_TYPES = 25;
 	
 //! The vide mode to use
 	const int VIDEOX = 1024;
@@ -51,10 +51,7 @@ class Brainblast
 public:
     
     Brainblast();
-    Brainblast(const Brainblast& bb);
     ~Brainblast();
-
-    Brainblast& operator=(const Brainblast& bb);
 
 	static Brainblast* instance() { return s_instance; }
 
@@ -75,6 +72,9 @@ public:
 	
 private:
 
+    Brainblast(const Brainblast& bb);
+    Brainblast& operator=(const Brainblast& bb);
+
 	static Brainblast* s_instance;
 
 	BrainSound* m_sound;
@@ -87,11 +87,14 @@ private:
     SDL_Rect*    m_field2;
 
     Brick**      m_bricks;
+	int          m_total_bricks;
 
 	KrEngine*    m_engine;
 
 	KrImNode*    m_bgTree;
 	KrImNode*    m_fgTree;
+
+	time_t m_start_time;
 
 	std::vector<BrainSprite*> m_sprites;
 
