@@ -7,10 +7,6 @@ using namespace brain;
 
 void BrainSprite::move()
 {
-//    if( m_x_speed!=0 && m_y_speed!=0 ) return;
-
-    m_time++;
-
     // 1. Find new position
     SetPos( static_cast<int>(X()+m_x_speed), 
             static_cast<int>(Y()+m_y_speed) );
@@ -81,12 +77,13 @@ KrImNode* BrainSprite::Clone()
  	clone->SetFrame( Frame() );
 
     // Local variables
-    clone->m_x_speed  = this->m_x_speed;
-    clone->m_y_speed  = this->m_y_speed;
-    clone->m_time     = this->m_time;
-    clone->m_acc      = this->m_acc;
-    clone->m_jumping  = this->m_jumping;
-    clone->m_child    = this->m_child;
+    clone->m_x_speed       = this->m_x_speed;
+    clone->m_y_speed       = this->m_y_speed;
+    clone->m_acc           = this->m_acc;
+    clone->m_jumping       = this->m_jumping;
+    clone->m_child         = this->m_child;
+    clone->m_creation_time = this->m_creation_time;
+    clone->m_temporary     = this->m_temporary;
 
 	return clone;
 }

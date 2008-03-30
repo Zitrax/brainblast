@@ -14,16 +14,22 @@
 class BrainSprite : public KrSprite
 {
 public:
-BrainSprite(KrSpriteResource* res, std::string name) : 
+	/**
+	 * A temporary sprite will be deleted after a delay
+	 */
+	BrainSprite(KrSpriteResource* res, std::string name, bool temporary=false) : 
         KrSprite(res), 
         m_name(name),
         m_x_speed(0.0),
         m_y_speed(1.0),
-        m_time(0),
         m_acc(1.0),
         m_jumping(true),
-        m_child(0){}
-        virtual ~BrainSprite(){std::cout << "BrainSprite destroyed " << m_name << "\n"; }
+        m_child(0),
+		m_creation_time(time(0)),
+		m_temporary(temporary)
+		{}
+
+	virtual ~BrainSprite(){std::cout << "BrainSprite destroyed " << m_name << "\n"; }
 
     BrainSprite(const BrainSprite&);
     BrainSprite& operator=(const BrainSprite&);
@@ -35,9 +41,6 @@ BrainSprite(KrSpriteResource* res, std::string name) :
     void setSpeed(double x, double y) { m_x_speed=x; m_y_speed=y; }
     void stop() { m_x_speed=0; m_y_speed=0; }
     
-    int time() const { return m_time; }
-    void setTime(int time) { m_time=time; }
-    
     double acc() const { return m_acc; }
     void setAcc(double acc) { m_acc=acc; }
     
@@ -48,13 +51,17 @@ BrainSprite(KrSpriteResource* res, std::string name) :
 
     void jump();
 
+	time_t creationTime() const { return m_creation_time; }
+	bool temporary() const { return m_temporary; }
+	void setTemporary(bool tmp) { m_temporary=tmp; }
+
     /**
      * Note that bs must be a child node.
      * You can reparent it with \ref BrainBlast::reparent first.
      */
     void pickUp(BrainSprite* bs);
     void drop();
-    bool isCarrying() {return m_child!=0;}
+    bool isCarrying() const {return m_child!=0;}
 
     KrImNode* Clone();
 
@@ -65,13 +72,16 @@ private:
     double m_x_speed;
     double m_y_speed;
 
-    int m_time;
     double m_acc;
 
     bool m_jumping;
 
     BrainSprite* m_child;
 
+	/// Used to measure for how long this sprite has been alive
+	time_t m_creation_time;
+	/// If true we can delete this sprite after a delay
+	bool m_temporary; 
 };
 
 #endif

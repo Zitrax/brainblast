@@ -260,7 +260,7 @@ Brainblast::startGame()
     if( !initGameKyra() )
 		return false;
 
-	if( !initGame() )
+	if( !initGame(1) )
 		return false;
 
 	time(&m_start_time);
@@ -327,7 +327,7 @@ BrainSprite* Brainblast::addBrick()
 	// TODO: Make sure the random selection is only among used game bricks
 	//       this while loop sucks, but is just for testing.
 	KrSpriteResource* brickRes = 0;
-	int r = 0;
+	uint r = 0;
 	while(!brickRes)
 	{
 		r = rand()%10;
@@ -337,7 +337,7 @@ BrainSprite* Brainblast::addBrick()
 	GLASSERT( brickRes );
 
 	// Create the wizard sprite and add it to the tree
-	BrainSprite* brick = new BrainSprite( brickRes, "rand" );
+	BrainSprite* brick = new BrainSprite( brickRes, "rand", true );
 	//brick->SetNodeId(BB_YBLOB);
 	brick->SetPos( rand()%VIDEOX, 0);
 	brick->setSpeed(double(bbc::randint(-10,10)),0);
@@ -414,20 +414,27 @@ int Brainblast::eventLoop()
 			
         case SDL_TIMER_EVENT:
         {
-// 			static int t = 0;
-// 			const float a = 1.01;
  			BrainSprite* wizard = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_WIZARD ));
-// 			BrainSprite* star = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_YBLOB ));
-// 			if( wizard && star )
-// 			{
-// 				wizard->move();
-// 				star->move();
-// 			}
 
-			std::vector<BrainSprite*>::iterator it;
+			time_t now = time(0);
+			std::vector<BrainSprite*>::iterator it  = m_sprites.begin();
 			std::vector<BrainSprite*>::iterator end = m_sprites.end();
-			for(it = m_sprites.begin(); it!=end; ++it)
-				(*it)->move();
+			while(it!=end)
+			{
+				// First check if we should delete this sprite after a timeout
+				if( (*it)->temporary() && (difftime(now,(*it)->creationTime()) > 30) )
+				{
+					m_engine->Tree()->DeleteNode(*it);
+					// Set it to the next valid element after erasing
+					it = m_sprites.erase(it);
+					end = m_sprites.end(); // Only recalculate this when we might be invalidated
+				}
+				else
+				{
+					(*it)->move();
+					++it;
+				}
+			}
 
 			m_engine->Tree()->Walk();
 
@@ -437,17 +444,17 @@ int Brainblast::eventLoop()
 				if( m_engine->Tree()->CheckAllCollision(wizard,&collides) )
 				{  
 					printf("Collision!\n");
-					wizard->pickUp(reparentSprite((BrainSprite*)*collides.begin(),wizard));
-// 					std::vector<KrImage*>::iterator cit;
-// 					std::vector<KrImage*>::iterator cend = collides.end();
-// 					for(cit = collides.begin(); cit != cend; ++cit)
-// 					{
-// 						wizard->pickUp(reparentSprite((BrainSprite*)*cit,wizard));
-// 					}
+					// Use of dynamic cast as we only want to try to pick
+					// up BrainSprites and not ordinary KrSprites as in the
+					// Bricks. 
+					// Otherwise we might be able to pick up the solution in the beginning :)
+					BrainSprite* c = dynamic_cast<BrainSprite*>(*collides.begin());
+					if( c ) 
+						wizard->pickUp(reparentSprite(c,wizard));
 				}
 			}
 
-			if( difftime(time(0),m_start_time) > 10.0 )
+			if( difftime(now,m_start_time) > 10.0 )
 			{
 				m_currentLvl1->setVisibleSolution(false);
 				m_currentLvl2->setVisibleSolution(false);
