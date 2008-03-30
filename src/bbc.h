@@ -3,7 +3,6 @@
  * @date 2006-2008
  * @author Daniel Bengtsson
  */
-// -*- mode: C++; -*-
 
 #ifndef BBC_H
 #define BBC_H
@@ -27,38 +26,43 @@ class Brainblast;
 
 namespace bbc{
   
-  extern int debug;
+	extern int debug;
 
-  enum{ERROR, NOTUSED};
+	enum{ERROR, NOTUSED};
 
-  extern bool ERRFLAG;
+	extern bool ERRFLAG;
 
-  struct error{
-    std::string msg;
-    error(std::string s) : msg(s){}
-  };
+	struct error{
+		std::string msg;
+		error(std::string s) : msg(s){}
+	};
 
-  void line(SDL_Surface *s, 
-		   int x1, int y1, 
-		   int x2, int y2, 
-		   Uint32 color);
+	void line(SDL_Surface *s, 
+			  int x1, int y1, 
+			  int x2, int y2, 
+			  Uint32 color);
 
-  void line8(SDL_Surface *s, 
-		    int x1, int y1, 
-		    int x2, int y2, 
-		    Uint32 color);
+	void line8(SDL_Surface *s, 
+			   int x1, int y1, 
+			   int x2, int y2, 
+			   Uint32 color);
 
-  void line16(SDL_Surface *s, 
-		     int x1, int y1, 
-		     int x2, int y2, 
-		     Uint32 color);
+	void line16(SDL_Surface *s, 
+				int x1, int y1, 
+				int x2, int y2, 
+				Uint32 color);
   
-  void line32(SDL_Surface *s, 
-		     int x1, int y1, 
-		     int x2, int y2, 
-		     Uint32 color);
-
-  template<class T> int round( T value );
+	void line32(SDL_Surface *s, 
+				int x1, int y1, 
+				int x2, int y2, 
+				Uint32 color);
+	
+	template<class T> int round( T value );
+	
+	inline int randint(int min,int max) 
+	{
+		return min+int((max-min+1)*(rand()/(RAND_MAX+1.0)));
+	}
 }
 
 #endif
