@@ -320,30 +320,30 @@ Brainblast::initGameKyra()
 	return true;
 }
 
-BrainSprite* Brainblast::createStar()
+BrainSprite* Brainblast::addBrick()
 {
 	// Get the YBLOB resource
 	
 	// TODO: Make sure the random selection is only among used game bricks
 	//       this while loop sucks, but is just for testing.
-	KrSpriteResource* starRes = 0;
+	KrSpriteResource* brickRes = 0;
 	int r = 0;
-	while(!starRes)
+	while(!brickRes)
 	{
 		r = rand()%10;
 		if(r!=BB_WIZARD) 
-			starRes = m_engine->Vault()->GetSpriteResource( r );
+			brickRes = m_engine->Vault()->GetSpriteResource( r );
 	}
-	cout << r << "\n";
-	GLASSERT( starRes );
+	GLASSERT( brickRes );
 
 	// Create the wizard sprite and add it to the tree
-	BrainSprite* star = new BrainSprite( starRes, "rand" );
-	//star->SetNodeId(BB_YBLOB);
-	star->SetPos( rand()%VIDEOX, 0);
-	m_engine->Tree()->AddNode( m_bgTree, star );
-	m_sprites.push_back(star);
-	return star;
+	BrainSprite* brick = new BrainSprite( brickRes, "rand" );
+	//brick->SetNodeId(BB_YBLOB);
+	brick->SetPos( rand()%VIDEOX, 0);
+	brick->setSpeed(double(bbc::randint(-10,10)),0);
+	m_engine->Tree()->AddNode( m_bgTree, brick );
+	m_sprites.push_back(brick);
+	return brick;
 }
 
 bool
@@ -467,12 +467,20 @@ int Brainblast::eventLoop()
 		if( keysHeld[SDLK_LEFT] )
 		{
 			BrainSprite* wizard = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_WIZARD ));
-			wizard->left();
+			if( wizard->isCarrying() )
+				wizard->SetAction("HOLDING.LEFT");
+			else
+				wizard->SetAction("WALKING.LEFT");
+			wizard->DoStep();
 		}
-		if( keysHeld[SDLK_RIGHT] )
+		else if( keysHeld[SDLK_RIGHT] )
 		{
 			BrainSprite* wizard = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_WIZARD ));
-			wizard->right();
+			if( wizard->isCarrying() )
+				wizard->SetAction("HOLDING.RIGHT");
+			else
+				wizard->SetAction("WALKING.RIGHT");
+			wizard->DoStep();
 		}
 		if( keysHeld[SDLK_j] )
 		{
@@ -480,7 +488,7 @@ int Brainblast::eventLoop()
 			wizard->jump();
 		}
 		if( keysHeld[SDLK_F1] )
-			createStar();
+			addBrick();
 		if( keysHeld[SDLK_DOWN] ) 
 		{
 			BrainSprite* wizard = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_WIZARD ));

@@ -30,6 +30,8 @@ BrainSprite(KrSpriteResource* res, std::string name) :
     
     double speedX() const { return m_x_speed; }
     double speedY() const { return m_y_speed; }
+
+	// Whats the point of double here when we cast to int in move() ?
     void setSpeed(double x, double y) { m_x_speed=x; m_y_speed=y; }
     void stop() { m_x_speed=0; m_y_speed=0; }
     

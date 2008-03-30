@@ -63,7 +63,7 @@ public:
     //! Start a new game
     bool startGame();
 
-	BrainSprite* createStar();
+	BrainSprite* addBrick();
 
 	/**
 	 * 
