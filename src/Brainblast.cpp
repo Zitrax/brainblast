@@ -191,7 +191,7 @@ Brainblast::createBoards()
 	if(bbc::debug) std::cerr << "Brainblast::createBoards()\n";
 
 	// Create the master tile
-	KrTileResource* tileRes = m_engine->Vault()->GetTileResource( BB_WOOD );
+	KrTileResource* tileRes = m_engine->Vault()->GetTileResource( BB_REDSTAR );
 	if( !tileRes )
 		return false;
 	KrTile* tile = new KrTile(tileRes);
@@ -306,29 +306,40 @@ Brainblast::initGameKyra()
 	m_bgTree->SetZDepth(1);
 	m_fgTree->SetZDepth(20);
 	
-	// Get the PAPRICE resource
-	KrSpriteResource* papriceRes = m_engine->Vault()->GetSpriteResource( BB_PAPRICE );
-	assert( papriceRes );
+	// Get the WIZARD resource
+	KrSpriteResource* wizardRes = m_engine->Vault()->GetSpriteResource( BB_WIZARD );
+	assert( wizardRes );
 
-	// Create the paprice sprite and add it to the tree
-	BrainSprite* paprice = new BrainSprite( papriceRes, "paprice" );
-	paprice->SetNodeId(BB_PAPRICE);
-	paprice->SetPos( rand()%VIDEOX, 0);
-	m_engine->Tree()->AddNode( m_fgTree, paprice );
-	m_sprites.push_back(paprice);
+	// Create the wizard sprite and add it to the tree
+	BrainSprite* wizard = new BrainSprite( wizardRes, "wizard" );
+	wizard->SetNodeId(BB_WIZARD);
+	wizard->SetPos( rand()%VIDEOX, 0);
+	m_engine->Tree()->AddNode( m_fgTree, wizard );
+	m_sprites.push_back(wizard);
 
 	return true;
 }
 
 BrainSprite* Brainblast::createStar()
 {
-	// Get the STAR resource
-	KrSpriteResource* starRes = m_engine->Vault()->GetSpriteResource( BB_STAR );
+	// Get the YBLOB resource
+	
+	// TODO: Make sure the random selection is only among used game bricks
+	//       this while loop sucks, but is just for testing.
+	KrSpriteResource* starRes = 0;
+	int r = 0;
+	while(!starRes)
+	{
+		r = rand()%10;
+		if(r!=BB_WIZARD) 
+			starRes = m_engine->Vault()->GetSpriteResource( r );
+	}
+	cout << r << "\n";
 	GLASSERT( starRes );
 
-	// Create the paprice sprite and add it to the tree
-	BrainSprite* star = new BrainSprite( starRes, "star" );
-	star->SetNodeId(BB_STAR);
+	// Create the wizard sprite and add it to the tree
+	BrainSprite* star = new BrainSprite( starRes, "rand" );
+	//star->SetNodeId(BB_YBLOB);
 	star->SetPos( rand()%VIDEOX, 0);
 	m_engine->Tree()->AddNode( m_bgTree, star );
 	m_sprites.push_back(star);
@@ -405,11 +416,11 @@ int Brainblast::eventLoop()
         {
 // 			static int t = 0;
 // 			const float a = 1.01;
- 			BrainSprite* paprice = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_PAPRICE ));
-// 			BrainSprite* star = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_STAR ));
-// 			if( paprice && star )
+ 			BrainSprite* wizard = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_WIZARD ));
+// 			BrainSprite* star = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_YBLOB ));
+// 			if( wizard && star )
 // 			{
-// 				paprice->move();
+// 				wizard->move();
 // 				star->move();
 // 			}
 
@@ -421,22 +432,22 @@ int Brainblast::eventLoop()
 			m_engine->Tree()->Walk();
 
 			// Detect collisions
-			if(!paprice->isCarrying() && keysHeld[SDLK_UP] ) {
+			if(!wizard->isCarrying() && keysHeld[SDLK_UP] ) {
 				std::vector<KrImage*> collides;
-				if( m_engine->Tree()->CheckAllCollision(paprice,&collides) )
+				if( m_engine->Tree()->CheckAllCollision(wizard,&collides) )
 				{  
 					printf("Collision!\n");
-					paprice->pickUp(reparentSprite((BrainSprite*)*collides.begin(),paprice));
+					wizard->pickUp(reparentSprite((BrainSprite*)*collides.begin(),wizard));
 // 					std::vector<KrImage*>::iterator cit;
 // 					std::vector<KrImage*>::iterator cend = collides.end();
 // 					for(cit = collides.begin(); cit != cend; ++cit)
 // 					{
-// 						paprice->pickUp(reparentSprite((BrainSprite*)*cit,paprice));
+// 						wizard->pickUp(reparentSprite((BrainSprite*)*cit,wizard));
 // 					}
 				}
 			}
 
-			if( difftime(time(0),m_start_time) > 5.0 )
+			if( difftime(time(0),m_start_time) > 10.0 )
 			{
 				m_currentLvl1->setVisibleSolution(false);
 				m_currentLvl2->setVisibleSolution(false);
@@ -455,25 +466,25 @@ int Brainblast::eventLoop()
 			done = true;
 		if( keysHeld[SDLK_LEFT] )
 		{
-			BrainSprite* paprice = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_PAPRICE ));
-			paprice->left();
+			BrainSprite* wizard = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_WIZARD ));
+			wizard->left();
 		}
 		if( keysHeld[SDLK_RIGHT] )
 		{
-			BrainSprite* paprice = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_PAPRICE ));
-			paprice->right();
+			BrainSprite* wizard = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_WIZARD ));
+			wizard->right();
 		}
-// 		if( keysHeld[SDLK_UP] )
-// 		{
-// 			BrainSprite* paprice = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_PAPRICE ));
-// 			paprice->jump();
-// 		}
+		if( keysHeld[SDLK_j] )
+		{
+			BrainSprite* wizard = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_WIZARD ));
+			wizard->jump();
+		}
 		if( keysHeld[SDLK_F1] )
 			createStar();
 		if( keysHeld[SDLK_DOWN] ) 
 		{
-			BrainSprite* paprice = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_PAPRICE ));
-			paprice->drop();
+			BrainSprite* wizard = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_WIZARD ));
+			wizard->drop();
 		}
 	}
     
