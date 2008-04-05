@@ -1,33 +1,36 @@
-<Definition filename="../images/bricks.bmp" Transparent0="#000000">
-    <Tile name="WOOD" x="196" y="382" size="45" />
-    <Sprite name="BLUEDOT">
+<Definition filename="bricks2.bmp" Transparent0="#000000">
+    <Sprite name="WIZARD">
+        <Action name="HOLDING.RIGHT">
+            <Frame x="237" y="120" width="54" height="55" hotspotx="260" hotspoty="133" deltax="6" deltay="0" />
+        </Action>
+        <Action name="HOLDING.LEFT">
+            <Frame x="293" y="119" width="51" height="56" hotspotx="324" hotspoty="134" deltax="-6" deltay="0" />
+        </Action>
+        <Action name="WALKING.LEFT">
+            <Frame x="140" y="120" width="43" height="58" hotspotx="164" hotspoty="134" deltax="0" deltay="0" />
+            <Frame x="183" y="119" width="50" height="59" hotspotx="209" hotspoty="134" deltax="-8" deltay="0" />
+        </Action>
+        <Action name="WALKING.RIGHT">
+            <Frame x="36" y="122" width="51" height="58" hotspotx="61" hotspoty="134" deltax="0" deltay="0" />
+            <Frame x="87" y="121" width="44" height="59" hotspotx="105" hotspoty="134" deltax="8" deltay="0" />
+        </Action>
+        <Action name="NONE" />
+    </Sprite>
+    <Sprite name="YBLOB">
         <Action name="NONE">
-            <Frame x="278" y="325" width="30" height="32" hotspotx="292" hotspoty="341" deltax="0" deltay="0" />
+            <Frame x="400" y="0" width="101" height="101" hotspotx="453" hotspoty="48" deltax="0" deltay="0" />
         </Action>
     </Sprite>
-    <Sprite name="MESS">
+    <Sprite name="GBLOB">
         <Action name="NONE">
-            <Frame x="181" y="323" width="71" height="58" hotspotx="218" hotspoty="350" deltax="0" deltay="0" />
+            <Frame x="300" y="0" width="101" height="101" hotspotx="345" hotspoty="45" deltax="0" deltay="0" />
         </Action>
     </Sprite>
-    <Sprite name="GIMP">
+    <Sprite name="CBLOB">
         <Action name="NONE">
-            <Frame x="271" y="254" width="61" height="50" hotspotx="299" hotspoty="277" deltax="0" deltay="0" />
+            <Frame x="201" y="0" width="100" height="101" hotspotx="250" hotspoty="50" deltax="0" deltay="0" />
         </Action>
     </Sprite>
-    <Sprite name="LEAVES">
-        <Action name="NONE">
-            <Frame x="180" y="257" width="79" height="64" hotspotx="180" hotspoty="257" deltax="0" deltay="0" />
-        </Action>
-    </Sprite>
-    <Sprite name="PAPRICE">
-        <Action name="NONE">
-            <Frame x="251" y="181" width="54" height="64" hotspotx="278" hotspoty="212" deltax="0" deltay="0" />
-        </Action>
-    </Sprite>
-    <Sprite name="STAR">
-        <Action name="NONE">
-            <Frame x="181" y="182" width="65" height="67" hotspotx="213" hotspoty="215" deltax="0" deltay="0" />
-        </Action>
-    </Sprite>
+    <Tile name="GRAYC" x="100" y="0" size="101" />
+    <Tile name="REDSTAR" x="0" y="0" size="101" />
 </Definition>

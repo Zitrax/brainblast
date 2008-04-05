@@ -369,7 +369,8 @@ Brainblast::initGame(int lvl)
 
 	// Start music
 	if( !(m_sound->initializeSound() &&
-		  m_sound->loadMusic("../music/Instant Remedy - Outrun.mp3") &&
+		  //m_sound->loadMusic("../music/Instant Remedy - Outrun.mp3") &&
+		  m_sound->loadMusic("../music/onward.xm") &&
 		  m_sound->playMusic()) )
 		printf("=== ERROR: Could not start music === \n");
 	
@@ -388,6 +389,8 @@ int Brainblast::eventLoop()
 
 	bool keysHeld[323] = {false};
 
+	BrainSprite* wizard = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_WIZARD ));
+
     while( !done && SDL_WaitEvent(&event) )
 	{
 		if ( event.type == SDL_QUIT )
@@ -396,7 +399,7 @@ int Brainblast::eventLoop()
 		switch(event.type)
 		{
         case SDL_KEYDOWN:
-			keysHeld[event.key.keysym.sym] = true;
+
 			printf( "%s\n", SDL_GetKeyName(event.key.keysym.sym));
 
 			// M = TOGGLE SOUND
@@ -405,6 +408,32 @@ int Brainblast::eventLoop()
 			// F = TOGGLE FULLSCREEN
 			else if( event.key.keysym.sym == SDLK_f )
 				SDL_WM_ToggleFullScreen(m_screen);
+			else if( (event.key.keysym.sym == SDLK_LEFT) && 
+					 (m_currentLvl1->isSelecting()) )
+			{
+				m_currentLvl1->navigate(Puzzle::LEFT);
+				
+			}
+			else if( (event.key.keysym.sym == SDLK_RIGHT) && 
+					 (m_currentLvl1->isSelecting()) )
+			{
+				m_currentLvl1->navigate(Puzzle::RIGHT);
+				
+			}
+			else if( (event.key.keysym.sym == SDLK_UP) && 
+					 (m_currentLvl1->isSelecting()) )
+			{
+				m_currentLvl1->navigate(Puzzle::UP);
+				
+			}
+			else if( (event.key.keysym.sym == SDLK_DOWN) && 
+					 (m_currentLvl1->isSelecting()) )
+			{
+				m_currentLvl1->navigate(Puzzle::DOWN);
+				
+			}
+			else
+				keysHeld[event.key.keysym.sym] = true;
 
 			break;
 			
@@ -414,8 +443,6 @@ int Brainblast::eventLoop()
 			
         case SDL_TIMER_EVENT:
         {
- 			BrainSprite* wizard = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_WIZARD ));
-
 			time_t now = time(0);
 			std::vector<BrainSprite*>::iterator it  = m_sprites.begin();
 			std::vector<BrainSprite*>::iterator end = m_sprites.end();
@@ -431,6 +458,36 @@ int Brainblast::eventLoop()
 				}
 				else
 				{
+// 					// <Collision between bricks experiment>
+// 					double x1 = (*it)->speedX();
+// 					double y1 = (*it)->speedY();
+
+// 					if( (x1>=15) || (y1>=0.15) )
+// 					{ 
+
+// 						std::vector<KrImage*> collides;
+// 						if( ((*it) != wizard) && m_engine->Tree()->CheckAllCollision(*it,&collides) )
+// 						{
+// 							BrainSprite* c = dynamic_cast<BrainSprite*>(*collides.begin());
+// 							if( c && (c != wizard) ) {
+								
+// 								double x2 = c->speedX();
+// 								double y2 = c->speedY();
+								
+// 								if( (x2 < 5) && (y2 < 5) )
+// 									(*it)->setSpeed(-0.5*x1,-0.5*y1);
+// 								else
+// 								{
+									
+// 									(*it)->setSpeed(x2,y2);
+// 									c->setSpeed(x1,y1);
+									
+// 								}
+// 							}
+// 						}
+// 					}
+// 					// </Collision between bricks experiment>
+
 					(*it)->move();
 					++it;
 				}
@@ -473,7 +530,6 @@ int Brainblast::eventLoop()
 			done = true;
 		if( keysHeld[SDLK_LEFT] )
 		{
-			BrainSprite* wizard = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_WIZARD ));
 			if( wizard->isCarrying() )
 				wizard->SetAction("HOLDING.LEFT");
 			else
@@ -482,7 +538,6 @@ int Brainblast::eventLoop()
 		}
 		else if( keysHeld[SDLK_RIGHT] )
 		{
-			BrainSprite* wizard = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_WIZARD ));
 			if( wizard->isCarrying() )
 				wizard->SetAction("HOLDING.RIGHT");
 			else
@@ -491,14 +546,21 @@ int Brainblast::eventLoop()
 		}
 		if( keysHeld[SDLK_j] )
 		{
-			BrainSprite* wizard = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_WIZARD ));
 			wizard->jump();
 		}
 		if( keysHeld[SDLK_F1] )
 			addBrick();
+		if( keysHeld[SDLK_F2] )
+		{
+			if( wizard->isCarrying() )
+			{
+				BrainSprite* o = wizard->drop();
+				o->setStatic(true);
+				m_currentLvl1->startSelection(o);
+			}
+		}
 		if( keysHeld[SDLK_DOWN] ) 
 		{
-			BrainSprite* wizard = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_WIZARD ));
 			wizard->drop();
 		}
 	}

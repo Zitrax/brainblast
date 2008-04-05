@@ -26,7 +26,8 @@ public:
         m_jumping(true),
         m_child(0),
 		m_creation_time(time(0)),
-		m_temporary(temporary)
+		m_temporary(temporary),
+		m_static(false)
 		{}
 
 	virtual ~BrainSprite(){std::cout << "BrainSprite destroyed " << m_name << "\n"; }
@@ -54,14 +55,24 @@ public:
 	time_t creationTime() const { return m_creation_time; }
 	bool temporary() const { return m_temporary; }
 	void setTemporary(bool tmp) { m_temporary=tmp; }
+	
+	/**
+	 * If static this sprite will not move in the move
+	 * function.
+	 */
+	void setStatic(bool stat) { m_static = stat; }
 
     /**
      * Note that bs must be a child node.
      * You can reparent it with \ref BrainBlast::reparent first.
      */
     void pickUp(BrainSprite* bs);
-    void drop();
+	/**
+	 * If something was dropped, it's returned.
+	 */
+    BrainSprite* drop();
     bool isCarrying() const {return m_child!=0;}
+	BrainSprite* carry() const { return m_child; }
 
     KrImNode* Clone();
 
@@ -82,6 +93,8 @@ private:
 	time_t m_creation_time;
 	/// If true we can delete this sprite after a delay
 	bool m_temporary; 
+
+	bool m_static;
 };
 
 #endif

@@ -7,9 +7,14 @@ using namespace brain;
 
 void BrainSprite::move()
 {
+    if( m_static ) return;
+
     // 1. Find new position
-    SetPos( static_cast<int>(X()+m_x_speed), 
-            static_cast<int>(Y()+m_y_speed) );
+//     SetPos( static_cast<int>(X()+m_x_speed), 
+//             static_cast<int>(Y()+m_y_speed) );
+    SetPos( bbc::round(X()+m_x_speed), 
+            bbc::round(Y()+m_y_speed) );
+
 
     if( X() > VIDEOX )
         SetPos(0,Y());
@@ -59,7 +64,7 @@ void BrainSprite::pickUp(BrainSprite* bs)
     }
 }
 
-void BrainSprite::drop()
+BrainSprite* BrainSprite::drop()
 {
     if( m_child ) {
         BrainSprite* clone = Brainblast::instance()->reparentSprite(m_child,0);
@@ -67,7 +72,9 @@ void BrainSprite::drop()
         clone->setAcc(m_acc);
         clone->setSpeed(m_x_speed,m_y_speed);
         m_child = 0;
+        return clone;
     }
+    return 0;
 }
 
 KrImNode* BrainSprite::Clone()
