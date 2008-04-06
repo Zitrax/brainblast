@@ -63,7 +63,7 @@ public:
     //! Start a new game
     bool startGame();
 
-	BrainSprite* addBrick();
+	BrainSprite* addSprite();
 
 	/**
 	 * 
@@ -77,6 +77,8 @@ private:
 
 	static Brainblast* s_instance;
 
+	static const double WAITTIME = 1.0;
+
 	BrainSound* m_sound;
 
     Puzzle* m_currentLvl1;
@@ -86,7 +88,7 @@ private:
     SDL_Rect*    m_field1;
     SDL_Rect*    m_field2;
 
-    Brick**      m_bricks;
+	std::map<int,Brick*> m_bricks;
 	int          m_total_bricks;
 
 	KrEngine*    m_engine;

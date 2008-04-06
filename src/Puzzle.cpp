@@ -14,6 +14,7 @@ Puzzle::Puzzle(int width, int height, SDL_Rect rect)
 	m_rect(rect),
 	m_solution(0), 
 	m_current(0),
+	m_current_tree(0),
 	m_solution_tree(0),
 	m_background_tree(0),
 	m_back(0),
@@ -41,6 +42,7 @@ Puzzle::Puzzle(const Puzzle& pz): Field(pz.m_width,pz.m_height),
 								  m_rect(pz.m_rect),
                                   m_solution(0),
                                   m_current(0),
+								  m_current_tree(0),
 								  m_solution_tree(0),
 								  m_background_tree(0),
 								  m_back(0),
@@ -49,6 +51,7 @@ Puzzle::Puzzle(const Puzzle& pz): Field(pz.m_width,pz.m_height),
 								  m_selection_sprite(0),
 								  m_s_coord(this)
 {
+	assert(0); // Fix before use
 
     for( uint i=0; i<m_width*m_height; i++) {
         m_solution[i] = new Brick(*pz.m_solution[i]);
@@ -59,12 +62,12 @@ Puzzle::Puzzle(const Puzzle& pz): Field(pz.m_width,pz.m_height),
 	if( pz.m_solution_tree ) {
 		m_solution_tree = pz.m_solution_tree->Clone();
 		Brainblast::instance()->engine()->Tree()->AddNode(0, m_solution_tree);
-		m_solution_tree->SetZDepth(5);
+		m_solution_tree->SetZDepth(SOLZ);
 	}
 	if( pz.m_background_tree ) {
 		m_background_tree = pz.m_background_tree->Clone();
 		Brainblast::instance()->engine()->Tree()->AddNode(0, m_background_tree);
-		m_background_tree->SetZDepth(15);
+		m_background_tree->SetZDepth(BACZ);
 	}
 
 }
@@ -72,6 +75,8 @@ Puzzle::Puzzle(const Puzzle& pz): Field(pz.m_width,pz.m_height),
 Puzzle&
 Puzzle::operator=(const Puzzle& pz) 
 { 
+	assert(0); // Fix before use
+
     m_width = pz.m_width;
     m_height = pz.m_height;
 
@@ -84,12 +89,12 @@ Puzzle::operator=(const Puzzle& pz)
 	if( pz.m_solution_tree ) {
 		m_solution_tree = pz.m_solution_tree->Clone();
 		Brainblast::instance()->engine()->Tree()->AddNode(0, m_solution_tree);
-		m_solution_tree->SetZDepth(5);
+		m_solution_tree->SetZDepth(SOLZ);
 	}
 	if( pz.m_background_tree ) {
 		m_background_tree = pz.m_background_tree->Clone();
 		Brainblast::instance()->engine()->Tree()->AddNode(0, m_background_tree);
-		m_background_tree->SetZDepth(15);
+		m_background_tree->SetZDepth(BACZ);
 	}
 	
     return *this;
@@ -111,9 +116,12 @@ Puzzle::checkSolution()
     if(bbc::debug) std::cerr << "Puzzle::checkSolution()\n";
   
     for(uint i=0; i<m_width*m_height; i++)
-        if( *m_solution[i] != *m_current[i] )
-            return false;
-
+		if( m_solution[i] )
+		{
+			if( !m_current[i] ) return false;
+			if( *m_solution[i] != *m_current[i] ) return false; 
+		}
+			
     return true;
 }
 
@@ -148,7 +156,7 @@ Puzzle::setSolutionBrickWithIdx(const Brick* const b, int idx)
 			m_solution_tree = new KrImNode;
 			assert(Brainblast::instance()->engine()->Tree());
 			Brainblast::instance()->engine()->Tree()->AddNode(0, m_solution_tree);
-			m_solution_tree->SetZDepth(5);
+			m_solution_tree->SetZDepth(SOLZ);
 		}
 		KrSprite* sprite = s->Clone()->ToSprite(); 
 		Brick* nb = new Brick(sprite,b->id());
@@ -168,9 +176,11 @@ Puzzle::setBackgroundTile(KrTile* tile)
 	if( m_background_tree )
 		Brainblast::instance()->engine()->Tree()->DeleteNode(m_background_tree);
 	// Create new tree and insert in the global tree
-	m_background_tree = new KrImNode;
-	Brainblast::instance()->engine()->Tree()->AddNode(0, m_background_tree);
-	m_solution_tree->SetZDepth(15);
+	if( !m_background_tree ) {
+		m_background_tree = new KrImNode;
+		Brainblast::instance()->engine()->Tree()->AddNode(0, m_background_tree);
+		m_background_tree->SetZDepth(BACZ);
+	}
 	
 	// Create and position all bg tiles
 	for(uint x=0;x<m_width;x++)
@@ -195,11 +205,12 @@ void Puzzle::updateSelection()
 	if( m_selected_tile )
 		m_selected_tile->SetVisible(true);
 
-	int x = m_s_coord.X();
-	int y = m_s_coord.Y();
+	int x = m_s_coord.x();
+	int y = m_s_coord.y();
+	int i = m_s_coord.i();
 
-	m_selected_tile = m_back[y*m_width+x];
-	m_back[y*m_width+x]->SetVisible(false);
+	m_selected_tile = m_back[i];
+	m_back[i]->SetVisible(false);
 
 	int xspace = m_rect.w/m_width;
 	int yspace = m_rect.h/m_height;
@@ -212,6 +223,8 @@ void Puzzle::updateSelection()
 		Brainblast::instance()->engine()->Tree()->AddNode(m_background_tree, m_selection_tile);
 	}
 	
+	m_selection_tile->SetVisible(true);
+
 	m_selection_tile->SetPos(m_rect.x + x*xspace+xspace/2-m_selection_tile->Size()/2,
 							 m_rect.y + y*yspace+yspace/2-m_selection_tile->Size()/2);
 	
@@ -224,6 +237,32 @@ void Puzzle::startSelection(BrainSprite* bs)
 	bs->setTemporary(false);
 	m_selection_sprite=bs; 
 	updateSelection(); 
+}
+
+BrainSprite* Puzzle::select()
+{
+	if( m_selected_tile )
+		m_selected_tile->SetVisible(true);
+	if( m_selection_tile )
+		m_selection_tile->SetVisible(false);
+
+	// Create solution brick
+	Brick* b = new Brick(m_selection_sprite,m_selection_sprite->NodeId());
+
+	if( !m_current_tree )
+	{
+		m_current_tree = new KrImNode;
+		Brainblast::instance()->engine()->Tree()->AddNode(0, m_current_tree);
+		m_current_tree->SetZDepth(SOLZ);
+	}
+
+	m_current[m_s_coord.i()] = b;
+
+	checkSolution();
+
+	BrainSprite* sprite = m_selection_sprite;
+	m_selection_sprite = 0;
+	return sprite;
 }
 
 // int 

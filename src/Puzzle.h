@@ -38,6 +38,14 @@ public:
 	enum direction { LEFT,RIGHT,UP,DOWN };
 	void navigate(enum direction dir) { m_s_coord.move(dir); updateSelection(); }
 	bool isSelecting() const { return m_selection_sprite != 0; } 
+	/**
+	 * This creates a brick of the moved type at the current
+	 * position. 
+	 *
+	 * If a sprite is returned the brick has taken over the 
+	 * ownership of the sprite.
+	 */
+	BrainSprite* select();
 
 //  	int getXCoord(int x) const;
 // 	int getYCoord(int y) const;
@@ -49,6 +57,7 @@ private:
 	SDL_Rect  m_rect;
 	Brick**   m_solution;
 	Brick**   m_current;
+	KrImNode* m_current_tree;
 	KrImNode* m_solution_tree;
 	KrImNode* m_background_tree;
 	KrTile**  m_back;
@@ -62,8 +71,9 @@ private:
 	public:
 		SelectCoord(const Puzzle* const p) : m_x(0), m_y(0), m_p(p) {}
 		
-		int X() const { return m_x; }
-		int Y() const { return m_y; }
+		int x() const { return m_x; }
+		int y() const { return m_y; }
+		int i() const { return m_x+m_y*m_p->m_width; }
 
 		void move(enum direction dir) {
 			switch(dir) {
@@ -98,6 +108,9 @@ private:
 	};
 
  	SelectCoord m_s_coord;
+
+	static const int SOLZ = 20;
+	static const int BACZ = -1; // Not sure why this has to be negative
 
 };
 

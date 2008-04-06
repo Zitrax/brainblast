@@ -21,7 +21,6 @@ Brainblast::Brainblast() : m_sound(new BrainSound),
                            m_screen( SDL_SetVideoMode( VIDEOX, VIDEOY, VIDEOBITS, SDL_HWSURFACE ) ),
                            m_field1(0),
                            m_field2(0),
-                           m_bricks(0),
 						   m_total_bricks(0),
 						   m_engine(0),
 						   m_bgTree(0),
@@ -79,10 +78,12 @@ Brainblast::~Brainblast()
 void
 Brainblast::cleanup()
 {
-    if( m_bricks )
-        for(int i=0; i<m_total_bricks; i++)
-            zap( m_bricks[i] );
-    zapArr( m_bricks );
+// TODO: Clean m_bricks map
+// 
+//     if( m_bricks )
+//         for(int i=0; i<m_total_bricks; i++)
+//             zap( m_bricks[i] );
+//     zapArr( m_bricks );
     
     // m_screen is deleted by SDL_Quit
     // zap( m_screen );
@@ -143,14 +144,15 @@ Brainblast::makeLevel(int lvl)
                 if(bbc::debug) std::cerr << val << " ";
                 if( i%2 == 0 ) tmp = val;
                 else  {
-					if( !(val<m_total_bricks && val>=0) )
+					std::map<int,Brick*>::iterator it = m_bricks.find(val);
+					if( it == m_bricks.end() )
 					{
 						std::cerr << "=== ERROR: Level file contain invalid brick type (" << val << ") ===\n";
 						return false;
 					}
 					
-                    m_currentLvl1->setSolutionBrickWithIdx(m_bricks[val],tmp-1);
-                    m_currentLvl2->setSolutionBrickWithIdx(m_bricks[val],tmp-1);
+                    m_currentLvl1->setSolutionBrickWithIdx(it->second,tmp-1);
+                    m_currentLvl2->setSolutionBrickWithIdx(it->second,tmp-1);
 				}
             }
             i++;
@@ -169,8 +171,6 @@ Brainblast::createBricks()
 {
     if(bbc::debug) std::cerr << "Brainblast::createBricks()\n";
 
-    m_bricks = new Brick*[MAX_NOF_BRICK_TYPES];
-
 	GlSListIterator<KrResource*> rit = m_engine->Vault()->GetResourceIterator();
 	for(rit.Begin(); !rit.Done(); rit.Next())
 	{
@@ -178,7 +178,7 @@ Brainblast::createBricks()
 		if( sr )
 		{
 			KrSprite* b = new KrSprite(sr);
-			m_bricks[m_total_bricks] = new Brick(b, m_total_bricks);
+			m_bricks.insert(pair<int,Brick*>(sr->ResourceId(),new Brick(b, sr->ResourceId())));
 			m_total_bricks++;
 			assert(m_total_bricks<MAX_NOF_BRICK_TYPES);
 		}
@@ -260,7 +260,7 @@ Brainblast::startGame()
     if( !initGameKyra() )
 		return false;
 
-	if( !initGame(1) )
+	if( !initGame(3) )
 		return false;
 
 	time(&m_start_time);
@@ -303,8 +303,8 @@ Brainblast::initGameKyra()
 	KrImNode* m_fgTree = new KrImNode;
 	m_engine->Tree()->AddNode(0, m_bgTree);
 	m_engine->Tree()->AddNode(0, m_fgTree);
-	m_bgTree->SetZDepth(1);
-	m_fgTree->SetZDepth(20);
+	m_bgTree->SetZDepth(10);
+	m_fgTree->SetZDepth(11);
 	
 	// Get the WIZARD resource
 	KrSpriteResource* wizardRes = m_engine->Vault()->GetSpriteResource( BB_WIZARD );
@@ -320,30 +320,31 @@ Brainblast::initGameKyra()
 	return true;
 }
 
-BrainSprite* Brainblast::addBrick()
+BrainSprite* Brainblast::addSprite()
 {
-	// Get the YBLOB resource
-	
+	if( difftime(time(0),m_start_time) <= WAITTIME )
+		return 0;
+
 	// TODO: Make sure the random selection is only among used game bricks
 	//       this while loop sucks, but is just for testing.
-	KrSpriteResource* brickRes = 0;
+	KrSpriteResource* spriteRes = 0;
 	uint r = 0;
-	while(!brickRes)
+	while(!spriteRes)
 	{
-		r = rand()%10;
+		r = bbc::randint(1,12);
 		if(r!=BB_WIZARD) 
-			brickRes = m_engine->Vault()->GetSpriteResource( r );
+			spriteRes = m_engine->Vault()->GetSpriteResource( r );
 	}
-	GLASSERT( brickRes );
+	assert( spriteRes );
 
 	// Create the wizard sprite and add it to the tree
-	BrainSprite* brick = new BrainSprite( brickRes, "rand", true );
-	//brick->SetNodeId(BB_YBLOB);
-	brick->SetPos( rand()%VIDEOX, 0);
-	brick->setSpeed(double(bbc::randint(-10,10)),0);
-	m_engine->Tree()->AddNode( m_bgTree, brick );
-	m_sprites.push_back(brick);
-	return brick;
+	BrainSprite* sprite = new BrainSprite( spriteRes, "rand", true );
+	sprite->SetNodeId(r);
+	sprite->SetPos( rand()%VIDEOX, 0);
+	sprite->setSpeed(double(bbc::randint(-10,10)),0);
+	m_engine->Tree()->AddNode( m_bgTree, sprite );
+	m_sprites.push_back(sprite);
+	return sprite;
 }
 
 bool
@@ -380,6 +381,10 @@ Brainblast::initGame(int lvl)
 
 int Brainblast::eventLoop()
 {
+	// There all sort of things that can be
+	// optimized in this loop. But lets get it
+	// working properly first.
+
 	assert(m_engine);
 
     SDL_Event event;
@@ -432,6 +437,18 @@ int Brainblast::eventLoop()
 				m_currentLvl1->navigate(Puzzle::DOWN);
 				
 			}
+			else if( (event.key.keysym.sym == SDLK_RETURN) && 
+					 (m_currentLvl1->isSelecting()) )
+			{
+				BrainSprite* s = m_currentLvl1->select();
+				if( s )
+				{
+					//m_engine->Tree()->DeleteNode(s);
+					std::vector<BrainSprite*>::iterator it = find(m_sprites.begin(),m_sprites.end(),s);
+					m_sprites.erase(it);
+				}
+			}
+
 			else
 				keysHeld[event.key.keysym.sym] = true;
 
@@ -511,7 +528,7 @@ int Brainblast::eventLoop()
 				}
 			}
 
-			if( difftime(now,m_start_time) > 10.0 )
+			if( difftime(now,m_start_time) > WAITTIME )
 			{
 				m_currentLvl1->setVisibleSolution(false);
 				m_currentLvl2->setVisibleSolution(false);
@@ -549,7 +566,7 @@ int Brainblast::eventLoop()
 			wizard->jump();
 		}
 		if( keysHeld[SDLK_F1] )
-			addBrick();
+			addSprite();
 		if( keysHeld[SDLK_F2] )
 		{
 			if( wizard->isCarrying() )
@@ -581,7 +598,7 @@ BrainSprite* Brainblast::reparentSprite(BrainSprite* bs, BrainSprite* parent)
 	m_engine->Tree()->AddNode(parent,clone);
 	std::vector<BrainSprite*>::iterator it = find(m_sprites.begin(),m_sprites.end(),bs);
 	if( it != m_sprites.end() )
-		m_sprites.erase(find(m_sprites.begin(),m_sprites.end(),bs));
+		m_sprites.erase(it);
 	if( !parent )
 		m_sprites.push_back(clone);
     m_engine->Tree()->DeleteNode(bs);

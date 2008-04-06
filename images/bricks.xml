@@ -1,4 +1,19 @@
 <Definition filename="bricks2.bmp" Transparent0="#000000">
+    <Sprite name="M_BLOB">
+        <Action name="NONE">
+            <Frame x="506" y="86" width="68" height="65" hotspotx="543" hotspoty="118" deltax="0" deltay="0" />
+        </Action>
+    </Sprite>
+    <Sprite name="B_BLOB">
+        <Action name="NONE">
+            <Frame x="503" y="14" width="73" height="64" hotspotx="540" hotspoty="47" deltax="0" deltay="0" />
+        </Action>
+    </Sprite>
+    <Sprite name="S_BLOB">
+        <Action name="NONE">
+            <Frame x="421" y="86" width="70" height="70" hotspotx="457" hotspoty="120" deltax="0" deltay="0" />
+        </Action>
+    </Sprite>
     <Sprite name="WIZARD">
         <Action name="HOLDING.RIGHT">
             <Frame x="237" y="120" width="54" height="55" hotspotx="260" hotspoty="133" deltax="6" deltay="0" />
@@ -18,7 +33,7 @@
     </Sprite>
     <Sprite name="YBLOB">
         <Action name="NONE">
-            <Frame x="400" y="0" width="101" height="101" hotspotx="453" hotspoty="48" deltax="0" deltay="0" />
+            <Frame x="418" y="13" width="69" height="69" hotspotx="453" hotspoty="49" deltax="0" deltay="0" />
         </Action>
     </Sprite>
     <Sprite name="GBLOB">
