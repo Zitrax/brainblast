@@ -7,8 +7,8 @@
 #include "Brainblast.h"
 
 #include "../images/bb.h"
-
 #include "grinliz/glrandom.h"
+#include "SDL_ttf.h"
 
 using namespace grinliz;
 using namespace brain;
@@ -54,6 +54,12 @@ Brainblast::Brainblast() : m_sound(new BrainSound),
         exit(1);
     }   
 
+	if( TTF_Init() == -1 )
+    {
+        printf("=== ERROR: Can't initialize ttf support: (%s) ===\n",TTF_GetError());
+        exit(1);
+    }   
+
     m_field1 = new SDL_Rect;
     m_field1->x = MARGIN; 
 	m_field1->y = MARGIN; 
@@ -74,6 +80,8 @@ Brainblast::~Brainblast()
     if(bbc::debug) std::cerr << "Brainblast::~Brainblast()\n";
  
     cleanup();
+
+	TTF_Quit();
 }
 
 void
@@ -261,7 +269,7 @@ Brainblast::startGame()
     if( !initGameKyra() )
 		return false;
 
-	if( !initGame(3) )
+	if( !initGame(1) )
 		return false;
 
 	time(&m_start_time);
@@ -269,17 +277,6 @@ Brainblast::startGame()
     eventLoop();
 
 	return true;
-}
-
-#define SDL_TIMER_EVENT ( SDL_USEREVENT + 0 )
-const int TIMER_INTERVAL = 40;
-Uint32 TimerCallback(Uint32 /*interval*/)
-{
-	SDL_Event event;
-	event.type = SDL_TIMER_EVENT;
-
-	SDL_PeepEvents( &event, 1, SDL_ADDEVENT, 0 );
-	return TIMER_INTERVAL;
 }
 
 bool 
@@ -385,6 +382,15 @@ Brainblast::initGame(int lvl)
 	return true;
 }
 
+#define SDL_DRAW_EVENT ( SDL_USEREVENT + 0 )
+#define SDL_ADD_SPRITE_EVENT ( SDL_USEREVENT + 1 )
+const int ADD_SPRITE_TIMER_INTERVAL = 400;
+Uint32 TimerCallback(Uint32 interval, void* event)
+{
+	SDL_PushEvent( static_cast<SDL_Event*>(event) );
+	return interval;
+}
+
 int Brainblast::eventLoop()
 {
 	// There all sort of things that can be
@@ -396,7 +402,10 @@ int Brainblast::eventLoop()
     SDL_Event event;
 	bool done = false;
     // Start timing!
-	SDL_SetTimer( TIMER_INTERVAL, TimerCallback );
+	SDL_Event draw_event; draw_event.type = SDL_DRAW_EVENT;
+	SDL_AddTimer( 40, TimerCallback, &draw_event );	
+	SDL_Event add_sprite_event; add_sprite_event.type = SDL_ADD_SPRITE_EVENT;
+	SDL_AddTimer( 4000, TimerCallback, &add_sprite_event );	
 
 	bool keysHeld[323] = {false};
 
@@ -419,6 +428,11 @@ int Brainblast::eventLoop()
 			// F = TOGGLE FULLSCREEN
 			else if( event.key.keysym.sym == SDLK_f )
 				SDL_WM_ToggleFullScreen(m_screen);
+			if( event.key.keysym.sym == SDLK_t )
+			{
+				SDL_Rect p; p.x=50; p.y=50; p.w=300; p.h=50;
+				drawText("Detta testar att rita text: åæø ÅÆØ Ää öÖ",p);
+			}
 			else if( (event.key.keysym.sym == SDLK_LEFT) && 
 					 (m_currentLvl1->isSelecting()) )
 			{
@@ -464,8 +478,12 @@ int Brainblast::eventLoop()
 		case SDL_KEYUP:
 			keysHeld[event.key.keysym.sym] = false;
 			break;
+
+		case SDL_ADD_SPRITE_EVENT:
+			addSprite();
+			break;
 			
-        case SDL_TIMER_EVENT:
+        case SDL_DRAW_EVENT:
         {
 			time_t now = time(0);
 			std::vector<BrainSprite*>::iterator it  = m_sprites.begin();
@@ -550,6 +568,9 @@ int Brainblast::eventLoop()
             break;
 		}
 
+		// The following section checks for keys that are held down
+		// and should continuosly do something.
+
 		if( keysHeld[SDLK_ESCAPE] )
 			done = true;
 		if( keysHeld[SDLK_LEFT] )
@@ -610,6 +631,29 @@ BrainSprite* Brainblast::reparentSprite(BrainSprite* bs, BrainSprite* parent)
 		m_sprites.push_back(clone);
     m_engine->Tree()->DeleteNode(bs);
 	return clone;
+}
+
+void Brainblast::drawText(const char* text, SDL_Rect pos)
+{
+	TTF_Font *font;
+	font=TTF_OpenFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf", 16);
+	if(!font) {
+		printf("=== Error: TTF_OpenFont: (%s) === \n", TTF_GetError());
+		return;
+	}
+
+	SDL_Color color={255,100,0};
+	SDL_Surface* text_surface;
+	if( !(text_surface=TTF_RenderUTF8_Blended(font,text,color)) ) {
+		printf("=== Error: TTF_RenderUTF8_Blended: (%s) === \n", TTF_GetError());
+	} 
+	else {
+		SDL_FillRect(m_screen,&pos,0);
+		SDL_BlitSurface(text_surface,NULL,m_screen,&pos);
+        SDL_UpdateRects( m_screen, 1, &pos);
+		//perhaps we can reuse it, but I assume not for simplicity.
+		SDL_FreeSurface(text_surface);
+	}
 }
 
 /* Definition of a level file ...

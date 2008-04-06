@@ -77,6 +77,8 @@ public:
 	
 	bool playSample(enum sounds sound) const { return m_sound->playSample(sound); }
 
+	void drawText(const char* text, SDL_Rect pos);
+
 private:
 
     Brainblast(const Brainblast& bb);
