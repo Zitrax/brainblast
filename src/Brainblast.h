@@ -69,7 +69,14 @@ public:
 	 * 
 	 */
 	BrainSprite* reparentSprite(BrainSprite* bs, BrainSprite* parent);
+
+	enum sounds {
+		CLICK,
+		BOUNCE
+	};
 	
+	bool playSample(enum sounds sound) const { return m_sound->playSample(sound); }
+
 private:
 
     Brainblast(const Brainblast& bb);

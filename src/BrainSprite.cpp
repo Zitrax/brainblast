@@ -39,6 +39,8 @@ void BrainSprite::move()
             m_y_speed = 0;
             m_x_speed = 0;
         }
+        else
+            Brainblast::instance()->playSample(Brainblast::BOUNCE);
     }
 
     if( m_name == "paprice" )

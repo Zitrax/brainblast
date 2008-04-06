@@ -21,6 +21,7 @@ Brainblast::Brainblast() : m_sound(new BrainSound),
                            m_screen( SDL_SetVideoMode( VIDEOX, VIDEOY, VIDEOBITS, SDL_HWSURFACE ) ),
                            m_field1(0),
                            m_field2(0),
+						   m_bricks(),
 						   m_total_bricks(0),
 						   m_engine(0),
 						   m_bgTree(0),
@@ -375,6 +376,11 @@ Brainblast::initGame(int lvl)
 		  m_sound->playMusic()) )
 		printf("=== ERROR: Could not start music === \n");
 	
+	if( m_sound->isInitialized() )
+	{
+		m_sound->addSample("../sounds/click.wav",CLICK);
+		m_sound->addSample("../sounds/bounce.wav",BOUNCE);
+	}
 
 	return true;
 }
@@ -440,6 +446,7 @@ int Brainblast::eventLoop()
 			else if( (event.key.keysym.sym == SDLK_RETURN) && 
 					 (m_currentLvl1->isSelecting()) )
 			{
+				m_sound->playSample(CLICK);
 				BrainSprite* s = m_currentLvl1->select();
 				if( s )
 				{
