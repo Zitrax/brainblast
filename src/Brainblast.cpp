@@ -113,16 +113,20 @@ Brainblast::~Brainblast()
 void
 Brainblast::cleanup()
 {
-// TODO: Clean m_bricks map
-// 
-//     if( m_bricks )
-//         for(int i=0; i<m_total_bricks; i++)
-//             zap( m_bricks[i] );
-//     zapArr( m_bricks );
+	std::map<int,Brick*>::iterator it;
+	std::map<int,Brick*>::iterator end = m_bricks.end();
+	for( it = m_bricks.begin(); it!=end; ++it)
+	{
+		// The sprite is never inserted in a node tree
+		// so we need to delete it. The brick itself
+		// can not know whether someone else has deleted it.
+		delete it->second->getSprite();  
+		delete it->second;
+	}
     
     // m_screen is deleted by SDL_Quit
-    // zap( m_screen );
 
+	zap( m_sound );
     zap( m_currentLvl1 );
     zap( m_currentLvl2 );
     zap( m_field1 ); 
@@ -262,11 +266,11 @@ Brainblast::createBoards()
 	KrTileResource* tileRes = m_engine->Vault()->GetTileResource( BB_REDSTAR );
 	if( !tileRes )
 		return false;
-	KrTile* tile = new KrTile(tileRes);
+	KrTile tile(tileRes); // The puzzles will clone it
 
-	m_currentLvl1->setBackgroundTile(tile);
+	m_currentLvl1->setBackgroundTile(&tile);
 	if( m_players > 1 )
-		m_currentLvl2->setBackgroundTile(tile);
+		m_currentLvl2->setBackgroundTile(&tile);
 
 	return true;
 }
@@ -726,6 +730,8 @@ void Brainblast::drawText(const char* text, SDL_Rect pos)
 		//perhaps we can reuse it, but I assume not for simplicity.
 		SDL_FreeSurface(text_surface);
 	}
+
+	TTF_CloseFont(font);
 }
 
 /* Definition of a level file ...

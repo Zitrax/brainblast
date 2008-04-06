@@ -17,8 +17,16 @@
 
 using namespace grinliz;
 
-/*! This class will handle the bricks (small icons) that
-  the player should put in their correct place */
+/**
+ * This class will handle the bricks that
+ * the player should put in their correct place 
+ *
+ * Note that the bricks contain a sprite that the
+ * user of this class must make sure to delete.
+ * If it has been inserted in a node tree it will
+ * be deleted with it, otherwise it has to be deleted
+ * manually, the brick can not know.
+ */
 class Brick
 {
 public:
@@ -62,7 +70,7 @@ private:
     int m_brickID;
     SDL_Surface* m_pixmap;
     uint m_X, m_Y;
-    KrSprite* m_sprite;
+	KrSprite* m_sprite;
 };
 
 #endif
