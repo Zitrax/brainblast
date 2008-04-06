@@ -1,0 +1,11 @@
+* Make an array or similar to keep the the puzzles in
+  instead of if checks on the nmber of players.
+
+* Make sure we do not crash when a level can not be 
+  loaded.
+
+* Show some progress indication on how correct your
+  solution is.
+
+* Perhaps we should only throw down pices that are
+  actually used in the puzzle.
