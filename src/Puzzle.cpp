@@ -256,6 +256,10 @@ BrainSprite* Puzzle::select()
 		m_current_tree->SetZDepth(SOLZ);
 	}
 
+	// Remove previous selection if exists
+	if( m_current[m_s_coord.i()] )
+		Brainblast::instance()->engine()->Tree()->DeleteNode(m_current[m_s_coord.i()]->getSprite());
+	
 	m_current[m_s_coord.i()] = b;
 
 	checkSolution();
