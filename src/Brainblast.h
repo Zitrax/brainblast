@@ -90,7 +90,7 @@ private:
 
 	static Brainblast* s_instance;
 
-	static const double WAITTIME = 1.0;
+	static const double WAITTIME = 3.0;
 
 	BrainSound* m_sound;
 

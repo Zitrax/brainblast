@@ -451,7 +451,6 @@ Brainblast::initGame(int lvl)
 
 #define SDL_DRAW_EVENT ( SDL_USEREVENT + 0 )
 #define SDL_ADD_SPRITE_EVENT ( SDL_USEREVENT + 1 )
-const int ADD_SPRITE_TIMER_INTERVAL = 400;
 Uint32 TimerCallback(Uint32 interval, void* event)
 {
 	SDL_PushEvent( static_cast<SDL_Event*>(event) );
@@ -472,7 +471,7 @@ int Brainblast::eventLoop()
 	SDL_Event draw_event; draw_event.type = SDL_DRAW_EVENT;
 	SDL_AddTimer( 40, TimerCallback, &draw_event );	
 	SDL_Event add_sprite_event; add_sprite_event.type = SDL_ADD_SPRITE_EVENT;
-	SDL_AddTimer( 4000, TimerCallback, &add_sprite_event );	
+	SDL_AddTimer( 2000, TimerCallback, &add_sprite_event );	
 
 	bool keysHeld[323] = {false};
 
@@ -534,7 +533,8 @@ int Brainblast::eventLoop()
 					{
 						SDL_Rect p; p.x=10; p.y=10; p.w=300; p.h=50;
 						drawText("CORRECT SOLUTION",p);
-						changeLevel(m_current_lvl+1);
+						if( !changeLevel(m_current_lvl+1) )
+							changeLevel(1);
 					}
 					if( (m_players > 1) && checkSolution(m_currentLvl2) )
 					{
