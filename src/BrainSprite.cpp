@@ -92,5 +92,7 @@ KrImNode* BrainSprite::Clone()
     clone->m_creation_time = this->m_creation_time;
     clone->m_temporary     = this->m_temporary;
 
+    clone->SetNodeId(this->NodeId());
+
 	return clone;
 }
