@@ -42,11 +42,11 @@ namespace bbc {
 
 		dx = x2 - x1;  
 		ax = abs(dx) << 1;  
-		sx = sign(dx);
+		sx = bb_sign(dx);
 
 		dy = y2 - y1;  
-		ay = abs(dy) << 1;  
-		sy = sign(dy);
+		ay = bb_abs(dy) << 1;  
+		sy = bb_sign(dy);
 		yOffset = sy * s->pitch;
 
 		x = x1;
@@ -122,11 +122,11 @@ namespace bbc {
 
 		dx = x2 - x1;  
 		ax = abs(dx) << 1;  
-		sx = sign(dx);
+		sx = bb_sign(dx);
 
 		dy = y2 - y1;  
-		ay = abs(dy) << 1;  
-		sy = sign(dy);
+		ay = bb_abs(dy) << 1;  
+		sy = bb_sign(dy);
 		yOffset = sy * s->pitch;
 
 		x = x1;
@@ -210,11 +210,11 @@ namespace bbc {
 
 		dx = x2 - x1;  
 		ax = abs(dx) << 1;  
-		sx = sign(dx);
+		sx = bb_sign(dx);
 
 		dy = y2 - y1;  
-		ay = abs(dy) << 1;  
-		sy = sign(dy);
+		ay = bb_abs(dy) << 1;  
+		sy = bb_sign(dy);
 		yOffset = sy * s->pitch;
 
 		x = x1;
@@ -293,12 +293,12 @@ namespace bbc {
 		Sint32 yOffset;
 
 		dx = x2 - x1;  
-		ax = abs(dx) << 1;  
-		sx = sign(dx);
+		ax = bb_abs(dx) << 1;  
+		sx = bb_sign(dx);
 
 		dy = y2 - y1;  
-		ay = abs(dy) << 1;  
-		sy = sign(dy);
+		ay = bb_abs(dy) << 1;  
+		sy = bb_sign(dy);
 		yOffset = sy * s->pitch;
 
 		x = x1;

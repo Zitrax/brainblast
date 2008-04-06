@@ -16,6 +16,6 @@ int main(int /*argc*/, char* /*argv*/ [])
 	}
 	
 	Brainblast* bb = new Brainblast();
-	bb->startGame();
+	bb->startGame(1);
     zap(bb);
 }

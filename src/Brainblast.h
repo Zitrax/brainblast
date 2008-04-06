@@ -61,7 +61,7 @@ public:
     bool checkSolution(Puzzle* puzzle);
 
     //! Start a new game
-    bool startGame();
+    bool startGame(int players);
 
 	BrainSprite* addSprite();
 
@@ -79,10 +79,14 @@ public:
 
 	void drawText(const char* text, SDL_Rect pos);
 
+	bool changeLevel(int lvl);
+
 private:
 
     Brainblast(const Brainblast& bb);
     Brainblast& operator=(const Brainblast& bb);
+
+	bool setupFields(int players);
 
 	static Brainblast* s_instance;
 
@@ -90,8 +94,11 @@ private:
 
 	BrainSound* m_sound;
 
+	int m_players;
+
     Puzzle* m_currentLvl1;
 	Puzzle* m_currentLvl2;
+	int m_current_lvl;
 
     SDL_Surface* m_screen;
     SDL_Rect*    m_field1;

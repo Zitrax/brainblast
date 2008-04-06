@@ -5,7 +5,6 @@
  */
 #include "Puzzle.h"
 
-#undef min // Stupid! It seems something else has defined min
 #include "Brainblast.h"
 #include "../images/bb.h"
 
@@ -104,10 +103,39 @@ Puzzle::~Puzzle()
 {
     if(bbc::debug) std::cerr << "Puzzle::~Puzzle()\n";
 
-    zapArr(m_solution);
-    zapArr(m_current);
+	// Apparently we need to remove the childnodes from the trees first
+	// would be convenient if that was handled automatically.
+	for( uint i=0; i<m_width*m_height; i++) 
+	{
+		if( m_solution[i] ) 
+			Brainblast::instance()->engine()->Tree()->DeleteNode(m_solution[i]->getSprite());
+		if( m_current[i] ) 
+			Brainblast::instance()->engine()->Tree()->DeleteNode(m_current[i]->getSprite());
+		if( m_back[i] )
+			Brainblast::instance()->engine()->Tree()->DeleteNode(m_back[i]);
+	}
 
-	//assert("make sure solution are cleaned"==0);
+	if( m_current_tree )
+		Brainblast::instance()->engine()->Tree()->DeleteNode(m_current_tree);
+	if( m_background_tree )
+		Brainblast::instance()->engine()->Tree()->DeleteNode(m_background_tree);
+	if( m_solution_tree )
+		Brainblast::instance()->engine()->Tree()->DeleteNode(m_solution_tree);
+
+	for( uint i=0; i<m_width*m_height; i++) 
+	{
+		delete m_solution[i];
+		delete m_current[i];
+	}
+	zapArr(m_solution);
+	zapArr(m_current);
+	zapArr(m_back); // The KrTiles are deleted along with the background tree
+
+	// Notes about other pointers
+	// --------------------------
+	// m_selected_tile    - points to a tile in m_back
+	// m_selection_sprite - if we have something here it still belongs to Brainblast
+	// m_selection_tile   - belong to the background tree  
 }
 
 bool
@@ -148,6 +176,8 @@ void
 Puzzle::setSolutionBrickWithIdx(const Brick* const b, int idx)
 {
     if(bbc::debug) std::cerr << "Puzzle::setSolutionBrickWithIdx(" << b << "," << idx << "," << b->getSprite()->NodeId() << ")\n";
+
+	assert(idx < m_width*m_height );
 
 	KrSprite* s = b->getSprite();
 	if( s )
@@ -261,8 +291,6 @@ BrainSprite* Puzzle::select()
 		Brainblast::instance()->engine()->Tree()->DeleteNode(m_current[m_s_coord.i()]->getSprite());
 	
 	m_current[m_s_coord.i()] = b;
-
-	checkSolution();
 
 	BrainSprite* sprite = m_selection_sprite;
 	m_selection_sprite = 0;

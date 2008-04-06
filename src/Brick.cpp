@@ -66,6 +66,7 @@ Brick::operator=(const Brick& br)
 Brick::~Brick()
 {
     if(bbc::debug) std::cerr << "Brick::~Brick()\n";
+
     SDL_FreeSurface(m_pixmap);
 }
 

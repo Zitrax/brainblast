@@ -15,10 +15,10 @@
 class Brainblast;
 
 // Should change to use C++ versions of these
-#define max(a,b) (((a) > (b)) ? (a) : (b))
-#define min(a,b) (((a) < (b)) ? (a) : (b))
-#define abs(a) (((a)<0) ? -(a) : (a))
-#define sign(a) (((a)<0) ? -1 : (a)>0 ? 1 : 0)
+#define bb_max(a,b) (((a) > (b)) ? (a) : (b))
+#define bb_min(a,b) (((a) < (b)) ? (a) : (b))
+#define bb_abs(a) (((a)<0) ? -(a) : (a))
+#define bb_sign(a) (((a)<0) ? -1 : (a)>0 ? 1 : 0)
 
 // Avoid defines here ?
 #define zap(x) if(x){delete(x); x=0;}

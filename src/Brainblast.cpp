@@ -16,8 +16,10 @@ using namespace brain;
 Brainblast* Brainblast::s_instance;
 
 Brainblast::Brainblast() : m_sound(new BrainSound),
+						   m_players(1),
 						   m_currentLvl1(0),
 						   m_currentLvl2(0),
+						   m_current_lvl(1),
                            m_screen( SDL_SetVideoMode( VIDEOX, VIDEOY, VIDEOBITS, SDL_HWSURFACE ) ),
                            m_field1(0),
                            m_field2(0),
@@ -59,21 +61,45 @@ Brainblast::Brainblast() : m_sound(new BrainSound),
         printf("=== ERROR: Can't initialize ttf support: (%s) ===\n",TTF_GetError());
         exit(1);
     }   
-
-    m_field1 = new SDL_Rect;
-    m_field1->x = MARGIN; 
-	m_field1->y = MARGIN; 
-    m_field1->w = VIDEOX/2-4*MARGIN; 
-	//m_field1->h = VIDEOY-2*MARGIN;
-	m_field1->h = m_field1->w;
-  
-    m_field2 = new SDL_Rect;
-    m_field2->x = m_field1->w+3*MARGIN; 
-	m_field2->y = MARGIN; 
-    m_field2->w = m_field1->w; 
-	m_field2->h = m_field1->h;
 }
 
+bool Brainblast::setupFields(int players)
+{
+	// Clear all fields
+	zap(m_field1);
+	zap(m_field2);
+
+	switch(players)
+	{
+	case 1:
+		m_field1 = new SDL_Rect;
+		m_field1->x = 200;
+		m_field1->y = MARGIN; 
+		m_field1->w = 500;
+		m_field1->h = m_field1->w;
+		return true;
+		break;
+	case 2:
+		m_field1 = new SDL_Rect;
+		m_field1->x = MARGIN; 
+		m_field1->y = MARGIN; 
+		m_field1->w = VIDEOX/2-4*MARGIN; 
+		m_field1->h = m_field1->w;
+		
+		m_field2 = new SDL_Rect;
+		m_field2->x = m_field1->w+3*MARGIN; 
+		m_field2->y = MARGIN; 
+		m_field2->w = m_field1->w; 
+		m_field2->h = m_field1->h;
+		return true;
+		break;
+	default:
+		return false;
+		break;
+	}
+	
+	return false;
+}
 
 Brainblast::~Brainblast()
 {
@@ -111,10 +137,14 @@ Brainblast::makeLevel(int lvl)
 {
     if(bbc::debug) std::cerr << "Brainblast::makeLevel(" << lvl << ")\n";
 
+	zap(m_currentLvl1);
+	zap(m_currentLvl2);
+
     if(lvl == 0) 
     {
         m_currentLvl1 = new Puzzle(5,5,*m_field1);
-        m_currentLvl2 = new Puzzle(5,5,*m_field2);
+		if( m_players > 1 )
+			m_currentLvl2 = new Puzzle(5,5,*m_field2);
         // placeBricksRandom();
 #warning "Should implement placeBricksRandom"
         return true;
@@ -146,7 +176,8 @@ Brainblast::makeLevel(int lvl)
             { 
                 height = val; 
                 m_currentLvl1 = new Puzzle( height, width, *m_field1 );
-                m_currentLvl2 = new Puzzle( height, width, *m_field2 );
+				if( m_players > 1 )
+					m_currentLvl2 = new Puzzle( height, width, *m_field2 );
             }
             else 
             {
@@ -159,9 +190,15 @@ Brainblast::makeLevel(int lvl)
 						std::cerr << "=== ERROR: Level file contain invalid brick type (" << val << ") ===\n";
 						return false;
 					}
-					
+					if( tmp > height*width )
+					{
+						std::cerr << "=== ERROR: Level file contain invalid brick position (" << tmp << ") ===\n";
+						return false;
+					}
+
                     m_currentLvl1->setSolutionBrickWithIdx(it->second,tmp-1);
-                    m_currentLvl2->setSolutionBrickWithIdx(it->second,tmp-1);
+					if( m_players > 1 )
+						m_currentLvl2->setSolutionBrickWithIdx(it->second,tmp-1);
 				}
             }
             i++;
@@ -195,6 +232,28 @@ Brainblast::createBricks()
 }
 
 bool
+Brainblast::changeLevel(int lvl)
+{
+	if( !makeLevel(lvl) )
+	{
+		printf("=== ERROR: Can't make level ===\n");
+		return false;
+	}
+
+	m_current_lvl = lvl;
+
+	if( !createBoards() )
+	{
+		printf("=== ERROR: Can't create boards ===\n");
+		return false;		
+	}
+
+	time(&m_start_time);
+
+	return true;
+}
+
+bool
 Brainblast::createBoards()
 {
 	if(bbc::debug) std::cerr << "Brainblast::createBoards()\n";
@@ -206,7 +265,8 @@ Brainblast::createBoards()
 	KrTile* tile = new KrTile(tileRes);
 
 	m_currentLvl1->setBackgroundTile(tile);
-	m_currentLvl2->setBackgroundTile(tile);
+	if( m_players > 1 )
+		m_currentLvl2->setBackgroundTile(tile);
 
 	return true;
 }
@@ -264,15 +324,27 @@ Brainblast::checkSolution(Puzzle* puzzle)
 }
 
 bool
-Brainblast::startGame()
+Brainblast::startGame(int players)
 {
-    if( !initGameKyra() )
+	m_players = players;
+
+	if( !setupFields(players) )
+	{
+		printf("=== ERROR: Could not setup fields. ===\n");
 		return false;
+	}
+
+    if( !initGameKyra() )
+	{
+		printf("=== ERROR: Could not init kyra. ===\n");
+		return false;
+	}
 
 	if( !initGame(1) )
+	{
+		printf("=== ERROR: Could not init game. ===\n");
 		return false;
-
-	time(&m_start_time);
+	}
 
     eventLoop();
 
@@ -350,17 +422,8 @@ Brainblast::initGame(int lvl)
 {
     createBricks();
 
-    if( !makeLevel(lvl) )
-	{
-		printf("=== ERROR: Can't make level ===\n");
+	if( !changeLevel(lvl) )
 		return false;
-	}
-
-	if( !createBoards() )
-	{
-		printf("=== ERROR: Can't create boards ===\n");
-		return false;		
-	}
 
     // SDL_WM_ToggleFullScreen(m_screen);
 
@@ -428,11 +491,6 @@ int Brainblast::eventLoop()
 			// F = TOGGLE FULLSCREEN
 			else if( event.key.keysym.sym == SDLK_f )
 				SDL_WM_ToggleFullScreen(m_screen);
-			if( event.key.keysym.sym == SDLK_t )
-			{
-				SDL_Rect p; p.x=50; p.y=50; p.w=300; p.h=50;
-				drawText("Detta testar att rita text: åæø ÅÆØ Ää öÖ",p);
-			}
 			else if( (event.key.keysym.sym == SDLK_LEFT) && 
 					 (m_currentLvl1->isSelecting()) )
 			{
@@ -467,6 +525,19 @@ int Brainblast::eventLoop()
 					//m_engine->Tree()->DeleteNode(s);
 					std::vector<BrainSprite*>::iterator it = find(m_sprites.begin(),m_sprites.end(),s);
 					m_sprites.erase(it);
+
+					if( checkSolution(m_currentLvl1) )
+					{
+						SDL_Rect p; p.x=10; p.y=10; p.w=300; p.h=50;
+						drawText("CORRECT SOLUTION",p);
+						changeLevel(m_current_lvl+1);
+					}
+					if( (m_players > 1) && checkSolution(m_currentLvl2) )
+					{
+						SDL_Rect p; p.x=10; p.y=500; p.w=300; p.h=50;
+						drawText("CORRECT SOLUTION",p);
+					}
+
 				}
 			}
 
@@ -556,7 +627,8 @@ int Brainblast::eventLoop()
 			if( difftime(now,m_start_time) > WAITTIME )
 			{
 				m_currentLvl1->setVisibleSolution(false);
-				m_currentLvl2->setVisibleSolution(false);
+				if( m_players > 1 )
+					m_currentLvl2->setVisibleSolution(false);
 			}
 
 			m_engine->Draw();
@@ -642,7 +714,7 @@ void Brainblast::drawText(const char* text, SDL_Rect pos)
 		return;
 	}
 
-	SDL_Color color={255,100,0};
+	SDL_Color color={255,100,0,0};
 	SDL_Surface* text_surface;
 	if( !(text_surface=TTF_RenderUTF8_Blended(font,text,color)) ) {
 		printf("=== Error: TTF_RenderUTF8_Blended: (%s) === \n", TTF_GetError());
