@@ -16,6 +16,7 @@ using namespace brain;
 Brainblast* Brainblast::s_instance;
 
 Brainblast::Brainblast() : m_sound(new BrainSound),
+						   m_wizard(0),
 						   m_players(1),
 						   m_currentLvl1(0),
 						   m_currentLvl2(0),
@@ -253,12 +254,11 @@ Brainblast::changeLevel(int lvl)
 	}
 
 	// Clear the floor of existing sprites here.
-	BrainSprite* wizard = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_WIZARD ));
 	std::vector<BrainSprite*>::iterator it  = m_sprites.begin();
 	std::vector<BrainSprite*>::iterator end = m_sprites.end();
 	while(it!=end)
 	{
-		if(*it!=wizard)
+		if(*it!=m_wizard)
 		{
 			m_engine->Tree()->DeleteNode(*it);
 			it=m_sprites.erase(it);
@@ -401,11 +401,11 @@ Brainblast::initGameKyra()
 	assert( wizardRes );
 
 	// Create the wizard sprite and add it to the tree
-	BrainSprite* wizard = new BrainSprite( wizardRes, "wizard" );
-	wizard->SetNodeId(BB_WIZARD);
-	wizard->SetPos( rand()%VIDEOX, 0);
-	m_engine->Tree()->AddNode( m_fgTree, wizard );
-	m_sprites.push_back(wizard);
+	m_wizard = new BrainSprite( wizardRes, "wizard" );
+	m_wizard->SetNodeId(BB_WIZARD);
+	m_wizard->SetPos( rand()%VIDEOX, 0);
+	m_engine->Tree()->AddNode( m_fgTree, m_wizard );
+	m_sprites.push_back(m_wizard);
 
 	return true;
 }
@@ -485,8 +485,6 @@ int Brainblast::eventLoop()
 	SDL_AddTimer( 2000, TimerCallback, &add_sprite_event );	
 
 	bool keysHeld[323] = {false};
-
-	BrainSprite* wizard = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_WIZARD ));
 
     while( !done && SDL_WaitEvent(&event) )
 	{
@@ -594,10 +592,10 @@ int Brainblast::eventLoop()
 // 					{ 
 
 // 						std::vector<KrImage*> collides;
-// 						if( ((*it) != wizard) && m_engine->Tree()->CheckAllCollision(*it,&collides) )
+// 						if( ((*it) != m_wizard) && m_engine->Tree()->CheckAllCollision(*it,&collides) )
 // 						{
 // 							BrainSprite* c = dynamic_cast<BrainSprite*>(*collides.begin());
-// 							if( c && (c != wizard) ) {
+// 							if( c && (c != m_wizard) ) {
 								
 // 								double x2 = c->speedX();
 // 								double y2 = c->speedY();
@@ -624,9 +622,9 @@ int Brainblast::eventLoop()
 			m_engine->Tree()->Walk();
 
 			// Detect collisions
-			if(!wizard->isCarrying() && keysHeld[SDLK_UP] ) {
+			if(!m_wizard->isCarrying() && keysHeld[SDLK_UP] ) {
 				std::vector<KrImage*> collides;
-				if( m_engine->Tree()->CheckAllCollision(wizard,&collides) )
+				if( m_engine->Tree()->CheckAllCollision(m_wizard,&collides) )
 				{  
 					printf("Collision!\n");
 					// Use of dynamic cast as we only want to try to pick
@@ -635,7 +633,7 @@ int Brainblast::eventLoop()
 					// Otherwise we might be able to pick up the solution in the beginning :)
 					BrainSprite* c = dynamic_cast<BrainSprite*>(*collides.begin());
 					if( c ) 
-						wizard->pickUp(reparentSprite(c,wizard));
+						m_wizard->pickUp(reparentSprite(c,m_wizard));
 				}
 			}
 
@@ -662,38 +660,38 @@ int Brainblast::eventLoop()
 			done = true;
 		if( keysHeld[SDLK_LEFT] )
 		{
-			if( wizard->isCarrying() )
-				wizard->SetAction("HOLDING.LEFT");
+			if( m_wizard->isCarrying() )
+				m_wizard->SetAction("HOLDING.LEFT");
 			else
-				wizard->SetAction("WALKING.LEFT");
-			wizard->DoStep();
+				m_wizard->SetAction("WALKING.LEFT");
+			m_wizard->DoStep();
 		}
 		else if( keysHeld[SDLK_RIGHT] )
 		{
-			if( wizard->isCarrying() )
-				wizard->SetAction("HOLDING.RIGHT");
+			if( m_wizard->isCarrying() )
+				m_wizard->SetAction("HOLDING.RIGHT");
 			else
-				wizard->SetAction("WALKING.RIGHT");
-			wizard->DoStep();
+				m_wizard->SetAction("WALKING.RIGHT");
+			m_wizard->DoStep();
 		}
 		if( keysHeld[SDLK_j] )
 		{
-			wizard->jump();
+			m_wizard->jump();
 		}
 		if( keysHeld[SDLK_F1] )
 			addSprite();
 		if( keysHeld[SDLK_F2] )
 		{
-			if( wizard->isCarrying() )
+			if( m_wizard->isCarrying() )
 			{
-				BrainSprite* o = wizard->drop();
+				BrainSprite* o = m_wizard->drop();
 				o->setStatic(true);
 				m_currentLvl1->startSelection(o);
 			}
 		}
 		if( keysHeld[SDLK_DOWN] ) 
 		{
-			wizard->drop();
+			m_wizard->drop();
 		}
 	}
     

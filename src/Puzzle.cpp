@@ -276,6 +276,8 @@ BrainSprite* Puzzle::select()
 	if( m_selection_tile )
 		m_selection_tile->SetVisible(false);
 
+	int idx = m_s_coord.i();
+
 	// Create solution brick
 	Brick* b = new Brick(m_selection_sprite,m_selection_sprite->NodeId());
 
@@ -287,10 +289,21 @@ BrainSprite* Puzzle::select()
 	}
 
 	// Remove previous selection if exists
-	if( m_current[m_s_coord.i()] )
-		Brainblast::instance()->engine()->Tree()->DeleteNode(m_current[m_s_coord.i()]->getSprite());
+	if( m_current[idx] )
+		Brainblast::instance()->engine()->Tree()->DeleteNode(m_current[idx]->getSprite());
 	
-	m_current[m_s_coord.i()] = b;
+	if(  m_solution[idx] && ( b->id() == m_solution[idx]->id() ) )
+	{
+		int x = m_back[idx]->X();
+		int y = m_back[idx]->Y();
+		Brainblast::instance()->engine()->Tree()->DeleteNode(m_back[idx]);
+		KrTileResource* tileRes = Brainblast::instance()->engine()->Vault()->GetTileResource( BB_CORRECT );
+		m_back[idx] = new KrTile(tileRes);
+		Brainblast::instance()->engine()->Tree()->AddNode(m_background_tree, m_back[idx]);
+		m_back[idx]->SetPos(x,y);
+	}
+
+	m_current[idx] = b;
 
 	BrainSprite* sprite = m_selection_sprite;
 	m_selection_sprite = 0;

@@ -94,6 +94,7 @@ private:
 
 	BrainSound* m_sound;
 
+	BrainSprite* m_wizard; // The player
 	int m_players;
 
     Puzzle* m_currentLvl1;
