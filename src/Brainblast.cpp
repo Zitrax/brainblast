@@ -252,6 +252,8 @@ Brainblast::changeLevel(int lvl)
 		return false;		
 	}
 
+	// TODO: We should clear the floor of existing sprites here.
+
 	time(&m_start_time);
 
 	return true;
@@ -399,21 +401,16 @@ BrainSprite* Brainblast::addSprite()
 	if( difftime(time(0),m_start_time) <= WAITTIME )
 		return 0;
 
-	// TODO: Make sure the random selection is only among used game bricks
-	//       this while loop sucks, but is just for testing.
 	KrSpriteResource* spriteRes = 0;
-	uint r = 0;
-	while(!spriteRes)
-	{
-		r = bbc::randint(1,12);
-		if(r!=BB_WIZARD) 
-			spriteRes = m_engine->Vault()->GetSpriteResource( r );
-	}
+	// TODO: Can we have different types on the other level ?
+	std::vector<int> types = m_currentLvl1->getSolutionTypes();
+	int r = bbc::randint(0,types.size()-1);
+	spriteRes = m_engine->Vault()->GetSpriteResource( types[r] );
 	assert( spriteRes );
 
 	// Create the wizard sprite and add it to the tree
 	BrainSprite* sprite = new BrainSprite( spriteRes, "rand", true );
-	sprite->SetNodeId(r);
+	sprite->SetNodeId(types[r]);
 	sprite->SetPos( rand()%VIDEOX, 0);
 	sprite->setSpeed(double(bbc::randint(-10,10)),0);
 	m_engine->Tree()->AddNode( m_bgTree, sprite );

@@ -33,6 +33,8 @@ public:
 
 	void setVisibleSolution(bool visible) { m_solution_tree->SetVisible(visible); }
 
+	std::vector<int> getSolutionTypes() const;
+
 	void setSelectionTile(KrTile* tile) { m_selection_tile = tile; }
 	void startSelection(BrainSprite* bs);
 	enum direction { LEFT,RIGHT,UP,DOWN };

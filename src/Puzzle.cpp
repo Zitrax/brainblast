@@ -297,6 +297,19 @@ BrainSprite* Puzzle::select()
 	return sprite;
 }
 
+std::vector<int> Puzzle::getSolutionTypes() const
+{
+	// TODO: Can be optimized to just be calculated
+	//       the first time.
+	std::vector<int> types;
+	for( uint i=0; i<m_width*m_height; i++) 
+	{
+		if( m_solution[i] ) 
+			types.push_back(m_solution[i]->id());
+	}
+	return types;
+}
+
 // int 
 // Puzzle::getXCoord(int x) const
 // {
