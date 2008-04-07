@@ -252,7 +252,21 @@ Brainblast::changeLevel(int lvl)
 		return false;		
 	}
 
-	// TODO: We should clear the floor of existing sprites here.
+	// Clear the floor of existing sprites here.
+	BrainSprite* wizard = static_cast<BrainSprite*>(m_engine->Tree()->FindNodeById( BB_WIZARD ));
+	std::vector<BrainSprite*>::iterator it  = m_sprites.begin();
+	std::vector<BrainSprite*>::iterator end = m_sprites.end();
+	while(it!=end)
+	{
+		if(*it!=wizard)
+		{
+			m_engine->Tree()->DeleteNode(*it);
+			it=m_sprites.erase(it);
+			end = m_sprites.end();
+		}
+		else
+			++it;
+	}
 
 	time(&m_start_time);
 
