@@ -20,6 +20,7 @@
 #include "Puzzle.h"
 #include "Brick.h"
 #include "BrainSprite.h"
+#include "BrainPlayer.h"
 #include "BrainSound.h"
 
 using namespace std;
@@ -94,7 +95,7 @@ private:
 
 	BrainSound* m_sound;
 
-	BrainSprite* m_wizard; // The player
+	BrainPlayer* m_player1; // The player
 	int m_players;
 
     Puzzle* m_currentLvl1;

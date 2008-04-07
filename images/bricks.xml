@@ -1,4 +1,5 @@
 <Definition filename="bricks2.bmp" Transparent0="#000000">
+    <Tile name="CORRECT" x="11" y="191" size="89" />
     <Sprite name="M_BLOB">
         <Action name="NONE">
             <Frame x="506" y="86" width="68" height="65" hotspotx="543" hotspoty="118" deltax="0" deltay="0" />

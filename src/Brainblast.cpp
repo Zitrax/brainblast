@@ -10,13 +10,15 @@
 #include "grinliz/glrandom.h"
 #include "SDL_ttf.h"
 
+#include <sstream>
+
 using namespace grinliz;
 using namespace brain;
 
 Brainblast* Brainblast::s_instance;
 
 Brainblast::Brainblast() : m_sound(new BrainSound),
-						   m_wizard(0),
+						   m_player1(0),
 						   m_players(1),
 						   m_currentLvl1(0),
 						   m_currentLvl2(0),
@@ -258,7 +260,7 @@ Brainblast::changeLevel(int lvl)
 	std::vector<BrainSprite*>::iterator end = m_sprites.end();
 	while(it!=end)
 	{
-		if(*it!=m_wizard)
+		if(*it!=m_player1)
 		{
 			m_engine->Tree()->DeleteNode(*it);
 			it=m_sprites.erase(it);
@@ -401,11 +403,12 @@ Brainblast::initGameKyra()
 	assert( wizardRes );
 
 	// Create the wizard sprite and add it to the tree
-	m_wizard = new BrainSprite( wizardRes, "wizard" );
-	m_wizard->SetNodeId(BB_WIZARD);
-	m_wizard->SetPos( rand()%VIDEOX, 0);
-	m_engine->Tree()->AddNode( m_fgTree, m_wizard );
-	m_sprites.push_back(m_wizard);
+	// TODO: Player should be created with a selected name instead of wizard
+	m_player1 = new BrainPlayer( wizardRes, "wizard" );
+	m_player1->SetNodeId(BB_WIZARD);
+	m_player1->SetPos( rand()%VIDEOX, 0);
+	m_engine->Tree()->AddNode( m_fgTree, m_player1 );
+	m_sprites.push_back(m_player1);
 
 	return true;
 }
@@ -531,26 +534,23 @@ int Brainblast::eventLoop()
 					 (m_currentLvl1->isSelecting()) )
 			{
 				m_sound->playSample(CLICK);
-				BrainSprite* s = m_currentLvl1->select();
+				BrainSprite* s = 0;
+				int cscore = m_currentLvl1->brickScore();
+				m_currentLvl1->select(&s) ? m_player1->addScore(cscore) : m_player1->addScore(-1*cscore/10);
 				if( s )
 				{
-					//m_engine->Tree()->DeleteNode(s);
 					std::vector<BrainSprite*>::iterator it = find(m_sprites.begin(),m_sprites.end(),s);
 					m_sprites.erase(it);
 
 					if( checkSolution(m_currentLvl1) )
 					{
-						SDL_Rect p; p.x=10; p.y=10; p.w=300; p.h=50;
-						drawText("CORRECT SOLUTION",p);
 						if( !changeLevel(m_current_lvl+1) )
 							changeLevel(1);
 					}
 					if( (m_players > 1) && checkSolution(m_currentLvl2) )
 					{
-						SDL_Rect p; p.x=10; p.y=500; p.w=300; p.h=50;
-						drawText("CORRECT SOLUTION",p);
-					}
 
+					}
 				}
 			}
 
@@ -592,10 +592,10 @@ int Brainblast::eventLoop()
 // 					{ 
 
 // 						std::vector<KrImage*> collides;
-// 						if( ((*it) != m_wizard) && m_engine->Tree()->CheckAllCollision(*it,&collides) )
+// 						if( ((*it) != m_player1) && m_engine->Tree()->CheckAllCollision(*it,&collides) )
 // 						{
 // 							BrainSprite* c = dynamic_cast<BrainSprite*>(*collides.begin());
-// 							if( c && (c != m_wizard) ) {
+// 							if( c && (c != m_player1) ) {
 								
 // 								double x2 = c->speedX();
 // 								double y2 = c->speedY();
@@ -622,9 +622,9 @@ int Brainblast::eventLoop()
 			m_engine->Tree()->Walk();
 
 			// Detect collisions
-			if(!m_wizard->isCarrying() && keysHeld[SDLK_UP] ) {
+			if(!m_player1->isCarrying() && keysHeld[SDLK_UP] ) {
 				std::vector<KrImage*> collides;
-				if( m_engine->Tree()->CheckAllCollision(m_wizard,&collides) )
+				if( m_engine->Tree()->CheckAllCollision(m_player1,&collides) )
 				{  
 					printf("Collision!\n");
 					// Use of dynamic cast as we only want to try to pick
@@ -633,7 +633,7 @@ int Brainblast::eventLoop()
 					// Otherwise we might be able to pick up the solution in the beginning :)
 					BrainSprite* c = dynamic_cast<BrainSprite*>(*collides.begin());
 					if( c ) 
-						m_wizard->pickUp(reparentSprite(c,m_wizard));
+						m_player1->pickUp(reparentSprite(c,m_player1));
 				}
 			}
 
@@ -660,39 +660,45 @@ int Brainblast::eventLoop()
 			done = true;
 		if( keysHeld[SDLK_LEFT] )
 		{
-			if( m_wizard->isCarrying() )
-				m_wizard->SetAction("HOLDING.LEFT");
+			if( m_player1->isCarrying() )
+				m_player1->SetAction("HOLDING.LEFT");
 			else
-				m_wizard->SetAction("WALKING.LEFT");
-			m_wizard->DoStep();
+				m_player1->SetAction("WALKING.LEFT");
+			m_player1->DoStep();
 		}
 		else if( keysHeld[SDLK_RIGHT] )
 		{
-			if( m_wizard->isCarrying() )
-				m_wizard->SetAction("HOLDING.RIGHT");
+			if( m_player1->isCarrying() )
+				m_player1->SetAction("HOLDING.RIGHT");
 			else
-				m_wizard->SetAction("WALKING.RIGHT");
-			m_wizard->DoStep();
+				m_player1->SetAction("WALKING.RIGHT");
+			m_player1->DoStep();
 		}
 		if( keysHeld[SDLK_j] )
 		{
-			m_wizard->jump();
+			m_player1->jump();
 		}
 		if( keysHeld[SDLK_F1] )
 			addSprite();
 		if( keysHeld[SDLK_F2] )
 		{
-			if( m_wizard->isCarrying() )
+			if( m_player1->isCarrying() )
 			{
-				BrainSprite* o = m_wizard->drop();
+				BrainSprite* o = m_player1->drop();
 				o->setStatic(true);
 				m_currentLvl1->startSelection(o);
 			}
 		}
 		if( keysHeld[SDLK_DOWN] ) 
 		{
-			m_wizard->drop();
+			m_player1->drop();
 		}
+
+		std::ostringstream score_str;
+		score_str << "Score: " << m_player1->getScore();
+		SDL_Rect p; p.x=10; p.y=10; p.w=300; p.h=50;
+		drawText(score_str.str().c_str(),p);
+		
 	}
     
     return 0;

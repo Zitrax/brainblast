@@ -173,7 +173,7 @@ Puzzle::setCurrentBrickWithIdx(Brick* b, int idx)
 }
 
 void
-Puzzle::setSolutionBrickWithIdx(const Brick* const b, int idx)
+Puzzle::setSolutionBrickWithIdx(const Brick* const b, unsigned int idx)
 {
     if(bbc::debug) std::cerr << "Puzzle::setSolutionBrickWithIdx(" << b << "," << idx << "," << b->getSprite()->NodeId() << ")\n";
 
@@ -269,7 +269,7 @@ void Puzzle::startSelection(BrainSprite* bs)
 	updateSelection(); 
 }
 
-BrainSprite* Puzzle::select()
+bool Puzzle::select(BrainSprite** bs)
 {
 	if( m_selected_tile )
 		m_selected_tile->SetVisible(true);
@@ -277,6 +277,7 @@ BrainSprite* Puzzle::select()
 		m_selection_tile->SetVisible(false);
 
 	int idx = m_s_coord.i();
+	bool ret = false;
 
 	// Create solution brick
 	Brick* b = new Brick(m_selection_sprite,m_selection_sprite->NodeId());
@@ -301,13 +302,14 @@ BrainSprite* Puzzle::select()
 		m_back[idx] = new KrTile(tileRes);
 		Brainblast::instance()->engine()->Tree()->AddNode(m_background_tree, m_back[idx]);
 		m_back[idx]->SetPos(x,y);
+		ret = true;
 	}
 
 	m_current[idx] = b;
 
-	BrainSprite* sprite = m_selection_sprite;
+	*bs = m_selection_sprite;
 	m_selection_sprite = 0;
-	return sprite;
+	return ret;
 }
 
 std::vector<int> Puzzle::getSolutionTypes() const
@@ -321,6 +323,21 @@ std::vector<int> Puzzle::getSolutionTypes() const
 			types.push_back(m_solution[i]->id());
 	}
 	return types;
+}
+
+int Puzzle::brickScore() const
+{
+	// TODO: We can precalculate the content in this function
+	std::vector<int> types = getSolutionTypes();
+	std::sort(types.begin(),types.end());
+	types.erase(std::unique(types.begin(),types.end()),types.end());
+	
+	int s=0;
+    for( uint i=0; i<m_width*m_height; i++)
+		if( m_solution[i] ) s++;
+
+	// Using a 10 multiplier
+	return types.size()*m_width*m_height*s*10;
 }
 
 // int 

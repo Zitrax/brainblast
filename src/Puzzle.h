@@ -27,7 +27,7 @@ public:
 	Brick* getCurrentBrickWithIdx(int idx) const;
 	Brick* getSolutionBrickWithIdx(int idx) const;
 	void setCurrentBrickWithIdx(Brick* b, int idx);
-	void setSolutionBrickWithIdx(const Brick* const b, int idx);
+	void setSolutionBrickWithIdx(const Brick* const b, unsigned int idx);
 	
 	void setBackgroundTile(KrTile* tile);
 
@@ -44,13 +44,21 @@ public:
 	 * This creates a brick of the moved type at the current
 	 * position. 
 	 *
-	 * If a sprite is returned the brick has taken over the 
+	 * If bs i set the brick has taken over the 
 	 * ownership of the sprite.
+	 *
+	 * Returns true if the selections was correct
 	 */
-	BrainSprite* select();
+	bool select(BrainSprite** bs);
 
 //  	int getXCoord(int x) const;
 // 	int getYCoord(int y) const;
+
+	/**
+	 * Each level give their own score per correct brick
+	 * which can be retrieved here.
+	 */
+	int brickScore() const;
 
 private:
 

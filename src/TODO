@@ -9,3 +9,23 @@
 
 * Perhaps we should only throw down pices that are
   actually used in the puzzle.
+
+* Make sure you can not set two pieces on one place 
+  in the lvl file.
+
+
+=== Scoring ===
+
+Boardsize*BrickTypes*#SolutionBricks
+
+For example a 3x3 level with 3 bricks of 2 types would give the player
+9*3*2=54 points per correct brick. And add a 10 multiplier for nicer
+number, so 540 points per brick here.
+
+Time bonus: 10 points per remaining second.
+
+A brick inserted at the wrong location would give a penalty of the
+brick score without the mltiplier. So on the board above a misplaced
+brick would give 54 points in penalty.
+
+
