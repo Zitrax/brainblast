@@ -303,6 +303,7 @@ bool Puzzle::select(BrainSprite** bs)
 		Brainblast::instance()->engine()->Tree()->AddNode(m_background_tree, m_back[idx]);
 		m_back[idx]->SetPos(x,y);
 		ret = true;
+		m_selected_tile = 0;
 	}
 
 	m_current[idx] = b;
