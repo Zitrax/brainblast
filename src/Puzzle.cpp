@@ -262,6 +262,15 @@ void Puzzle::updateSelection()
 							   m_rect.y + y*yspace+yspace/2);
 }
 
+void Puzzle::stopSelection()
+{
+	m_selection_sprite = 0;
+	if( m_selection_tile )
+		m_selection_tile->SetVisible(false);
+	if( m_selected_tile )
+		m_selected_tile->SetVisible(true);
+}
+
 void Puzzle::startSelection(BrainSprite* bs)
 { 
 	bs->setTemporary(false);

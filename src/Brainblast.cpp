@@ -257,6 +257,10 @@ Brainblast::clearFloor()
 		else
 			++it;
 	}
+
+	m_currentLvl1->stopSelection();
+	if( m_players > 1 )
+		m_currentLvl2->stopSelection();
 }
 
 bool
@@ -767,7 +771,7 @@ void Brainblast::drawText(const char* text, SDL_Rect pos, int size)
 	SDL_Color color={255,100,0,0};
 	SDL_Surface* text_surface;
 	if( !(text_surface=TTF_RenderUTF8_Blended(font,text,color)) ) {
-		printf("=== Error: TTF_RenderUTF8_Blended: (%s) === \n", TTF_GetError());
+		printf("=== Error: TTF_Rend erUTF8_Blended: (%s) === \n", TTF_GetError());
 	} 
 	else {
 		SDL_FillRect(m_screen,&pos,0);

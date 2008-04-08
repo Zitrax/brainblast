@@ -37,6 +37,8 @@ public:
 
 	void setSelectionTile(KrTile* tile) { m_selection_tile = tile; }
 	void startSelection(BrainSprite* bs);
+	/// If the selection sprite is removed it must be reset
+	void stopSelection();
 	enum direction { LEFT,RIGHT,UP,DOWN };
 	void navigate(enum direction dir) { m_s_coord.move(dir); updateSelection(); }
 	bool isSelecting() const { return m_selection_sprite != 0; } 
