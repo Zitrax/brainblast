@@ -169,7 +169,7 @@ Brainblast::makeLevel(int lvl)
       
         ifstream in(filename);
         if ( !in ) { 
-            cerr << "Level file could not be opened...\n"; 
+            cerr << "=== ERROR: Level file could not be opened... ===\n"; 
             free(filename);
             return false;
         }
@@ -194,12 +194,12 @@ Brainblast::makeLevel(int lvl)
 					std::map<int,Brick*>::iterator it = m_bricks.find(val);
 					if( it == m_bricks.end() )
 					{
-						std::cerr << "=== ERROR: Level file contain invalid brick type (" << val << ") ===\n";
+						cerr << "=== ERROR: Level file contain invalid brick type (" << val << ") ===\n";
 						return false;
 					}
 					if( tmp > height*width )
 					{
-						std::cerr << "=== ERROR: Level file contain invalid brick position (" << tmp << ") ===\n";
+						cerr << "=== ERROR: Level file contain invalid brick position (" << tmp << ") ===\n";
 						return false;
 					}
 
@@ -238,6 +238,25 @@ Brainblast::createBricks()
 	}
 }
 
+void
+Brainblast::clearFloor()
+{
+	// Clear the floor of existing sprites here.
+	std::vector<BrainSprite*>::iterator it  = m_sprites.begin();
+	std::vector<BrainSprite*>::iterator end = m_sprites.end();
+	while(it!=end)
+	{
+		if(*it!=m_player1)
+		{
+			m_engine->Tree()->DeleteNode(*it);
+			it=m_sprites.erase(it);
+			end = m_sprites.end();
+		}
+		else
+			++it;
+	}
+}
+
 bool
 Brainblast::changeLevel(int lvl)
 {
@@ -255,20 +274,7 @@ Brainblast::changeLevel(int lvl)
 		return false;		
 	}
 
-	// Clear the floor of existing sprites here.
-	std::vector<BrainSprite*>::iterator it  = m_sprites.begin();
-	std::vector<BrainSprite*>::iterator end = m_sprites.end();
-	while(it!=end)
-	{
-		if(*it!=m_player1)
-		{
-			m_engine->Tree()->DeleteNode(*it);
-			it=m_sprites.erase(it);
-			end = m_sprites.end();
-		}
-		else
-			++it;
-	}
+	clearFloor();
 
 	time(&m_start_time);
 
@@ -494,6 +500,8 @@ int Brainblast::eventLoop()
 		if ( event.type == SDL_QUIT )
 			break;
         
+		time_t now = time(0);
+
 		switch(event.type)
 		{
         case SDL_KEYDOWN:
@@ -569,7 +577,6 @@ int Brainblast::eventLoop()
 			
         case SDL_DRAW_EVENT:
         {
-			time_t now = time(0);
 			std::vector<BrainSprite*>::iterator it  = m_sprites.begin();
 			std::vector<BrainSprite*>::iterator end = m_sprites.end();
 			while(it!=end)
@@ -694,8 +701,14 @@ int Brainblast::eventLoop()
 			m_player1->drop();
 		}
 
+		// Time left
+		int sec = static_cast<int>(300 - difftime(now,m_start_time));
+		bool over = sec <= 0;
+		int min = sec/60;
+		sec -= min*60;
+
 		std::ostringstream score_str;
-		score_str << "Score: " << m_player1->getScore();
+		score_str << "Score: " << m_player1->getScore() << "   Time: " << min << ":" << sec;
 		SDL_Rect p; p.x=10; p.y=10; p.w=300; p.h=50;
 		drawText(score_str.str().c_str(),p);
 		

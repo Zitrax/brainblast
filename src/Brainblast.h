@@ -88,6 +88,12 @@ private:
     Brainblast& operator=(const Brainblast& bb);
 
 	bool setupFields(int players);
+	/**
+	 * Removes all sprites on the playfield
+	 * except the players and the ones belonging
+	 * to the puzzles.
+	 */
+	void clearFloor();
 
 	static Brainblast* s_instance;
 
