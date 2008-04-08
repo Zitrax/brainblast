@@ -533,11 +533,19 @@ int Brainblast::eventLoop()
 				m_currentLvl1->navigate(Puzzle::RIGHT);
 				
 			}
-			else if( (event.key.keysym.sym == SDLK_UP) && 
-					 (m_currentLvl1->isSelecting()) )
+			else if( event.key.keysym.sym == SDLK_UP )  
 			{
-				m_currentLvl1->navigate(Puzzle::UP);
-				
+				if( m_currentLvl1->isSelecting() )
+					m_currentLvl1->navigate(Puzzle::UP);
+				else if( m_player1->isCarrying() )
+				{
+					BrainSprite* o = m_player1->drop();
+					o->setStatic(true);
+					m_currentLvl1->startSelection(o);
+				}
+				else
+					keysHeld[event.key.keysym.sym] = true;
+					
 			}
 			else if( (event.key.keysym.sym == SDLK_DOWN) && 
 					 (m_currentLvl1->isSelecting()) )
@@ -570,6 +578,7 @@ int Brainblast::eventLoop()
 			}
 			else if( game_over && (event.key.keysym.sym == SDLK_SPACE) )
 			{
+				m_player1->setScore(0);
 				changeLevel(1);
 			}
 
@@ -701,12 +710,6 @@ int Brainblast::eventLoop()
 			addSprite();
 		if( keysHeld[SDLK_F2] )
 		{
-			if( m_player1->isCarrying() )
-			{
-				BrainSprite* o = m_player1->drop();
-				o->setStatic(true);
-				m_currentLvl1->startSelection(o);
-			}
 		}
 		if( keysHeld[SDLK_DOWN] ) 
 		{
