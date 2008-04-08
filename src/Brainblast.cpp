@@ -10,10 +10,12 @@
 #include "grinliz/glrandom.h"
 #include "SDL_ttf.h"
 
-#include <sstream>
+#include <sstream>  // ostringstream
+#include <iomanip>  // setfill setw
 
 using namespace grinliz;
 using namespace brain;
+using namespace std;
 
 Brainblast* Brainblast::s_instance;
 
@@ -42,7 +44,7 @@ Brainblast::Brainblast() : m_sound(new BrainSound),
                            cyan   ( SDL_MapRGB(m_screen->format, 0x00, 0xff, 0xff) ),
                            magenta( SDL_MapRGB(m_screen->format, 0xff, 0x00, 0xff) )
 {
-    if(bbc::debug) std::cerr << "Brainblast::Brainblast() Videomode(" << VIDEOX << "," << VIDEOY << ")\n";
+    if(bbc::debug) cerr << "Brainblast::Brainblast() Videomode(" << VIDEOX << "," << VIDEOY << ")\n";
 
 	s_instance = this;
 
@@ -106,7 +108,7 @@ bool Brainblast::setupFields(int players)
 
 Brainblast::~Brainblast()
 {
-    if(bbc::debug) std::cerr << "Brainblast::~Brainblast()\n";
+    if(bbc::debug) cerr << "Brainblast::~Brainblast()\n";
  
     cleanup();
 
@@ -116,8 +118,8 @@ Brainblast::~Brainblast()
 void
 Brainblast::cleanup()
 {
-	std::map<int,Brick*>::iterator it;
-	std::map<int,Brick*>::iterator end = m_bricks.end();
+	map<int,Brick*>::iterator it;
+	map<int,Brick*>::iterator end = m_bricks.end();
 	for( it = m_bricks.begin(); it!=end; ++it)
 	{
 		// The sprite is never inserted in a node tree
@@ -142,7 +144,7 @@ Brainblast::cleanup()
 bool
 Brainblast::makeLevel(int lvl)
 {
-    if(bbc::debug) std::cerr << "Brainblast::makeLevel(" << lvl << ")\n";
+    if(bbc::debug) cerr << "Brainblast::makeLevel(" << lvl << ")\n";
 
 	zap(m_currentLvl1);
 	zap(m_currentLvl2);
@@ -165,7 +167,7 @@ Brainblast::makeLevel(int lvl)
         char* filebase = "../lvl/lvl%03d.txt";
       
         sprintf(filename, filebase, lvl);
-        if( bbc::debug ) std::cerr << "Level file: " << filename << "\n";
+        if( bbc::debug ) cerr << "Level file: " << filename << "\n";
       
         ifstream in(filename);
         if ( !in ) { 
@@ -188,10 +190,10 @@ Brainblast::makeLevel(int lvl)
             }
             else 
             {
-                if(bbc::debug) std::cerr << val << " ";
+                if(bbc::debug) cerr << val << " ";
                 if( i%2 == 0 ) tmp = val;
                 else  {
-					std::map<int,Brick*>::iterator it = m_bricks.find(val);
+					map<int,Brick*>::iterator it = m_bricks.find(val);
 					if( it == m_bricks.end() )
 					{
 						cerr << "=== ERROR: Level file contain invalid brick type (" << val << ") ===\n";
@@ -211,7 +213,7 @@ Brainblast::makeLevel(int lvl)
             i++;
         }
 
-        if(bbc::debug) std::cerr << "\n";
+        if(bbc::debug) cerr << "\n";
         free(filename);
         in.close();
     } 
@@ -222,7 +224,7 @@ Brainblast::makeLevel(int lvl)
 void
 Brainblast::createBricks()
 {
-    if(bbc::debug) std::cerr << "Brainblast::createBricks()\n";
+    if(bbc::debug) cerr << "Brainblast::createBricks()\n";
 
 	GlSListIterator<KrResource*> rit = m_engine->Vault()->GetResourceIterator();
 	for(rit.Begin(); !rit.Done(); rit.Next())
@@ -242,8 +244,8 @@ void
 Brainblast::clearFloor()
 {
 	// Clear the floor of existing sprites here.
-	std::vector<BrainSprite*>::iterator it  = m_sprites.begin();
-	std::vector<BrainSprite*>::iterator end = m_sprites.end();
+	vector<BrainSprite*>::iterator it  = m_sprites.begin();
+	vector<BrainSprite*>::iterator end = m_sprites.end();
 	while(it!=end)
 	{
 		if(*it!=m_player1)
@@ -284,7 +286,7 @@ Brainblast::changeLevel(int lvl)
 bool
 Brainblast::createBoards()
 {
-	if(bbc::debug) std::cerr << "Brainblast::createBoards()\n";
+	if(bbc::debug) cerr << "Brainblast::createBoards()\n";
 
 	// Create the master tile
 	KrTileResource* tileRes = m_engine->Vault()->GetTileResource( BB_REDSTAR );
@@ -302,7 +304,7 @@ Brainblast::createBoards()
 void
 Brainblast::drawBoard(SDL_Surface* s, SDL_Rect* dim, Puzzle* p)
 {
-//    if(bbc::debug) std::cerr << "Brainblast::drawBoard()\n";
+//    if(bbc::debug) cerr << "Brainblast::drawBoard()\n";
 
 	return;
 
@@ -426,7 +428,7 @@ BrainSprite* Brainblast::addSprite()
 
 	KrSpriteResource* spriteRes = 0;
 	// TODO: Can we have different types on the other level ?
-	std::vector<int> types = m_currentLvl1->getSolutionTypes();
+	vector<int> types = m_currentLvl1->getSolutionTypes();
 	int r = bbc::randint(0,types.size()-1);
 	spriteRes = m_engine->Vault()->GetSpriteResource( types[r] );
 	assert( spriteRes );
@@ -494,6 +496,7 @@ int Brainblast::eventLoop()
 	SDL_AddTimer( 2000, TimerCallback, &add_sprite_event );	
 
 	bool keysHeld[323] = {false};
+	bool game_over = false;
 
     while( !done && SDL_WaitEvent(&event) )
 	{
@@ -547,7 +550,7 @@ int Brainblast::eventLoop()
 				m_currentLvl1->select(&s) ? m_player1->addScore(cscore) : m_player1->addScore(-1*cscore/10);
 				if( s )
 				{
-					std::vector<BrainSprite*>::iterator it = find(m_sprites.begin(),m_sprites.end(),s);
+					vector<BrainSprite*>::iterator it = find(m_sprites.begin(),m_sprites.end(),s);
 					m_sprites.erase(it);
 
 					if( checkSolution(m_currentLvl1) )
@@ -561,6 +564,10 @@ int Brainblast::eventLoop()
 					}
 				}
 			}
+			else if( game_over && (event.key.keysym.sym == SDLK_SPACE) )
+			{
+				changeLevel(1);
+			}
 
 			else
 				keysHeld[event.key.keysym.sym] = true;
@@ -572,13 +579,14 @@ int Brainblast::eventLoop()
 			break;
 
 		case SDL_ADD_SPRITE_EVENT:
-			addSprite();
+			if( !game_over )
+				addSprite();
 			break;
 			
         case SDL_DRAW_EVENT:
         {
-			std::vector<BrainSprite*>::iterator it  = m_sprites.begin();
-			std::vector<BrainSprite*>::iterator end = m_sprites.end();
+			vector<BrainSprite*>::iterator it  = m_sprites.begin();
+			vector<BrainSprite*>::iterator end = m_sprites.end();
 			while(it!=end)
 			{
 				// First check if we should delete this sprite after a timeout
@@ -598,7 +606,7 @@ int Brainblast::eventLoop()
 // 					if( (x1>=15) || (y1>=0.15) )
 // 					{ 
 
-// 						std::vector<KrImage*> collides;
+// 						vector<KrImage*> collides;
 // 						if( ((*it) != m_player1) && m_engine->Tree()->CheckAllCollision(*it,&collides) )
 // 						{
 // 							BrainSprite* c = dynamic_cast<BrainSprite*>(*collides.begin());
@@ -630,7 +638,7 @@ int Brainblast::eventLoop()
 
 			// Detect collisions
 			if(!m_player1->isCarrying() && keysHeld[SDLK_UP] ) {
-				std::vector<KrImage*> collides;
+				vector<KrImage*> collides;
 				if( m_engine->Tree()->CheckAllCollision(m_player1,&collides) )
 				{  
 					printf("Collision!\n");
@@ -702,16 +710,24 @@ int Brainblast::eventLoop()
 		}
 
 		// Time left
-		int sec = static_cast<int>(300 - difftime(now,m_start_time));
-		bool over = sec <= 0;
+		int sec = static_cast<int>(30 - difftime(now,m_start_time));
+		game_over = sec <= 0;
+		if( game_over ) sec = 0;
 		int min = sec/60;
 		sec -= min*60;
 
-		std::ostringstream score_str;
-		score_str << "Score: " << m_player1->getScore() << "   Time: " << min << ":" << sec;
-		SDL_Rect p; p.x=10; p.y=10; p.w=300; p.h=50;
-		drawText(score_str.str().c_str(),p);
-		
+		ostringstream score_str;
+		score_str << "Score: " << m_player1->getScore() << "   Time: " 
+				  << setw(2) << setfill('0') << min << ":" 
+				  << setw(2) << setfill('0') << sec;
+		SDL_Rect s; s.x=10; s.y=10; s.w=300; s.h=50;
+		drawText(score_str.str().c_str(),s);
+		if( game_over )
+		{
+			SDL_Rect p; p.x=400; p.y=300; p.w=300; p.h=50;
+			drawText("Game Over",p,32);
+			clearFloor();
+		}
 	}
     
     return 0;
@@ -728,7 +744,7 @@ BrainSprite* Brainblast::reparentSprite(BrainSprite* bs, BrainSprite* parent)
 {
 	BrainSprite* clone = static_cast<BrainSprite*>(bs->Clone());
 	m_engine->Tree()->AddNode(parent,clone);
-	std::vector<BrainSprite*>::iterator it = find(m_sprites.begin(),m_sprites.end(),bs);
+	vector<BrainSprite*>::iterator it = find(m_sprites.begin(),m_sprites.end(),bs);
 	if( it != m_sprites.end() )
 		m_sprites.erase(it);
 	if( !parent )
@@ -737,10 +753,12 @@ BrainSprite* Brainblast::reparentSprite(BrainSprite* bs, BrainSprite* parent)
 	return clone;
 }
 
-void Brainblast::drawText(const char* text, SDL_Rect pos)
+void Brainblast::drawText(const char* text, SDL_Rect pos, int size)
 {
+	// TODO: We could keep the fonts open for performance
+
 	TTF_Font *font;
-	font=TTF_OpenFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf", 16);
+	font=TTF_OpenFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf", size);
 	if(!font) {
 		printf("=== Error: TTF_OpenFont: (%s) === \n", TTF_GetError());
 		return;

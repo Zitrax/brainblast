@@ -78,7 +78,7 @@ public:
 	
 	bool playSample(enum sounds sound) const { return m_sound->playSample(sound); }
 
-	void drawText(const char* text, SDL_Rect pos);
+	void drawText(const char* text, SDL_Rect pos, int size=16);
 
 	bool changeLevel(int lvl);
 
