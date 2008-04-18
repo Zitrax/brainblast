@@ -11,9 +11,13 @@ OBJECTS = bbc.o Brainblast.o Brick.o Puzzle.o Field.o BrainSprite.o BrainSound.o
 
 all: Brainblast
 
-$(IMAGES)/bb.h: ../images/bricks.xml
+$(IMAGES)/bb.h: ../images/bricks.xml 
 	cd $(IMAGES) && \
 	krencoder -pBB_ bb.h bricks.xml
+
+$(IMAGES)/bb_bg.h: ../images/bg.xml
+	cd $(IMAGES) && \
+	krencoder -pBB_BG_ bb_bg.h bg.xml
 
 Brainblast: $(OBJECTS)
 	$(GCC) -o $@ $(OBJECTS) -lkyra -lengine $(SDL_LIBS) 
@@ -26,7 +30,7 @@ remake:
 
 clean:
 	rm -rfv *.o Brainblast *~ \
-	$(IMAGES)/bb.h $(IMAGES)/bb.dat
+	$(IMAGES)/bb.h $(IMAGES)/bb.dat $(IMAGES)/bb_bg.h $(IMAGES)/bb_bg.dat 
 
 # DO NOT DELETE
 
@@ -42,7 +46,7 @@ Brainblast.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
 Brainblast.o: /usr/include/sys/sysmacros.h /usr/include/bits/pthreadtypes.h
 Brainblast.o: /usr/include/alloca.h /usr/include/assert.h bbc.h Puzzle.h
 Brainblast.o: Brick.h Field.h BrainSprite.h BrainPlayer.h BrainSound.h
-Brainblast.o: ../images/bb.h
+Brainblast.o: ../images/bb.h ../images/bb_bg.h
 BrainPlayer.o: BrainPlayer.h BrainSprite.h
 BrainSound.o: BrainSound.h bbc.h
 BrainSprite.o: BrainSprite.h Brainblast.h /usr/include/stdlib.h
