@@ -1,0 +1,7 @@
+<Definition filename="stars.png">
+    <Sprite name="STARS_BG">
+        <Action name="NONE">
+            <Frame x="0" y="0" width="1024" height="768" hotspotx="0" hotspoty="0" deltax="0" deltay="0" />
+        </Action>
+    </Sprite>
+</Definition>
