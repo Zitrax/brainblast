@@ -7,6 +7,7 @@
 #include "Brainblast.h"
 
 #include "../images/bb.h"
+#include "../images/bb_bg.h"
 #include "grinliz/glrandom.h"
 #include "SDL_ttf.h"
 
@@ -19,7 +20,8 @@ using namespace std;
 
 Brainblast* Brainblast::s_instance;
 
-Brainblast::Brainblast() : m_sound(new BrainSound),
+Brainblast::Brainblast() : m_play(false),
+						   m_sound(new BrainSound),
 						   m_player1(0),
 						   m_players(1),
 						   m_currentLvl1(0),
@@ -42,7 +44,9 @@ Brainblast::Brainblast() : m_sound(new BrainSound),
                            white  ( SDL_MapRGB(m_screen->format, 0xff, 0xff, 0xff) ),
                            yellow ( SDL_MapRGB(m_screen->format, 0xff, 0xff, 0x00) ),
                            cyan   ( SDL_MapRGB(m_screen->format, 0x00, 0xff, 0xff) ),
-                           magenta( SDL_MapRGB(m_screen->format, 0xff, 0x00, 0xff) )
+                           magenta( SDL_MapRGB(m_screen->format, 0xff, 0x00, 0xff) ),
+						   m_bg_vault( new KrResourceVault() ),
+						   m_bg_sprite(0)
 {
     if(bbc::debug) cerr << "Brainblast::Brainblast() Videomode(" << VIDEOX << "," << VIDEOY << ")\n";
 
@@ -66,6 +70,9 @@ Brainblast::Brainblast() : m_sound(new BrainSound),
         printf("=== ERROR: Can't initialize ttf support: (%s) ===\n",TTF_GetError());
         exit(1);
     }   
+
+	m_center_text_rect.x=400; m_center_text_rect.y=300; m_center_text_rect.w=300; m_center_text_rect.h=50;
+	m_topleft_text_rect.x=10; m_topleft_text_rect.y=10; m_topleft_text_rect.w=300; m_topleft_text_rect.h=50;
 }
 
 bool Brainblast::setupFields(int players)
@@ -78,7 +85,7 @@ bool Brainblast::setupFields(int players)
 	{
 	case 1:
 		m_field1 = new SDL_Rect;
-		m_field1->x = 200;
+		m_field1->x = 262;
 		m_field1->y = MARGIN; 
 		m_field1->w = 500;
 		m_field1->h = m_field1->w;
@@ -130,6 +137,8 @@ Brainblast::cleanup()
 	}
     
     // m_screen is deleted by SDL_Quit
+	//	zap( m_bgTree );   - Deleted along with the engine
+	//	zap( m_fgTree );   - Deleted along with the engine
 
 	zap( m_sound );
     zap( m_currentLvl1 );
@@ -137,8 +146,7 @@ Brainblast::cleanup()
     zap( m_field1 ); 
 	zap( m_field2 );
 	zap( m_engine );
-	zap( m_bgTree );
-	zap( m_fgTree );
+	zap( m_bg_vault );
 }
 
 bool
@@ -282,7 +290,23 @@ Brainblast::changeLevel(int lvl)
 
 	clearFloor();
 
+	// Make sure texts are cleared
+ 	grinliz::Rectangle2I r1,r2,r3;
+//  	r1.Set(m_center_text_rect.x,m_center_text_rect.y,
+// 		   m_center_text_rect.w,m_center_text_rect.h);
+// 	r2.Set(m_topleft_text_rect.x,m_topleft_text_rect.y,
+// 		   m_topleft_text_rect.w,m_topleft_text_rect.h);
+// 	m_engine->InvalidateRectangle(r1);
+// 	m_engine->InvalidateRectangle(r2);
+
+	// Smaller rectangles are not entirely correct
+	// so just invalidate the entire screen.
+	// It's not expensive to do that here.
+	r3.Set(0,0,VIDEOX,VIDEOY);
+	m_engine->InvalidateRectangle(r3);
+
 	time(&m_start_time);
+	m_play = false;
 
 	return true;
 }
@@ -395,21 +419,34 @@ Brainblast::initGameKyra()
 
 	// Load the dat file.
 	// The dat file was carefully created in the sprite
-	// editor. Loading allows us access to the 
-	// MAGE, PARTICLE, and CARPET.
+	// editor.
 	if ( !m_engine->Vault()->LoadDatFile( "../images/bb.dat" ) )
 	{
-		printf( "Error loading the sprites file.\n" );
-		return false;	}
+		printf( "=== Error: Loading the sprites file. ===\n" );
+		return false;	
+	}
+
+	// Load the background vault
+	if( !m_bg_vault->LoadDatFile( "../images/bb_bg.dat" ) )
+	{
+		printf( "=== Error: Loading backgrounds. ===\n" );
+	}
 
 	// Add background and foreground trees
-	KrImNode* m_bgTree = new KrImNode;
-	KrImNode* m_fgTree = new KrImNode;
+	m_bgTree = new KrImNode;
+	m_fgTree = new KrImNode;
+	m_bgTree->SetZDepth(-10);
+	m_fgTree->SetZDepth(11);
 	m_engine->Tree()->AddNode(0, m_bgTree);
 	m_engine->Tree()->AddNode(0, m_fgTree);
-	m_bgTree->SetZDepth(10);
-	m_fgTree->SetZDepth(11);
 	
+	// Add the background
+	KrSpriteResource* bg = m_bg_vault->GetSpriteResource( BB_BG_STARS_BG );
+	assert(bg);
+	m_bg_sprite = new KrSprite(bg);
+	m_engine->Tree()->AddNode( 0, m_bg_sprite );
+	m_bg_sprite->SetZDepth(-20);
+
 	// Get the WIZARD resource
 	KrSpriteResource* wizardRes = m_engine->Vault()->GetSpriteResource( BB_WIZARD );
 	assert( wizardRes );
@@ -427,7 +464,7 @@ Brainblast::initGameKyra()
 
 BrainSprite* Brainblast::addSprite()
 {
-	if( difftime(time(0),m_start_time) <= WAITTIME )
+	if( !m_play && (difftime(time(0),m_start_time) <= WAITTIME) )
 		return 0;
 
 	KrSpriteResource* spriteRes = 0;
@@ -539,11 +576,11 @@ int Brainblast::eventLoop()
 					m_currentLvl1->navigate(Puzzle::UP);
 				else if( m_player1->isCarrying() )
 				{
-					BrainSprite* o = m_player1->drop();
+					BrainSprite* o = m_player1->drop(0);
 					o->setStatic(true);
 					m_currentLvl1->startSelection(o);
 				}
-				else
+				else					
 					keysHeld[event.key.keysym.sym] = true;
 					
 			}
@@ -576,10 +613,15 @@ int Brainblast::eventLoop()
 					}
 				}
 			}
-			else if( game_over && (event.key.keysym.sym == SDLK_SPACE) )
+			else if( event.key.keysym.sym == SDLK_SPACE )
 			{
-				m_player1->setScore(0);
-				changeLevel(1);
+				if( game_over )
+				{
+					m_player1->setScore(0);
+					changeLevel(1);
+				}
+				else if( !m_play )
+					m_play = true;
 			}
 
 			else
@@ -652,7 +694,7 @@ int Brainblast::eventLoop()
 			// Detect collisions
 			if(!m_player1->isCarrying() && keysHeld[SDLK_UP] ) {
 				vector<KrImage*> collides;
-				if( m_engine->Tree()->CheckAllCollision(m_player1,&collides) )
+				if( m_engine->Tree()->CheckChildCollision(m_player1,m_bgTree,&collides) )
 				{  
 					printf("Collision!\n");
 					// Use of dynamic cast as we only want to try to pick
@@ -665,11 +707,12 @@ int Brainblast::eventLoop()
 				}
 			}
 
-			if( difftime(now,m_start_time) > WAITTIME )
+			if( m_play || (difftime(now,m_start_time) > WAITTIME) )
 			{
 				m_currentLvl1->setVisibleSolution(false);
 				if( m_players > 1 )
 					m_currentLvl2->setVisibleSolution(false);
+				m_play = true;
 			}
 
 			m_engine->Draw();
@@ -702,24 +745,24 @@ int Brainblast::eventLoop()
 				m_player1->SetAction("WALKING.RIGHT");
 			m_player1->DoStep();
 		}
-		if( keysHeld[SDLK_j] )
+		if( keysHeld[SDLK_RCTRL] )
 		{
 			m_player1->jump();
 		}
 		if( keysHeld[SDLK_F1] )
 			addSprite();
-		if( keysHeld[SDLK_F2] )
-		{
-		}
 		if( keysHeld[SDLK_DOWN] ) 
 		{
-			m_player1->drop();
+			BrainSprite* bs = m_player1->drop(m_bgTree);
+			if(bs)
+				m_sprites.push_back(bs);
 		}
 
 		// Time left
-		int sec = static_cast<int>(30 - difftime(now,m_start_time));
+		int basetime = m_play ? 60 : WAITTIME;
+		int sec = static_cast<int>(basetime - difftime(now,m_start_time));
 		game_over = sec <= 0;
-		if( game_over ) sec = 0;
+		if( m_play && game_over ) sec = 0;
 		int min = sec/60;
 		sec -= min*60;
 
@@ -727,14 +770,13 @@ int Brainblast::eventLoop()
 		score_str << "Score: " << m_player1->getScore() << "   Time: " 
 				  << setw(2) << setfill('0') << min << ":" 
 				  << setw(2) << setfill('0') << sec;
-		SDL_Rect s; s.x=10; s.y=10; s.w=300; s.h=50;
-		drawText(score_str.str().c_str(),s);
-		if( game_over )
+		drawText(score_str.str().c_str(),m_topleft_text_rect);
+		if( m_play && game_over )
 		{
-			SDL_Rect p; p.x=400; p.y=300; p.w=300; p.h=50;
-			drawText("Game Over",p,32);
+			drawText("Game Over",m_center_text_rect,32);
 			clearFloor();
 		}
+		
 	}
     
     return 0;
@@ -747,7 +789,7 @@ void Brainblast::handleKeyEvent(SDL_KeyboardEvent* key)
     printf( "%s\n", SDL_GetKeyName(key->keysym.sym));
 }
 
-BrainSprite* Brainblast::reparentSprite(BrainSprite* bs, BrainSprite* parent)
+BrainSprite* Brainblast::reparentSprite(BrainSprite* bs, KrImNode* parent)
 {
 	BrainSprite* clone = static_cast<BrainSprite*>(bs->Clone());
 	m_engine->Tree()->AddNode(parent,clone);

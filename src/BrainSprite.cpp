@@ -66,10 +66,10 @@ void BrainSprite::pickUp(BrainSprite* bs)
     }
 }
 
-BrainSprite* BrainSprite::drop()
+BrainSprite* BrainSprite::drop(KrImNode* new_parent)
 {
     if( m_child ) {
-        BrainSprite* clone = Brainblast::instance()->reparentSprite(m_child,0);
+        BrainSprite* clone = Brainblast::instance()->reparentSprite(m_child,new_parent);
         clone->SetPos(X()-30,Y()-30);
         clone->setAcc(m_acc);
         clone->setSpeed(m_x_speed,m_y_speed);

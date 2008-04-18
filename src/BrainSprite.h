@@ -70,7 +70,7 @@ public:
 	/**
 	 * If something was dropped, it's returned.
 	 */
-    BrainSprite* drop();
+    BrainSprite* drop(KrImNode* new_parent);
     bool isCarrying() const {return m_child!=0;}
 	BrainSprite* carry() const { return m_child; }
 

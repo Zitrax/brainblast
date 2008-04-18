@@ -69,7 +69,7 @@ public:
 	/**
 	 * 
 	 */
-	BrainSprite* reparentSprite(BrainSprite* bs, BrainSprite* parent);
+	BrainSprite* reparentSprite(BrainSprite* bs, KrImNode* parent);
 
 	enum sounds {
 		CLICK,
@@ -95,9 +95,30 @@ private:
 	 */
 	void clearFloor();
 
+    //! Returns true if created succesfully, false otherwise
+    bool makeLevel(int lvl);
+
+    void createBricks();
+	bool createBoards();
+
+    void drawBoard(SDL_Surface* s, SDL_Rect* dim, Puzzle* p);
+	void drawBoards();
+
+    //! Sets up a new game
+    bool initGame(int lvl=1);
+    bool initGameKyra();
+
+    //! Used to clean up for all pointers
+    void cleanup();
+
+    int eventLoop();
+
+    void handleKeyEvent(SDL_KeyboardEvent* key);
+
 	static Brainblast* s_instance;
 
-	static const double WAITTIME = 3.0;
+	static const double WAITTIME = 10.0;
+	bool m_play; // Tells if the user has aborted the wait
 
 	BrainSound* m_sound;
 
@@ -126,25 +147,11 @@ private:
 
     const Uint32 red, blue, black, green, white, yellow, cyan, magenta;
 
-    //! Returns true if created succesfully, false otherwise
-    bool makeLevel(int lvl);
+	KrResourceVault* m_bg_vault;
+	KrSprite*        m_bg_sprite;
 
-    void createBricks();
-	bool createBoards();
-
-    void drawBoard(SDL_Surface* s, SDL_Rect* dim, Puzzle* p);
-	void drawBoards();
-
-    //! Sets up a new game
-    bool initGame(int lvl=1);
-    bool initGameKyra();
-
-    //! Used to clean up for all pointers
-    void cleanup();
-
-    int eventLoop();
-
-    void handleKeyEvent(SDL_KeyboardEvent* key);
+	SDL_Rect m_center_text_rect;
+	SDL_Rect m_topleft_text_rect;
 };
 
 #endif

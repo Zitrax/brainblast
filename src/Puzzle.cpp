@@ -194,7 +194,7 @@ Puzzle::setSolutionBrickWithIdx(const Brick* const b, unsigned int idx)
 		int xspace = m_rect.w/m_width;
 		int yspace = m_rect.h/m_height;
 		nb->setPos(m_rect.x + (idx%m_width)*xspace+xspace/2,
-				   m_rect.y + (idx/m_height)*yspace+yspace/2);
+				   m_rect.y + (idx/m_width)*yspace+yspace/2);
 		m_solution[idx] = nb;
 	}
 }
