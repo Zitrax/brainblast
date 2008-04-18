@@ -13,6 +13,16 @@
 * Make sure you can not set two pieces on one place 
   in the lvl file.
 
+=== Optimizations ===
+
+Currently drawing the text happens too often. If the text has not
+changed and note been moved over we should not need to repaint it.
+Also I should look into drawing the text with kyra itself, there seem
+to be some font functions there.
+
+=== BUGS ===
+
+* You can overwrite correct pieces with correct or incorrect bricks.
 
 === Scoring ===
 
