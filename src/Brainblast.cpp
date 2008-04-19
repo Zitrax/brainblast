@@ -46,7 +46,9 @@ Brainblast::Brainblast() : m_play(false),
                            cyan   ( SDL_MapRGB(m_screen->format, 0x00, 0xff, 0xff) ),
                            magenta( SDL_MapRGB(m_screen->format, 0xff, 0x00, 0xff) ),
 						   m_bg_vault( new KrResourceVault() ),
-						   m_bg_sprite(0)
+						   m_bg_sprite(0),
+						   m_center_text_rect(),
+						   m_topleft_text_rect()
 {
     if(bbc::debug) cerr << "Brainblast::Brainblast() Videomode(" << VIDEOX << "," << VIDEOY << ")\n";
 
@@ -325,7 +327,7 @@ Brainblast::changeLevel(int lvl)
 	clearFloor();
 
 	// Make sure texts are cleared
- 	grinliz::Rectangle2I r1,r2,r3;
+ 	grinliz::Rectangle2I /*r1,r2,*/r3;
 //  	r1.Set(m_center_text_rect.x,m_center_text_rect.y,
 // 		   m_center_text_rect.w,m_center_text_rect.h);
 // 	r2.Set(m_topleft_text_rect.x,m_topleft_text_rect.y,
@@ -627,12 +629,12 @@ int Brainblast::eventLoop()
 			else if( (event.key.keysym.sym == SDLK_RETURN) && 
 					 (m_currentLvl1->isSelecting()) )
 			{
-				m_sound->playSample(CLICK);
 				BrainSprite* s = 0;
 				int cscore = m_currentLvl1->brickScore();
 				m_currentLvl1->select(&s) ? m_player1->addScore(cscore) : m_player1->addScore(-1*cscore/10);
 				if( s )
 				{
+					m_sound->playSample(CLICK);
 					vector<BrainSprite*>::iterator it = find(m_sprites.begin(),m_sprites.end(),s);
 					m_sprites.erase(it);
 
@@ -793,7 +795,7 @@ int Brainblast::eventLoop()
 		}
 
 		// Time left
-		int basetime = m_play ? 60 : WAITTIME;
+		int basetime = m_play ? 60 : static_cast<int>(WAITTIME);
 		int sec = static_cast<int>(basetime - difftime(now,m_start_time));
 		game_over = sec <= 0;
 		if( m_play && game_over ) sec = 0;
