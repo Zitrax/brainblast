@@ -46,7 +46,7 @@ public:
 	 * This creates a brick of the moved type at the current
 	 * position. 
 	 *
-	 * If bs i set the brick has taken over the 
+	 * If bs is set the brick has taken over the 
 	 * ownership of the sprite.
 	 *
 	 * Returns true if the selections was correct
@@ -78,6 +78,9 @@ private:
 	KrTile*   m_selection_tile;
 	BrainSprite* m_selection_sprite;
 
+	/**
+	 * Handles coordinate selection on the grid.
+	 */
 	class SelectCoord
 	{
 	public:
@@ -98,11 +101,11 @@ private:
 
 	private:
 
-		void left()  { if( decV(&m_x,m_p->m_width)  ) decV(&m_y,m_p->m_height); }
-		void right() { if( incV(&m_x,m_p->m_width)  ) incV(&m_y,m_p->m_height); }
-		void up()    { if( decV(&m_y,m_p->m_height) ) decV(&m_x,m_p->m_width);  }
-		void down()  { if( incV(&m_y,m_p->m_height) ) incV(&m_x,m_p->m_width);  } 
-
+		void left()  { decV(&m_x,m_p->m_width);  }
+		void right() { incV(&m_x,m_p->m_width);  }
+		void up()    { decV(&m_y,m_p->m_height); }
+		void down()  { incV(&m_y,m_p->m_height); } 
+		
 		bool incV(int* v, int max) {	
 			++(*v); 
 			if( *v == max ) *v = 0; 
