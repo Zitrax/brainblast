@@ -280,12 +280,18 @@ void Puzzle::startSelection(BrainSprite* bs)
 
 bool Puzzle::select(BrainSprite** bs)
 {
+	// First check that there is not already
+	// a correct brick at this location.
+	int idx = m_s_coord.i();
+	if( m_current[idx] && m_solution[idx] && 
+		(m_current[idx]->id() == m_solution[idx]->id()) )
+		return false;
+
 	if( m_selected_tile )
 		m_selected_tile->SetVisible(true);
 	if( m_selection_tile )
 		m_selection_tile->SetVisible(false);
 
-	int idx = m_s_coord.i();
 	bool ret = false;
 
 	// Create solution brick
