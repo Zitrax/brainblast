@@ -155,6 +155,8 @@ Brainblast::makeRandomLevel(int w,int h,int n)
 	if(bbc::debug) cerr << "Brainblast::makeRandomLevel(" 
 						<< w << "," << h << "," << n << ")\n";
 
+	assert(n<=w*h);
+
 	m_currentLvl1 = new Puzzle(w,h,*m_field1);
 	if( m_players > 1 )
 		m_currentLvl2 = new Puzzle(w,h,*m_field2);
