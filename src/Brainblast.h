@@ -97,6 +97,11 @@ private:
 
     //! Returns true if created succesfully, false otherwise
     bool makeLevel(int lvl);
+	/**
+	 * Creates random levels with specified
+	 * width and height, and n number of bricks.
+	 */
+	void makeRandomLevel(int w,int h,int n);
 
     void createBricks();
 	bool createBoards();

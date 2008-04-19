@@ -149,6 +149,42 @@ Brainblast::cleanup()
 	zap( m_bg_vault );
 }
 
+void
+Brainblast::makeRandomLevel(int w,int h,int n)
+{
+	if(bbc::debug) cerr << "Brainblast::makeRandomLevel(" 
+						<< w << "," << h << "," << n << ")\n";
+
+	m_currentLvl1 = new Puzzle(w,h,*m_field1);
+	if( m_players > 1 )
+		m_currentLvl2 = new Puzzle(w,h,*m_field2);
+
+	// Vector to make sure we use up the indexes
+	// I guess a nicer solution would be to randomize
+	// and iterate over a vector/array instead but...
+	vector<int> indexes;
+	for(int i=0; i<w*h; ++i)
+		indexes.push_back(i);
+
+	for(int i=0; i<n; ++i)
+	{
+		int type = bbc::randint(0,m_bricks.size()-1);
+		map<int,Brick*>::iterator it = m_bricks.begin();
+		for(int j=0;j<type;++j)
+			++it;
+		assert(it!=m_bricks.end());
+
+		int idxidx  = bbc::randint(0,indexes.size()-1);
+		int idx = indexes[idxidx];
+		indexes.erase(find(indexes.begin(),indexes.end(),idx));
+
+		m_currentLvl1->setSolutionBrickWithIdx(it->second,idx);
+		if( m_players > 1 )
+			m_currentLvl2->setSolutionBrickWithIdx(it->second,idx);
+	}
+	
+}
+
 bool
 Brainblast::makeLevel(int lvl)
 {
@@ -159,11 +195,7 @@ Brainblast::makeLevel(int lvl)
 
     if(lvl == 0) 
     {
-        m_currentLvl1 = new Puzzle(5,5,*m_field1);
-		if( m_players > 1 )
-			m_currentLvl2 = new Puzzle(5,5,*m_field2);
-        // placeBricksRandom();
-#warning "Should implement placeBricksRandom"
+		makeRandomLevel(4,4,4);
         return true;
     }
 
@@ -398,7 +430,7 @@ Brainblast::startGame(int players)
 		return false;
 	}
 
-	if( !initGame(1) )
+	if( !initGame(0) )
 	{
 		printf("=== ERROR: Could not init game. ===\n");
 		return false;
