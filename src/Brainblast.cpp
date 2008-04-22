@@ -641,11 +641,11 @@ int Brainblast::eventLoop()
 					if( checkSolution(m_currentLvl1) )
 					{
 						if( !changeLevel(m_current_lvl+1) )
-							changeLevel(1);
+							changeLevel(0);
 					}
 					if( (m_players > 1) && checkSolution(m_currentLvl2) )
 					{
-
+						assert(!"Fixme");
 					}
 				}
 			}
@@ -803,9 +803,11 @@ int Brainblast::eventLoop()
 		sec -= min*60;
 
 		ostringstream score_str;
-		score_str << "Score: " << m_player1->getScore() << "   Time: " 
+		score_str << "Score: " << m_player1->getScore() << " | Time: " 
 				  << setw(2) << setfill('0') << min << ":" 
-				  << setw(2) << setfill('0') << sec;
+				  << setw(2) << setfill('0') << sec 
+				  << " | Bricks: " << m_currentLvl1->correctBricks()
+				  << "/" << m_currentLvl1->totalSolutionBricks();
 		drawText(score_str.str().c_str(),m_topleft_text_rect);
 		if( m_play && game_over )
 		{

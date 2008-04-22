@@ -20,6 +20,8 @@ Puzzle::Puzzle(int width, int height, SDL_Rect rect)
 	m_selected_tile(0),
 	m_selection_tile(0),
 	m_selection_sprite(0),
+	m_correct_bricks(0),
+	m_total_solution_bricks(0),
 	m_s_coord(this)
 {
     if(bbc::debug) std::cerr << "Puzzle::Puzzle(" << m_width << "," << m_height << "," 
@@ -196,6 +198,7 @@ Puzzle::setSolutionBrickWithIdx(const Brick* const b, unsigned int idx)
 		nb->setPos(m_rect.x + (idx%m_width)*xspace+xspace/2,
 				   m_rect.y + (idx/m_width)*yspace+yspace/2);
 		m_solution[idx] = nb;
+		m_total_solution_bricks++;
 	}
 }
 
@@ -308,6 +311,7 @@ bool Puzzle::select(BrainSprite** bs)
 	if( m_current[idx] )
 		Brainblast::instance()->engine()->Tree()->DeleteNode(m_current[idx]->getSprite());
 	
+	// A correct brick
 	if(  m_solution[idx] && ( b->id() == m_solution[idx]->id() ) )
 	{
 		int x = m_back[idx]->X();
@@ -319,6 +323,7 @@ bool Puzzle::select(BrainSprite** bs)
 		m_back[idx]->SetPos(x,y);
 		ret = true;
 		m_selected_tile = 0;
+		m_correct_bricks++;
 	}
 
 	m_current[idx] = b;

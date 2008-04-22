@@ -23,7 +23,9 @@ public:
 	Puzzle& operator=(const Puzzle& pz);
 	
 	bool checkSolution();
-	
+	int correctBricks() const { return m_correct_bricks; }
+	int totalSolutionBricks() const { return m_total_solution_bricks; }
+
 	Brick* getCurrentBrickWithIdx(int idx) const;
 	Brick* getSolutionBrickWithIdx(int idx) const;
 	void setCurrentBrickWithIdx(Brick* b, int idx);
@@ -77,6 +79,9 @@ private:
 	KrTile*   m_selected_tile;
 	KrTile*   m_selection_tile;
 	BrainSprite* m_selection_sprite;
+
+	int m_correct_bricks;         // TODO: This might also be used in checkSolution.
+	int m_total_solution_bricks;  // TODO: This might also be used in checkSolution.
 
 	/**
 	 * Handles coordinate selection on the grid.
