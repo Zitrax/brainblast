@@ -22,6 +22,9 @@
 #include "BrainSprite.h"
 #include "BrainPlayer.h"
 #include "BrainSound.h"
+#include "BrainAI.h"
+
+class BrainAI;
 
 using namespace std;
 
@@ -66,9 +69,6 @@ public:
 
 	BrainSprite* addSprite();
 
-	/**
-	 * 
-	 */
 	BrainSprite* reparentSprite(BrainSprite* bs, KrImNode* parent);
 
 	enum sounds {
@@ -81,6 +81,13 @@ public:
 	void drawText(const char* text, SDL_Rect pos, int size=16);
 
 	bool changeLevel(int lvl);
+
+	std::vector<BrainSprite*>& getAllSprites() { return m_sprites; }
+
+	/**
+	 * Perform a select for the player at lvl.
+	 */
+	void select(Puzzle& lvl, BrainPlayer& player);
 
 private:
 
@@ -129,6 +136,7 @@ private:
 
 	BrainPlayer* m_player1; // The player
 	int m_players;
+	BrainAI* m_ai;
 
     Puzzle* m_currentLvl1;
 	Puzzle* m_currentLvl2;

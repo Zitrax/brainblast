@@ -1,5 +1,5 @@
 * Make an array or similar to keep the the puzzles in
-  instead of if checks on the nmber of players.
+  instead of if checks on the number of players.
 
 * Make sure we do not crash when a level can not be 
   loaded.
@@ -7,22 +7,45 @@
 * Show some progress indication on how correct your
   solution is.
 
-* Perhaps we should only throw down pieces that are
+X Perhaps we should only throw down pieces that are
   actually used in the puzzle.
 
-* Make sure you can not set two pieces on one place 
+X Make sure you can not set two pieces on one place 
   in the lvl file.
+
+X You can overwrite correct pieces with correct or incorrect bricks. 
+
+* In puzzle we have several ** variables that should be just a *.
+
+* If the score goes down the text area is not cleared.
+
+* There should be falling blocks to temporarily show the solution.
+
+* There should be "joker-blocks" that is correct if put where there is
+  a piece.
+
+* Find music with suitable license.
+
+* In two player mode, drop pieces which you could use to destroy a
+  pice on the other players board.
+
+* Cooperative two player mode.
+
+* Falling bombs that scatter the bricks on ground or stuns the
+  players.
+
+* AI player.
+
+* Make sure to show the correct solution on game over
+
+* Dont score so hight for large boards
 
 === Optimizations ===
 
 Currently drawing the text happens too often. If the text has not
-changed and note been moved over we should not need to repaint it.
+changed and not been moved over we should not need to repaint it.
 Also I should look into drawing the text with kyra itself, there seem
 to be some font functions there.
-
-=== BUGS ===
-
-* You can overwrite correct pieces with correct or incorrect bricks.
 
 === Scoring ===
 

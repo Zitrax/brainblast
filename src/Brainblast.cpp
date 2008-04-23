@@ -24,6 +24,7 @@ Brainblast::Brainblast() : m_play(false),
 						   m_sound(new BrainSound),
 						   m_player1(0),
 						   m_players(1),
+						   m_ai(0),
 						   m_currentLvl1(0),
 						   m_currentLvl2(0),
 						   m_current_lvl(1),
@@ -199,7 +200,7 @@ Brainblast::makeLevel(int lvl)
 
     if(lvl == 0) 
     {
-		makeRandomLevel(4,4,4);
+		makeRandomLevel(6,6,6);
         return true;
     }
 
@@ -343,6 +344,9 @@ Brainblast::changeLevel(int lvl)
 
 	time(&m_start_time);
 	m_play = false;
+
+	// Testing ai
+	m_ai = new BrainAI(m_player1,m_currentLvl1);
 
 	return true;
 }
@@ -526,11 +530,7 @@ Brainblast::initGame(int lvl)
     createBricks();
 
 	if( !changeLevel(lvl) )
-		return false;
-
-    // SDL_WM_ToggleFullScreen(m_screen);
-
-    //SDL_Delay(1000); 
+		return false; 
 
 	// Start music
 	if( !(m_sound->initializeSound() &&
@@ -629,25 +629,7 @@ int Brainblast::eventLoop()
 			else if( (event.key.keysym.sym == SDLK_RETURN) && 
 					 (m_currentLvl1->isSelecting()) )
 			{
-				BrainSprite* s = 0;
-				int cscore = m_currentLvl1->brickScore();
-				m_currentLvl1->select(&s) ? m_player1->addScore(cscore) : m_player1->addScore(-1*cscore/10);
-				if( s )
-				{
-					m_sound->playSample(CLICK);
-					vector<BrainSprite*>::iterator it = find(m_sprites.begin(),m_sprites.end(),s);
-					m_sprites.erase(it);
-
-					if( checkSolution(m_currentLvl1) )
-					{
-						if( !changeLevel(m_current_lvl+1) )
-							changeLevel(0);
-					}
-					if( (m_players > 1) && checkSolution(m_currentLvl2) )
-					{
-						assert(!"Fixme");
-					}
-				}
+				select(*m_currentLvl1,*m_player1); // TODO: Player2
 			}
 			else if( event.key.keysym.sym == SDLK_SPACE )
 			{
@@ -676,6 +658,9 @@ int Brainblast::eventLoop()
 			
         case SDL_DRAW_EVENT:
         {
+			if( m_ai )
+				m_ai->move();
+
 			vector<BrainSprite*>::iterator it  = m_sprites.begin();
 			vector<BrainSprite*>::iterator end = m_sprites.end();
 			while(it!=end)
@@ -820,6 +805,25 @@ int Brainblast::eventLoop()
     return 0;
 }
 
+void Brainblast::select(Puzzle& lvl, BrainPlayer& player)
+{
+	BrainSprite* s = 0;
+	int cscore = lvl.brickScore();
+	lvl.select(&s) ? player.addScore(cscore) : player.addScore(-1*cscore/10);
+	if( s )
+	{
+		m_sound->playSample(CLICK);
+		vector<BrainSprite*>::iterator it = find(m_sprites.begin(),m_sprites.end(),s);
+		m_sprites.erase(it);
+
+		if( checkSolution(&lvl) )
+		{
+			if( !changeLevel(m_current_lvl+1) )
+				changeLevel(0);
+		}
+	}	
+}
+
 void Brainblast::handleKeyEvent(SDL_KeyboardEvent* key)
 {
     assert(key);
@@ -839,7 +843,7 @@ BrainSprite* Brainblast::reparentSprite(BrainSprite* bs, KrImNode* parent)
     m_engine->Tree()->DeleteNode(bs);
 	return clone;
 }
-
+ 
 void Brainblast::drawText(const char* text, SDL_Rect pos, int size)
 {
 	// TODO: We could keep the fonts open for performance

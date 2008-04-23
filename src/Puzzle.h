@@ -43,7 +43,16 @@ public:
 	void stopSelection();
 	enum direction { LEFT,RIGHT,UP,DOWN };
 	void navigate(enum direction dir) { m_s_coord.move(dir); updateSelection(); }
+	/**
+	 * Returns true when we are at the correct id.
+	 * The caller has to make sure that the id is indeed
+	 * a valid remaining solution or we will just 
+	 * not do anything in this function.
+	 */
+	bool navigateTowards();
+
 	bool isSelecting() const { return m_selection_sprite != 0; } 
+	const BrainSprite* const getSelectionSprite() { return m_selection_sprite; }
 	/**
 	 * This creates a brick of the moved type at the current
 	 * position. 

@@ -281,6 +281,37 @@ void Puzzle::startSelection(BrainSprite* bs)
 	updateSelection(); 
 }
 
+bool Puzzle::navigateTowards()
+{
+	// Find non-filled brick for id
+	int target_id = m_selection_sprite->NodeId();
+	int nav_id = -1;
+
+	for(uint i=0; i<m_width*m_height; i++)
+		if( m_solution[i] && (m_solution[i]->id() == target_id) ) // Is there the solution we look for here
+		{
+			if( !m_current[i] || (m_solution[i]->id() != m_current[i]->id()) ) // Is it not yet correct
+			{
+				nav_id = i;
+				break;
+			}
+		}
+
+	assert(nav_id!=-1); // We should never look for id's that do not exist
+	if(nav_id==-1)
+		return false;
+
+	if( nav_id == m_s_coord.i() )
+		return true;
+
+	if( m_s_coord.x() != nav_id%m_width )
+		navigate(LEFT);
+	else
+		navigate(UP);
+
+	return false;
+}
+
 bool Puzzle::select(BrainSprite** bs)
 {
 	// First check that there is not already
