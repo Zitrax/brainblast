@@ -16,3 +16,21 @@ BrainPlayer::BrainPlayer(KrSpriteResource* res, std::string name) :
 BrainPlayer::~BrainPlayer()
 {
 }
+
+void BrainPlayer::left()
+{
+	if( isCarrying() )
+		SetAction("HOLDING.LEFT");
+	else
+		SetAction("WALKING.LEFT");
+	DoStep();
+}
+
+void BrainPlayer::right()
+{
+	if( isCarrying() )
+		SetAction("HOLDING.RIGHT");
+	else
+		SetAction("WALKING.RIGHT");
+	DoStep();
+}

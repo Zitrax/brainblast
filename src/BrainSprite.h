@@ -47,8 +47,8 @@ public:
     
     void move();
     
-    void left()  { m_x_speed = -5; }
-    void right() { m_x_speed =  5; }
+    virtual void left()  { m_x_speed = -5; }
+    virtual void right() { m_x_speed =  5; }
 
     void jump();
 

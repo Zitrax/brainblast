@@ -6,6 +6,31 @@
 
 #include "BrainAI.h"
 
+#include <queue>
+
+using namespace std;
+
+/**
+ * Comparison object used in priority queue
+ * It measures the distance from the player
+ * to the sprite.
+ */
+class distcmp
+{
+public:
+    distcmp(int x) : m_x(x){}
+
+    bool operator() (BrainSprite*& lhs, BrainSprite*& rhs) const
+        {
+            return 
+                min(abs(lhs->X()-m_x),abs(m_x-lhs->X()+brain::VIDEOX)) >
+                min(abs(rhs->X()-m_x),abs(m_x-rhs->X()+brain::VIDEOX));
+        }
+private:
+    int m_x;
+};
+
+
 BrainAI::BrainAI(BrainPlayer* player, Puzzle* lvl)
     : m_player(player),
       m_lvl(lvl),
@@ -15,8 +40,6 @@ BrainAI::BrainAI(BrainPlayer* player, Puzzle* lvl)
                                // perhaps clock_gettime would be ok.
 {
 }
-
-
 
 void BrainAI::move()
 {
@@ -29,7 +52,7 @@ void BrainAI::move()
             if( m_lvl->navigateTowards() )
             {
                 // Stupid kyra has not made NodeId const so we have to const_case here
-                m_needed_ids.erase(std::find(m_needed_ids.begin(),
+                m_needed_ids.erase(find(m_needed_ids.begin(),
                                              m_needed_ids.end(),
                                              const_cast<BrainSprite*>(m_lvl->getSelectionSprite())->NodeId()));
                 Brainblast::instance()->select(*m_lvl,*m_player);
@@ -53,10 +76,12 @@ void BrainAI::move()
     //   For later : even take into consideration 
     //               bricks in the air with jumping.
 
-    std::vector<BrainSprite*>& sprites = Brainblast::instance()->getAllSprites();
+    vector<BrainSprite*>& sprites = Brainblast::instance()->getAllSprites();
 
-    // TODO: Sort by distance
-    
+    // Constructing a priority queue wuth distance comparison
+    // The comparison class is constructed with the players x-position
+    priority_queue< BrainSprite*, vector<BrainSprite*>, distcmp > pqueue(m_player->X());
+
     std::vector<BrainSprite*>::const_iterator it;
     std::vector<BrainSprite*>::const_iterator end = sprites.end();
     for( it=sprites.begin(); it!=end; ++it)
@@ -68,27 +93,41 @@ void BrainAI::move()
         if( std::find(m_needed_ids.begin(),
                       m_needed_ids.end(),
                       (*it)->NodeId()) != m_needed_ids.end() )
-            break;
+        {
+            pqueue.push(*it);
+        }
+            
     }
 
-    if( it == end )
-    {
-        m_player->stop();
+    if( pqueue.empty() )
         return;
-    }
 
-    // If we have reached a brick, pick it up
-    if( (abs(m_player->X() - (*it)->X()) < 5) && 
-        (abs(m_player->Y() - (*it)->Y()) < 15))
+    // The candidate is: 
+    BrainSprite* candidate = pqueue.top();
+
+    int px = m_player->X();
+    int py = m_player->Y();
+    int cx = candidate->X();
+    int cy = candidate->Y();
+
+    // If we have reached the brick, pick it up
+    if( (abs(px - cx) < 5) && 
+        (abs(py - cy) < 15))
     {
-        m_player->pickUp(Brainblast::instance()->reparentSprite(*it,m_player));
+        m_player->pickUp(Brainblast::instance()->reparentSprite(candidate,m_player));
         return;
     }
 
     // Now we have a candidate to run towards
-    // printf("%i > %i\n",m_player->X(),(*it)->X());
-    if( m_player->X() > (*it)->X() )
+
+    int left = cx-px<0 ? px-cx : px-cx+brain::VIDEOX;;
+
+    if( left < brain::VIDEOX/2 )
+    {
         m_player->left();
+    }
     else
+    {
         m_player->right();
+    }
 }

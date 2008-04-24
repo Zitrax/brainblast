@@ -39,5 +39,4 @@ private:
   	float m_selection_delay;
 };
 
-
 #endif // BRAIN_AI_H

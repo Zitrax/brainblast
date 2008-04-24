@@ -43,7 +43,7 @@ void BrainSprite::move()
             Brainblast::instance()->playSample(Brainblast::BOUNCE);
     }
 
-    if( m_name == "paprice" )
+    if( m_name == "wizard" )
         fprintf(stderr,"\rv=%f (%i)(%p)(%s)",m_y_speed,m_child!=0,this,m_name.c_str());
 }
 

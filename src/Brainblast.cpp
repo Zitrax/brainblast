@@ -754,25 +754,11 @@ int Brainblast::eventLoop()
 		if( keysHeld[SDLK_ESCAPE] )
 			done = true;
 		if( keysHeld[SDLK_LEFT] )
-		{
-			if( m_player1->isCarrying() )
-				m_player1->SetAction("HOLDING.LEFT");
-			else
-				m_player1->SetAction("WALKING.LEFT");
-			m_player1->DoStep();
-		}
+			m_player1->left();
 		else if( keysHeld[SDLK_RIGHT] )
-		{
-			if( m_player1->isCarrying() )
-				m_player1->SetAction("HOLDING.RIGHT");
-			else
-				m_player1->SetAction("WALKING.RIGHT");
-			m_player1->DoStep();
-		}
+			m_player1->right();
 		if( keysHeld[SDLK_RCTRL] )
-		{
 			m_player1->jump();
-		}
 		if( keysHeld[SDLK_F1] )
 			addSprite();
 		if( keysHeld[SDLK_DOWN] ) 

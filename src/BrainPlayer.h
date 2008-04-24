@@ -24,6 +24,9 @@ public:
 	string getName() const    { return m_name; }
 	void setName(string name) { m_name = name; }
 
+    virtual void left();
+    virtual void right();
+
 private:
 	int m_score;
 	string m_name;
