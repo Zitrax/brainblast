@@ -346,7 +346,10 @@ Brainblast::changeLevel(int lvl)
 	m_play = false;
 
 	// Testing ai
-	m_ai = new BrainAI(m_player1,m_currentLvl1);
+	if( m_ai ) 
+		m_ai->setLevel(m_currentLvl1);
+	else
+		m_ai = new BrainAI(m_player1,m_currentLvl1);
 
 	return true;
 }
