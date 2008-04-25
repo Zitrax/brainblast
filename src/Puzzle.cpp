@@ -39,68 +39,6 @@ Puzzle::Puzzle(int width, int height, SDL_Rect rect)
 
 }
 
-Puzzle::Puzzle(const Puzzle& pz): Field(pz.m_width,pz.m_height),
-								  m_rect(pz.m_rect),
-                                  m_solution(0),
-                                  m_current(0),
-								  m_current_tree(0),
-								  m_solution_tree(0),
-								  m_background_tree(0),
-								  m_back(0),
-								  m_selected_tile(0),
-								  m_selection_tile(0),
-								  m_selection_sprite(0),
-								  m_s_coord(this)
-{
-	assert(0); // Fix before use
-
-    for( uint i=0; i<m_width*m_height; i++) {
-        m_solution[i] = new Brick(*pz.m_solution[i]);
-        m_current[i]  = new Brick(*pz.m_current[i]); 
-        m_back[i]     = new KrTile(*pz.m_back[i]); 
-    }
-	// Todo: Is this correct ?
-	if( pz.m_solution_tree ) {
-		m_solution_tree = pz.m_solution_tree->Clone();
-		Brainblast::instance()->engine()->Tree()->AddNode(0, m_solution_tree);
-		m_solution_tree->SetZDepth(SOLZ);
-	}
-	if( pz.m_background_tree ) {
-		m_background_tree = pz.m_background_tree->Clone();
-		Brainblast::instance()->engine()->Tree()->AddNode(0, m_background_tree);
-		m_background_tree->SetZDepth(BACZ);
-	}
-
-}
-
-Puzzle&
-Puzzle::operator=(const Puzzle& pz) 
-{ 
-	assert(0); // Fix before use
-
-    m_width = pz.m_width;
-    m_height = pz.m_height;
-
-    for( uint i=0; i<m_width*m_height; i++) {
-        m_solution[i] = new Brick(*pz.m_solution[i]);
-        m_current[i]  = new Brick(*pz.m_current[i]); 
-        m_back[i]     = new KrTile(*pz.m_back[i]); 
-    }
-	// Todo: Is this correct ?
-	if( pz.m_solution_tree ) {
-		m_solution_tree = pz.m_solution_tree->Clone();
-		Brainblast::instance()->engine()->Tree()->AddNode(0, m_solution_tree);
-		m_solution_tree->SetZDepth(SOLZ);
-	}
-	if( pz.m_background_tree ) {
-		m_background_tree = pz.m_background_tree->Clone();
-		Brainblast::instance()->engine()->Tree()->AddNode(0, m_background_tree);
-		m_background_tree->SetZDepth(BACZ);
-	}
-	
-    return *this;
-}
-
 Puzzle::~Puzzle()
 {
     if(bbc::debug) std::cerr << "Puzzle::~Puzzle()\n";
@@ -304,7 +242,7 @@ bool Puzzle::navigateTowards()
 	if( nav_id == m_s_coord.i() )
 		return true;
 
-	if( m_s_coord.x() != nav_id%m_width )
+	if( m_s_coord.x() != static_cast<int>(nav_id%m_width) )
 		navigate(LEFT);
 	else
 		navigate(UP);
@@ -391,14 +329,3 @@ int Puzzle::brickScore() const
 	// Using a 10 multiplier
 	return types.size()*m_width*m_height*s*10;
 }
-
-// int 
-// Puzzle::getXCoord(int x) const
-// {
-// }
-
-// int 
-// Puzzle::getYCoord(int y) const
-// {
-	
-// }

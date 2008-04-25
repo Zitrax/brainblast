@@ -113,9 +113,6 @@ private:
     void createBricks();
 	bool createBoards();
 
-    void drawBoard(SDL_Surface* s, SDL_Rect* dim, Puzzle* p);
-	void drawBoards();
-
     //! Sets up a new game
     bool initGame(int lvl=1);
     bool initGameKyra();

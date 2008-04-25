@@ -17,10 +17,7 @@ class Puzzle : public Field
 public:
 	
 	Puzzle(int width, int height, SDL_Rect rect);
-	Puzzle(const Puzzle& pz);
 	~Puzzle();
-	
-	Puzzle& operator=(const Puzzle& pz);
 	
 	bool checkSolution();
 	int correctBricks() const { return m_correct_bricks; }
@@ -64,9 +61,6 @@ public:
 	 */
 	bool select(BrainSprite** bs);
 
-//  	int getXCoord(int x) const;
-// 	int getYCoord(int y) const;
-
 	/**
 	 * Each level give their own score per correct brick
 	 * which can be retrieved here.
@@ -74,6 +68,9 @@ public:
 	int brickScore() const;
 
 private:
+
+	Puzzle(const Puzzle& bb);
+    Puzzle& operator=(const Puzzle& bb);
 
 	void updateSelection();
 	

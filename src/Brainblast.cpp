@@ -372,47 +372,6 @@ Brainblast::createBoards()
 	return true;
 }
 
-void
-Brainblast::drawBoard(SDL_Surface* s, SDL_Rect* dim, Puzzle* p)
-{
-//    if(bbc::debug) cerr << "Brainblast::drawBoard()\n";
-
-	return;
-
-    assert(s); 
-    assert(dim);
-    assert(p);
-
-    /* Lock the screen, if needed */
-    if(SDL_MUSTLOCK(m_screen)) {
-        if(SDL_LockSurface(m_screen) < 0) 
-            return;
-    }
-
-    int xSpace = bbc::round(static_cast<double>(dim->w) / p->width ());
-    int ySpace = bbc::round(static_cast<double>(dim->h) / p->height());
-
-//   int xSpace = dim->w / p->getWidth();
-//   int ySpace = dim->h / p->getHeight();
-
-    for(unsigned int i=0; i<=p->height(); i++)     
-        bbc::line(s, dim->x, dim->y+i*ySpace, dim->x+dim->w, dim->y+i*ySpace, magenta);
-
-    for(unsigned int i=0; i<=p->width(); i++) 
-        bbc::line(s, dim->x+i*xSpace, dim->y, dim->x+i*xSpace, dim->y+dim->h, yellow);
-
-    /* Unlock the screen if needed */
-    if(SDL_MUSTLOCK(m_screen)) {
-        SDL_UnlockSurface(m_screen);
-    }
-  
-    SDL_Rect destination;
-    destination.x = 10;
-    destination.y = 10;
-
-    SDL_Flip(m_screen);
-}
-
 bool
 Brainblast::checkSolution(Puzzle* puzzle)
 {
