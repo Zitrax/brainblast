@@ -51,10 +51,10 @@ void BrainAI::move()
         {
             if( m_lvl->navigateTowards() )
             {
-                // Stupid kyra has not made NodeId const so we have to const_case here
+                // Stupid kyra has not made NodeId const so we have to const_cast here
                 m_needed_ids.erase(find(m_needed_ids.begin(),
-                                             m_needed_ids.end(),
-                                             const_cast<BrainSprite*>(m_lvl->getSelectionSprite())->NodeId()));
+										m_needed_ids.end(),
+										const_cast<BrainSprite*>(m_lvl->getSelectionSprite())->NodeId()));
                 Brainblast::instance()->select(*m_lvl,*m_player);
                 
             }
@@ -78,7 +78,7 @@ void BrainAI::move()
 
     vector<BrainSprite*>& sprites = Brainblast::instance()->getAllSprites();
 
-    // Constructing a priority queue wuth distance comparison
+    // Constructing a priority queue with distance comparison
     // The comparison class is constructed with the players x-position
     priority_queue< BrainSprite*, vector<BrainSprite*>, distcmp > pqueue(m_player->X());
 
@@ -120,7 +120,7 @@ void BrainAI::move()
 
     // Now we have a candidate to run towards
 
-    int left = cx-px<0 ? px-cx : px-cx+brain::VIDEOX;;
+    int left = cx-px<0 ? px-cx : px-cx+brain::VIDEOX;
 
     if( left < brain::VIDEOX/2 )
     {
