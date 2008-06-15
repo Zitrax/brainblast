@@ -10,8 +10,6 @@
 
 BrainSound::~BrainSound()
 {
-	Mix_CloseAudio();	
-
 	// TODO: Make sure all sounds are freed correctly
 	if( m_music )
 		Mix_FreeMusic(m_music);
@@ -20,6 +18,10 @@ BrainSound::~BrainSound()
 	std::map<int,Mix_Chunk*>::const_iterator end = m_samples.end();
 	for(it=m_samples.begin();it!=end;++it)
 		Mix_FreeChunk(it->second);
+
+	// Must be last call
+	// No Mix_* functions work after this call.
+	Mix_CloseAudio(); 
 }
 
 bool BrainSound::initializeSound()
