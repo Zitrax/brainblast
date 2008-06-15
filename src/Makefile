@@ -7,7 +7,7 @@ SDL_LIBS  = $(shell sdl-config --libs) -lSDL_mixer -lSDL_ttf
 SDL_FLAGS = $(shell sdl-config --cflags)
 IMAGES    = ../images
 
-OBJECTS = bbc.o Brainblast.o Brick.o Puzzle.o Field.o BrainSprite.o BrainSound.o BrainPlayer.o BrainAI.o main.o
+OBJECTS = bbc.o consolefont.o Brainblast.o Brick.o Puzzle.o Field.o BrainSprite.o BrainSound.o BrainPlayer.o BrainAI.o main.o
 
 all: Brainblast
 
