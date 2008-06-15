@@ -160,8 +160,10 @@ private:
 	KrResourceVault* m_bg_vault;
 	KrSprite*        m_bg_sprite;
 
-	SDL_Rect m_center_text_rect;
-	SDL_Rect m_topleft_text_rect;
+	// Text
+	KrFontResource* m_font;
+	KrTextBox*      m_score_text_box;
+	KrTextBox*      m_center_text_box;
 };
 
 #endif

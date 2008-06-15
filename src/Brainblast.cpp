@@ -9,7 +9,7 @@
 #include "../images/bb.h"
 #include "../images/bb_bg.h"
 #include "grinliz/glrandom.h"
-#include "SDL_ttf.h"
+#include "consolefont.h"
 
 #include <sstream>  // ostringstream
 #include <iomanip>  // setfill setw
@@ -48,8 +48,9 @@ Brainblast::Brainblast() : m_play(false),
                            magenta( SDL_MapRGB(m_screen->format, 0xff, 0x00, 0xff) ),
 						   m_bg_vault( new KrResourceVault() ),
 						   m_bg_sprite(0),
-						   m_center_text_rect(),
-						   m_topleft_text_rect()
+						   m_font(0),
+						   m_score_text_box(0),
+						   m_center_text_box(0)
 {
     if(bbc::debug) cerr << "Brainblast::Brainblast() Videomode(" << VIDEOX << "," << VIDEOY << ")\n";
 
@@ -68,14 +69,6 @@ Brainblast::Brainblast() : m_play(false),
         exit(1);
     }   
 
-	if( TTF_Init() == -1 )
-    {
-        printf("=== ERROR: Can't initialize ttf support: (%s) ===\n",TTF_GetError());
-        exit(1);
-    }   
-
-	m_center_text_rect.x=400; m_center_text_rect.y=300; m_center_text_rect.w=300; m_center_text_rect.h=50;
-	m_topleft_text_rect.x=10; m_topleft_text_rect.y=10; m_topleft_text_rect.w=300; m_topleft_text_rect.h=50;
 }
 
 bool Brainblast::setupFields(int players)
@@ -121,8 +114,6 @@ Brainblast::~Brainblast()
     if(bbc::debug) cerr << "Brainblast::~Brainblast()\n";
  
     cleanup();
-
-	TTF_Quit();
 }
 
 void
@@ -150,6 +141,7 @@ Brainblast::cleanup()
 	zap( m_field2 );
 	zap( m_engine );
 	zap( m_bg_vault );
+	zap( m_font );
 }
 
 void
@@ -200,7 +192,7 @@ Brainblast::makeLevel(int lvl)
 
     if(lvl == 0) 
     {
-		makeRandomLevel(6,6,6);
+		makeRandomLevel(4,4,3);
         return true;
     }
 
@@ -209,7 +201,7 @@ Brainblast::makeLevel(int lvl)
 
         char* filename  = static_cast<char*>(malloc(40));
       
-        char* filebase = "../lvl/lvl%03d.txt";
+        const char* filebase = "../lvl/lvl%03d.txt";
       
         sprintf(filename, filebase, lvl);
         if( bbc::debug ) cerr << "Level file: " << filename << "\n";
@@ -222,7 +214,7 @@ Brainblast::makeLevel(int lvl)
         }
     
         // Parse Level File
-        int val; int i=0; int tmp; int width=0; int height=0;
+        int val; int i=0; int tmp=0; int width=0; int height=0;
         while( in >> val ) 
         { 
             if( i==0 ) { width = val; }
@@ -281,6 +273,11 @@ Brainblast::createBricks()
 			m_bricks.insert(pair<int,Brick*>(sr->ResourceId(),new Brick(b, sr->ResourceId())));
 			m_total_bricks++;
 			assert(m_total_bricks<MAX_NOF_BRICK_TYPES);
+		}
+		KrFontResource* fr = rit.Current()->ToFontResource();
+		if( fr )
+		{
+			printf("Found a font\n");
 		}
 	}
 }
@@ -346,10 +343,10 @@ Brainblast::changeLevel(int lvl)
 	m_play = false;
 
 	// Testing ai
-	if( m_ai ) 
-		m_ai->setLevel(m_currentLvl1);
-	else
-		m_ai = new BrainAI(m_player1,m_currentLvl1);
+// 	if( m_ai ) 
+// 		m_ai->setLevel(m_currentLvl1);
+// 	else
+// 		m_ai = new BrainAI(m_player1,m_currentLvl1);
 
 	return true;
 }
@@ -418,6 +415,24 @@ Brainblast::initGameKyra()
 
     m_engine = new KrEngine( m_screen );
     m_engine->Draw(); 
+
+	// Set up the font
+ 	m_font = KrEncoder::CreateFixedFontResource( "CONSOLE", CONSOLEFONT_DAT, CONSOLEFONT_SIZE );
+	if( !m_font ) 
+	{
+		printf( "=== Error: Loading font ===\n" );
+		return false;
+	}
+
+ 	m_score_text_box = new KrTextBox(m_font,300,50,1);
+	assert(m_score_text_box);
+	m_score_text_box->SetPos(10,10);
+	m_engine->Tree()->AddNode(0,m_score_text_box);
+
+ 	m_center_text_box = new KrTextBox(m_font,300,50,1);
+	assert(m_center_text_box);
+	m_center_text_box->SetPos(475,300);
+	m_engine->Tree()->AddNode(0,m_center_text_box);
 
 	// Load the dat file.
 	// The dat file was carefully created in the sprite
@@ -741,10 +756,11 @@ int Brainblast::eventLoop()
 				  << setw(2) << setfill('0') << sec 
 				  << " | Bricks: " << m_currentLvl1->correctBricks()
 				  << "/" << m_currentLvl1->totalSolutionBricks();
-		drawText(score_str.str().c_str(),m_topleft_text_rect);
+
+		m_score_text_box->SetTextChar(score_str.str(),0);
 		if( m_play && game_over )
 		{
-			drawText("Game Over",m_center_text_rect,32);
+			m_center_text_box->SetTextChar("Game Over",0);
 			clearFloor();
 		}
 		
@@ -790,33 +806,6 @@ BrainSprite* Brainblast::reparentSprite(BrainSprite* bs, KrImNode* parent)
 		m_sprites.push_back(clone);
     m_engine->Tree()->DeleteNode(bs);
 	return clone;
-}
- 
-void Brainblast::drawText(const char* text, SDL_Rect pos, int size)
-{
-	// TODO: We could keep the fonts open for performance
-
-	TTF_Font *font;
-	font=TTF_OpenFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf", size);
-	if(!font) {
-		printf("=== Error: TTF_OpenFont: (%s) === \n", TTF_GetError());
-		return;
-	}
-
-	SDL_Color color={255,100,0,0};
-	SDL_Surface* text_surface;
-	if( !(text_surface=TTF_RenderUTF8_Blended(font,text,color)) ) {
-		printf("=== Error: TTF_Rend erUTF8_Blended: (%s) === \n", TTF_GetError());
-	} 
-	else {
-		SDL_FillRect(m_screen,&pos,0);
-		SDL_BlitSurface(text_surface,NULL,m_screen,&pos);
-        SDL_UpdateRects( m_screen, 1, &pos);
-		//perhaps we can reuse it, but I assume not for simplicity.
-		SDL_FreeSurface(text_surface);
-	}
-
-	TTF_CloseFont(font);
 }
 
 /* Definition of a level file ...
