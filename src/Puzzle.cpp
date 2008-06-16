@@ -34,7 +34,8 @@ Puzzle::Puzzle(int width, int height, SDL_Rect rect)
     // initialize all positions to empty
     for(uint i=0; i<m_width*m_height; i++) {
         m_solution[i] = 0;
-        m_current[i] = 0;
+        m_current[i]  = 0;
+		m_back[i]     = 0;
     }
 
 }
