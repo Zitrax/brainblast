@@ -3,7 +3,7 @@ CFLAGS    = -g -Weffc++ -Wall -Wextra #-pedantic
 
 CFLAGS   += -I../include
 
-SDL_LIBS  = $(shell sdl-config --libs) -lSDL_mixer -lSDL_ttf
+SDL_LIBS  = $(shell sdl-config --libs) -lSDL_mixer
 SDL_FLAGS = $(shell sdl-config --cflags)
 IMAGES    = ../images
 
