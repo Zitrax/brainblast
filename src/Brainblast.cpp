@@ -38,14 +38,6 @@ Brainblast::Brainblast() : m_play(false),
 						   m_fgTree(0),
 						   m_start_time(0),
 						   m_sprites(0),
-                           red    ( SDL_MapRGB(m_screen->format, 0xff, 0x00, 0x00) ),
-                           blue   ( SDL_MapRGB(m_screen->format, 0x00, 0x00, 0xff) ),
-                           black  ( SDL_MapRGB(m_screen->format, 0x00, 0x00, 0x00) ),
-                           green  ( SDL_MapRGB(m_screen->format, 0x00, 0xff, 0x00) ),
-                           white  ( SDL_MapRGB(m_screen->format, 0xff, 0xff, 0xff) ),
-                           yellow ( SDL_MapRGB(m_screen->format, 0xff, 0xff, 0x00) ),
-                           cyan   ( SDL_MapRGB(m_screen->format, 0x00, 0xff, 0xff) ),
-                           magenta( SDL_MapRGB(m_screen->format, 0xff, 0x00, 0xff) ),
 						   m_bg_vault( new KrResourceVault() ),
 						   m_bg_sprite(0),
 						   m_font(0),
@@ -192,7 +184,7 @@ Brainblast::makeLevel(int lvl)
 
     if(lvl == 0) 
     {
-		makeRandomLevel(4,4,3);
+		makeRandomLevel(3,3,2);
         return true;
     }
 
@@ -269,15 +261,16 @@ Brainblast::createBricks()
 		KrSpriteResource* sr = rit.Current()->ToSpriteResource();
 		if( sr )
 		{
+			// FIXME: We do not want the player sprites here
+			// so aborting. But ideally they should be separated
+			// into different vaults or in another better way than this.
+			if( sr->ResourceId() == BB_WIZARD )
+				continue;
+
 			KrSprite* b = new KrSprite(sr);
 			m_bricks.insert(pair<int,Brick*>(sr->ResourceId(),new Brick(b, sr->ResourceId())));
 			m_total_bricks++;
 			assert(m_total_bricks<MAX_NOF_BRICK_TYPES);
-		}
-		KrFontResource* fr = rit.Current()->ToFontResource();
-		if( fr )
-		{
-			printf("Found a font\n");
 		}
 	}
 }
@@ -290,6 +283,7 @@ Brainblast::clearFloor()
 	vector<BrainSprite*>::iterator end = m_sprites.end();
 	while(it!=end)
 	{
+		// TODO: Check mult players...
 		if(*it!=m_player1)
 		{
 			m_engine->Tree()->DeleteNode(*it);
@@ -323,21 +317,6 @@ Brainblast::changeLevel(int lvl)
 	}
 
 	clearFloor();
-
-	// Make sure texts are cleared
- 	grinliz::Rectangle2I /*r1,r2,*/r3;
-//  	r1.Set(m_center_text_rect.x,m_center_text_rect.y,
-// 		   m_center_text_rect.w,m_center_text_rect.h);
-// 	r2.Set(m_topleft_text_rect.x,m_topleft_text_rect.y,
-// 		   m_topleft_text_rect.w,m_topleft_text_rect.h);
-// 	m_engine->InvalidateRectangle(r1);
-// 	m_engine->InvalidateRectangle(r2);
-
-	// Smaller rectangles are not entirely correct
-	// so just invalidate the entire screen.
-	// It's not expensive to do that here.
-	r3.Set(0,0,VIDEOX,VIDEOY);
-	m_engine->InvalidateRectangle(r3);
 
 	time(&m_start_time);
 	m_play = false;
@@ -617,6 +596,7 @@ int Brainblast::eventLoop()
 				}
 				else if( !m_play )
 					m_play = true;
+				m_center_text_box->SetTextChar("",0);
 			}
 
 			else

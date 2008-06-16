@@ -155,8 +155,6 @@ private:
 
 	std::vector<BrainSprite*> m_sprites;
 
-    const Uint32 red, blue, black, green, white, yellow, cyan, magenta;
-
 	KrResourceVault* m_bg_vault;
 	KrSprite*        m_bg_sprite;
 
