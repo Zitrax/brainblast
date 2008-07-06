@@ -8,12 +8,28 @@
 #define BRAINPLAYER_H
 
 #include "BrainSprite.h"
+#include "Puzzle.h"
 
 using namespace std;
 
 class BrainPlayer : public BrainSprite
 {
+	
 public:
+
+	enum PlayerAction
+	{
+		NONE,
+		WALK_LEFT,
+		WALK_RIGHT,
+		JUMP,
+		PICKUP,
+		DROP,
+		SELECT
+	};
+
+	typedef std::map<SDLKey,enum PlayerAction> keymap;
+
 	BrainPlayer(KrSpriteResource* res, std::string name);  
 	virtual ~BrainPlayer();
 
@@ -24,13 +40,44 @@ public:
 	string getName() const    { return m_name; }
 	void setName(string name) { m_name = name; }
 
+	virtual Puzzle* getLevel() const  { return m_level;}
+	virtual void setLevel(Puzzle* lvl){ m_level = lvl; }
+
     virtual void left();
     virtual void right();
 
+	/**
+	 * Return the action that this player maps 
+	 * to a certain key.
+	 */
+	enum PlayerAction action(SDLKey key) const 
+		{
+			keymap::const_iterator it = m_actions.find(key);
+			return it==m_actions.end() ? NONE : it->second;
+		}
+
+	keymap::const_iterator keyMapIterator() const 
+		{
+			return m_actions.begin();
+		}
+
+	void mapAction( enum PlayerAction action, SDLKey key); 
+
+	const std::vector<SDLKey>& keys() const { return m_keys; }
+
+protected:
+
+	Puzzle* m_level;
+
 private:
+    BrainPlayer(const BrainPlayer&);
+    BrainPlayer& operator=(const BrainPlayer&);
+
 	int m_score;
 	string m_name;
 
+	keymap m_actions;
+	std::vector<SDLKey> m_keys;
 };
 
 #endif

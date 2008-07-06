@@ -236,7 +236,7 @@ bool Puzzle::navigateTowards()
 			}
 		}
 
-	assert(nav_id!=-1); // We should never look for id's that do not exist
+	//assert(nav_id!=-1); // We should never look for id's that do not exist
 	if(nav_id==-1)
 		return false;
 

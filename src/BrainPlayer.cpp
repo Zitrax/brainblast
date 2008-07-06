@@ -8,8 +8,11 @@
 
 BrainPlayer::BrainPlayer(KrSpriteResource* res, std::string name) :
     BrainSprite(res,"Player",false),
+	m_level(0),
     m_score(0),
-    m_name(name)
+    m_name(name),
+	m_actions(),
+	m_keys()
 {
 }
 
@@ -33,4 +36,10 @@ void BrainPlayer::right()
 	else
 		SetAction("WALKING.RIGHT");
 	DoStep();
+}
+
+void BrainPlayer::mapAction( enum PlayerAction action, SDLKey key)
+{ 
+	m_actions[key] = action; 
+	m_keys.push_back(key);
 }

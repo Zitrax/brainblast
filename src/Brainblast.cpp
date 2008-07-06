@@ -21,28 +21,25 @@ using namespace std;
 Brainblast* Brainblast::s_instance;
 
 Brainblast::Brainblast() : m_play(false),
+						   m_start_time(0),
 						   m_sound(new BrainSound),
-						   m_player1(0),
-						   m_players(1),
-						   m_ai(0),
-						   m_currentLvl1(0),
-						   m_currentLvl2(0),
+						   m_players(2),
+						   m_current_levels(),
+						   m_fields(),
 						   m_current_lvl(1),
                            m_screen( SDL_SetVideoMode( VIDEOX, VIDEOY, VIDEOBITS, SDL_HWSURFACE ) ),
-                           m_field1(0),
-                           m_field2(0),
 						   m_bricks(),
 						   m_total_bricks(0),
 						   m_engine(0),
 						   m_bgTree(0),
 						   m_fgTree(0),
-						   m_start_time(0),
 						   m_sprites(0),
 						   m_bg_vault( new KrResourceVault() ),
 						   m_bg_sprite(0),
 						   m_font(0),
 						   m_score_text_box(0),
-						   m_center_text_box(0)
+						   m_center_text_box(0),
+						   m_player_manager(0)
 {
     if(bbc::debug) cerr << "Brainblast::Brainblast() Videomode(" << VIDEOX << "," << VIDEOY << ")\n";
 
@@ -66,32 +63,41 @@ Brainblast::Brainblast() : m_play(false),
 bool Brainblast::setupFields(int players)
 {
 	// Clear all fields
-	zap(m_field1);
-	zap(m_field2);
+	for(unsigned int i=0; i<m_current_levels.size(); ++i)
+		zap(m_current_levels[i] );
+	m_fields.clear();
 
 	switch(players)
 	{
 	case 1:
-		m_field1 = new SDL_Rect;
-		m_field1->x = 262;
-		m_field1->y = MARGIN; 
-		m_field1->w = 500;
-		m_field1->h = m_field1->w;
+	{
+		SDL_Rect field1;
+		field1.x = 262;
+		field1.y = MARGIN; 
+		field1.w = 500;
+		field1.h = field1.w;
+		m_fields.push_back(field1);
 		return true;
+	}
 		break;
 	case 2:
-		m_field1 = new SDL_Rect;
-		m_field1->x = MARGIN; 
-		m_field1->y = MARGIN; 
-		m_field1->w = VIDEOX/2-4*MARGIN; 
-		m_field1->h = m_field1->w;
+	{
+		SDL_Rect field1;
+		field1.x = MARGIN; 
+		field1.y = MARGIN; 
+		field1.w = VIDEOX/2-4*MARGIN; 
+		field1.h = field1.w;
 		
-		m_field2 = new SDL_Rect;
-		m_field2->x = m_field1->w+3*MARGIN; 
-		m_field2->y = MARGIN; 
-		m_field2->w = m_field1->w; 
-		m_field2->h = m_field1->h;
+		SDL_Rect field2;
+		field2.x = field1.w+3*MARGIN; 
+		field2.y = MARGIN; 
+		field2.w = field1.w; 
+		field2.h = field1.h;
+
+		m_fields.push_back(field1);
+		m_fields.push_back(field2);
 		return true;
+	}
 		break;
 	default:
 		return false;
@@ -126,13 +132,17 @@ Brainblast::cleanup()
 	//	zap( m_bgTree );   - Deleted along with the engine
 	//	zap( m_fgTree );   - Deleted along with the engine
 
+	for(unsigned int i=0; i<m_current_levels.size(); ++i)
+		zap(m_current_levels[i] );
+	for(unsigned int i=0; i<m_current_levels.size(); ++i)
+		zap(m_current_levels[i] );
+	m_current_levels.clear();
+	m_fields.clear();
+
 	zap( m_sound );
-    zap( m_currentLvl1 );
-    zap( m_currentLvl2 );
-    zap( m_field1 ); 
-	zap( m_field2 );
 	zap( m_engine );
 	zap( m_bg_vault );
+	zap( m_player_manager );
 	zap( m_font );
 }
 
@@ -144,9 +154,8 @@ Brainblast::makeRandomLevel(int w,int h,int n)
 
 	assert(n<=w*h);
 
-	m_currentLvl1 = new Puzzle(w,h,*m_field1);
-	if( m_players > 1 )
-		m_currentLvl2 = new Puzzle(w,h,*m_field2);
+	for(unsigned int i=0; i<m_player_manager->playerCount(); ++i)
+		m_current_levels.push_back(new Puzzle(w,h,m_fields[i]));
 
 	// Vector to make sure we use up the indexes
 	// I guess a nicer solution would be to randomize
@@ -167,24 +176,32 @@ Brainblast::makeRandomLevel(int w,int h,int n)
 		int idx = indexes[idxidx];
 		indexes.erase(find(indexes.begin(),indexes.end(),idx));
 
-		m_currentLvl1->setSolutionBrickWithIdx(it->second,idx);
-		if( m_players > 1 )
-			m_currentLvl2->setSolutionBrickWithIdx(it->second,idx);
+		// Currently same solution on all levels
+		for(unsigned int i=0; i < m_current_levels.size(); ++i)
+			m_current_levels[i]->setSolutionBrickWithIdx(it->second,idx);
 	}
-	
+
+	// FIXME: If we want to have several players (co-op) on one level
+	//        this must be fixed. ( Or levels without players? )
+	assert( m_player_manager->playerCount() == m_current_levels.size() );
+
+	for(unsigned int i=0; i < m_current_levels.size(); ++i)
+		m_player_manager->getPlayer(i)->setLevel(m_current_levels[i]);
 }
 
 bool
 Brainblast::makeLevel(int lvl)
 {
     if(bbc::debug) cerr << "Brainblast::makeLevel(" << lvl << ")\n";
-
-	zap(m_currentLvl1);
-	zap(m_currentLvl2);
-
+	
+	for(unsigned int i=0; i<m_current_levels.size(); ++i)
+		zap(m_current_levels[i] );
+	m_current_levels.clear();
+	
     if(lvl == 0) 
     {
-		makeRandomLevel(3,3,2);
+		// 7x8 is maximum size if you want to avoid overlapping
+		makeRandomLevel(7,8,55);
         return true;
     }
 
@@ -213,9 +230,8 @@ Brainblast::makeLevel(int lvl)
             else if ( i==1 ) 
             { 
                 height = val; 
-                m_currentLvl1 = new Puzzle( height, width, *m_field1 );
-				if( m_players > 1 )
-					m_currentLvl2 = new Puzzle( height, width, *m_field2 );
+				for(unsigned int i=0; i<m_player_manager->playerCount(); ++i)
+					m_current_levels.push_back(new Puzzle( height, width, m_fields[i] ));
             }
             else 
             {
@@ -234,9 +250,8 @@ Brainblast::makeLevel(int lvl)
 						return false;
 					}
 
-                    m_currentLvl1->setSolutionBrickWithIdx(it->second,tmp-1);
-					if( m_players > 1 )
-						m_currentLvl2->setSolutionBrickWithIdx(it->second,tmp-1);
+					for(unsigned int i=0; i<m_current_levels.size(); ++i)
+						m_current_levels[i]->setSolutionBrickWithIdx(it->second,tmp-1);
 				}
             }
             i++;
@@ -246,6 +261,13 @@ Brainblast::makeLevel(int lvl)
         free(filename);
         in.close();
     } 
+
+	// FIXME: If we want to have several players (co-op) on one level
+	//        this must be fixed. ( Or levels without players? )
+	assert( m_player_manager->playerCount() == m_current_levels.size() );
+
+	for(unsigned int i=0; i < m_current_levels.size(); ++i)
+		m_player_manager->getPlayer(i)->setLevel(m_current_levels[i]);
 
     return true;
 }
@@ -283,8 +305,7 @@ Brainblast::clearFloor()
 	vector<BrainSprite*>::iterator end = m_sprites.end();
 	while(it!=end)
 	{
-		// TODO: Check mult players...
-		if(*it!=m_player1)
+		if(!dynamic_cast<BrainPlayer*>(*it))
 		{
 			m_engine->Tree()->DeleteNode(*it);
 			it=m_sprites.erase(it);
@@ -294,9 +315,8 @@ Brainblast::clearFloor()
 			++it;
 	}
 
-	m_currentLvl1->stopSelection();
-	if( m_players > 1 )
-		m_currentLvl2->stopSelection();
+	for(unsigned int i=0; i<m_current_levels.size(); ++i)
+		m_current_levels[i]->stopSelection();
 }
 
 bool
@@ -321,12 +341,6 @@ Brainblast::changeLevel(int lvl)
 	time(&m_start_time);
 	m_play = false;
 
-	// Testing ai
-// 	if( m_ai ) 
-// 		m_ai->setLevel(m_currentLvl1);
-// 	else
-// 		m_ai = new BrainAI(m_player1,m_currentLvl1);
-
 	return true;
 }
 
@@ -341,9 +355,8 @@ Brainblast::createBoards()
 		return false;
 	KrTile tile(tileRes); // The puzzles will clone it
 
-	m_currentLvl1->setBackgroundTile(&tile);
-	if( m_players > 1 )
-		m_currentLvl2->setBackgroundTile(&tile);
+	for(unsigned int i=0; i<m_current_levels.size(); ++i)
+		m_current_levels[i]->setBackgroundTile(&tile);
 
 	return true;
 }
@@ -447,13 +460,7 @@ Brainblast::initGameKyra()
 	KrSpriteResource* wizardRes = m_engine->Vault()->GetSpriteResource( BB_WIZARD );
 	assert( wizardRes );
 
-	// Create the wizard sprite and add it to the tree
-	// TODO: Player should be created with a selected name instead of wizard
-	m_player1 = new BrainPlayer( wizardRes, "wizard" );
-	m_player1->SetNodeId(BB_WIZARD);
-	m_player1->SetPos( rand()%VIDEOX, 0);
-	m_engine->Tree()->AddNode( m_fgTree, m_player1 );
-	m_sprites.push_back(m_player1);
+	m_player_manager = new BrainPlayerManager(0,2);
 
 	return true;
 }
@@ -464,8 +471,9 @@ BrainSprite* Brainblast::addSprite()
 		return 0;
 
 	KrSpriteResource* spriteRes = 0;
-	// TODO: Can we have different types on the other level ?
-	vector<int> types = m_currentLvl1->getSolutionTypes();
+	// TODO:  Can we have different types on the other level ?
+	// FIXME: This should be fixed.
+	vector<int> types = m_current_levels[0]->getSolutionTypes();
 	int r = bbc::randint(0,types.size()-1);
 	spriteRes = m_engine->Vault()->GetSpriteResource( types[r] );
 	assert( spriteRes );
@@ -550,57 +558,21 @@ int Brainblast::eventLoop()
 			// F = TOGGLE FULLSCREEN
 			else if( event.key.keysym.sym == SDLK_f )
 				SDL_WM_ToggleFullScreen(m_screen);
-			else if( (event.key.keysym.sym == SDLK_LEFT) && 
-					 (m_currentLvl1->isSelecting()) )
-			{
-				m_currentLvl1->navigate(Puzzle::LEFT);
-				
-			}
-			else if( (event.key.keysym.sym == SDLK_RIGHT) && 
-					 (m_currentLvl1->isSelecting()) )
-			{
-				m_currentLvl1->navigate(Puzzle::RIGHT);
-				
-			}
-			else if( event.key.keysym.sym == SDLK_UP )  
-			{
-				if( m_currentLvl1->isSelecting() )
-					m_currentLvl1->navigate(Puzzle::UP);
-				else if( m_player1->isCarrying() )
-				{
-					BrainSprite* o = m_player1->drop(0);
-					o->setStatic(true);
-					m_currentLvl1->startSelection(o);
-				}
-				else					
-					keysHeld[event.key.keysym.sym] = true;
-					
-			}
-			else if( (event.key.keysym.sym == SDLK_DOWN) && 
-					 (m_currentLvl1->isSelecting()) )
-			{
-				m_currentLvl1->navigate(Puzzle::DOWN);
-				
-			}
-			else if( (event.key.keysym.sym == SDLK_RETURN) && 
-					 (m_currentLvl1->isSelecting()) )
-			{
-				select(*m_currentLvl1,*m_player1); // TODO: Player2
-			}
 			else if( event.key.keysym.sym == SDLK_SPACE )
 			{
 				if( game_over )
 				{
-					m_player1->setScore(0);
+					for(unsigned int i=0; i<m_player_manager->playerCount(); ++i)
+						m_player_manager->getPlayer(i)->setScore(0);
 					changeLevel(1);
 				}
 				else if( !m_play )
 					m_play = true;
 				m_center_text_box->SetTextChar("",0);
 			}
-
 			else
-				keysHeld[event.key.keysym.sym] = true;
+				if( !m_player_manager->handleKeyDown(event.key.keysym.sym) )
+					keysHeld[event.key.keysym.sym] = true;
 
 			break;
 			
@@ -615,9 +587,6 @@ int Brainblast::eventLoop()
 			
         case SDL_DRAW_EVENT:
         {
-			if( m_ai )
-				m_ai->move();
-
 			vector<BrainSprite*>::iterator it  = m_sprites.begin();
 			vector<BrainSprite*>::iterator end = m_sprites.end();
 			while(it!=end)
@@ -667,29 +636,35 @@ int Brainblast::eventLoop()
 				}
 			}
 
+			m_player_manager->move();
+
 			m_engine->Tree()->Walk();
 
 			// Detect collisions
-			if(!m_player1->isCarrying() && keysHeld[SDLK_UP] ) {
-				vector<KrImage*> collides;
-				if( m_engine->Tree()->CheckChildCollision(m_player1,m_bgTree,&collides) )
-				{  
-					printf("Collision!\n");
-					// Use of dynamic cast as we only want to try to pick
-					// up BrainSprites and not ordinary KrSprites as in the
-					// Bricks. 
-					// Otherwise we might be able to pick up the solution in the beginning :)
-					BrainSprite* c = dynamic_cast<BrainSprite*>(*collides.begin());
-					if( c ) 
-						m_player1->pickUp(reparentSprite(c,m_player1));
+			// FIXME: This should go into the player manager class
+			for(unsigned int i=0; i<m_player_manager->playerCount(); ++i)
+			{
+
+				if(!m_player_manager->getPlayer(i)->isCarrying() && keysHeld[SDLK_UP] ) {
+					vector<KrImage*> collides;
+					if( m_engine->Tree()->CheckChildCollision(m_player_manager->getPlayer(i),m_bgTree,&collides) )
+					{  
+						printf("Collision!\n");
+						// Use of dynamic cast as we only want to try to pick
+						// up BrainSprites and not ordinary KrSprites as in the
+						// Bricks. 
+						// Otherwise we might be able to pick up the solution in the beginning :)
+						BrainSprite* c = dynamic_cast<BrainSprite*>(*collides.begin());
+						if( c ) 
+							m_player_manager->getPlayer(i)->pickUp(reparentSprite(c,m_player_manager->getPlayer(i)));
+					}
 				}
 			}
 
 			if( m_play || (difftime(now,m_start_time) > WAITTIME) )
 			{
-				m_currentLvl1->setVisibleSolution(false);
-				if( m_players > 1 )
-					m_currentLvl2->setVisibleSolution(false);
+				for(unsigned int i=0; i<m_current_levels.size(); ++i)
+					m_current_levels[i]->setVisibleSolution(false);
 				m_play = true;
 			}
 
@@ -707,20 +682,10 @@ int Brainblast::eventLoop()
 
 		if( keysHeld[SDLK_ESCAPE] )
 			done = true;
-		if( keysHeld[SDLK_LEFT] )
-			m_player1->left();
-		else if( keysHeld[SDLK_RIGHT] )
-			m_player1->right();
-		if( keysHeld[SDLK_RCTRL] )
-			m_player1->jump();
-		if( keysHeld[SDLK_F1] )
+		else if( keysHeld[SDLK_F1] )
 			addSprite();
-		if( keysHeld[SDLK_DOWN] ) 
-		{
-			BrainSprite* bs = m_player1->drop(m_bgTree);
-			if(bs)
-				m_sprites.push_back(bs);
-		}
+		else
+			m_player_manager->handleKeyHeld(keysHeld);
 
 		// Time left
 		int basetime = m_play ? 60 : static_cast<int>(WAITTIME);
@@ -731,11 +696,11 @@ int Brainblast::eventLoop()
 		sec -= min*60;
 
 		ostringstream score_str;
-		score_str << "Score: " << m_player1->getScore() << " | Time: " 
+		score_str << "Score: " << m_player_manager->getPlayer(0)->getScore() << " | Time: " 
 				  << setw(2) << setfill('0') << min << ":" 
 				  << setw(2) << setfill('0') << sec 
-				  << " | Bricks: " << m_currentLvl1->correctBricks()
-				  << "/" << m_currentLvl1->totalSolutionBricks();
+				  << " | Bricks: " << m_current_levels[0]->correctBricks()
+				  << "/" << m_current_levels[0]->totalSolutionBricks();
 
 		m_score_text_box->SetTextChar(score_str.str(),0);
 		if( m_play && game_over )
@@ -768,13 +733,6 @@ void Brainblast::select(Puzzle& lvl, BrainPlayer& player)
 	}	
 }
 
-void Brainblast::handleKeyEvent(SDL_KeyboardEvent* key)
-{
-    assert(key);
-    
-    printf( "%s\n", SDL_GetKeyName(key->keysym.sym));
-}
-
 BrainSprite* Brainblast::reparentSprite(BrainSprite* bs, KrImNode* parent)
 {
 	BrainSprite* clone = static_cast<BrainSprite*>(bs->Clone());
@@ -786,6 +744,13 @@ BrainSprite* Brainblast::reparentSprite(BrainSprite* bs, KrImNode* parent)
 		m_sprites.push_back(clone);
     m_engine->Tree()->DeleteNode(bs);
 	return clone;
+}
+
+void Brainblast::dropPlayerSprite(BrainPlayer* player)
+{
+	BrainSprite* bs = player->drop(m_bgTree);
+	if(bs)
+		m_sprites.push_back(bs);
 }
 
 /* Definition of a level file ...

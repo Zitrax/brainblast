@@ -7,21 +7,22 @@
 #ifndef BRAIN_AI_H
 #define BRAIN_AI_H
 
+#include "BrainPlayer.h"
 #include "Brainblast.h"
 #include "Puzzle.h"
 
-class BrainAI
+class BrainAI : public BrainPlayer
 {
 public:
-    BrainAI(BrainPlayer* player, Puzzle* lvl);
+    BrainAI(KrSpriteResource* res, std::string name);
 	
     virtual ~BrainAI(){}
 	
-	void move();
-
-	void setLevel(Puzzle* lvl) 
+	virtual void move();
+	
+	virtual void setLevel(Puzzle* lvl) 
 		{ 
-			m_lvl = lvl; 
+			m_level = lvl; 
 			m_needed_ids = lvl->getSolutionTypes();
 		}
 
@@ -29,9 +30,6 @@ private:
 
 	BrainAI(const BrainAI& bb);
     BrainAI& operator=(const BrainAI& bb);
-
-    BrainPlayer* m_player;
-	Puzzle* m_lvl;
 
 	std::vector<int> m_needed_ids;
 

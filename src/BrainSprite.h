@@ -45,7 +45,7 @@ public:
     double acc() const { return m_acc; }
     void setAcc(double acc) { m_acc=acc; }
     
-    void move();
+    virtual void move();
     
     virtual void left()  { m_x_speed = -5; }
     virtual void right() { m_x_speed =  5; }

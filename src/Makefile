@@ -1,5 +1,5 @@
 GCC       = g++
-CFLAGS    = -g -Weffc++ -Wall -Wextra #-pedantic 
+CFLAGS    = -O2 -Weffc++ -Wall -Wextra #-pedantic 
 
 CFLAGS   += -I../include
 
@@ -7,7 +7,7 @@ SDL_LIBS  = $(shell sdl-config --libs) -lSDL_mixer
 SDL_FLAGS = $(shell sdl-config --cflags)
 IMAGES    = ../images
 
-OBJECTS = bbc.o consolefont.o Brainblast.o Brick.o Puzzle.o Field.o BrainSprite.o BrainSound.o BrainPlayer.o BrainAI.o main.o
+OBJECTS = bbc.o consolefont.o Brainblast.o Brick.o Puzzle.o Field.o BrainSprite.o BrainSound.o BrainPlayer.o BrainAI.o BrainPlayerManager.o main.o
 
 all: Brainblast
 

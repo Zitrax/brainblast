@@ -21,6 +21,7 @@
 #include "Brick.h"
 #include "BrainSprite.h"
 #include "BrainPlayer.h"
+#include "BrainPlayerManager.h"
 #include "BrainSound.h"
 #include "BrainAI.h"
 
@@ -70,6 +71,8 @@ public:
 	BrainSprite* addSprite();
 
 	BrainSprite* reparentSprite(BrainSprite* bs, KrImNode* parent);
+	//! Drop eventual carried sprite and add it back to the bg tree.
+	void dropPlayerSprite(BrainPlayer* player);
 
 	enum sounds {
 		CLICK,
@@ -82,7 +85,7 @@ public:
 
 	bool changeLevel(int lvl);
 
-	std::vector<BrainSprite*>& getAllSprites() { return m_sprites; }
+	vector<BrainSprite*>& getAllSprites() { return m_sprites; }
 
 	/**
 	 * Perform a select for the player at lvl.
@@ -119,31 +122,42 @@ private:
 
     //! Used to clean up for all pointers
     void cleanup();
-
+	
+	/**
+	 * This is the loop that runs continuously during
+	 * gameplay to move all sprites and handle key events.
+	 */ 
     int eventLoop();
 
-    void handleKeyEvent(SDL_KeyboardEvent* key);
-
+	/**
+	 * The one and only instance of this class. It 
+	 * can be accessed with Brainblast::instance().
+	 */
 	static Brainblast* s_instance;
 
+	/**
+	 * This is the time the game waits before hiding
+	 * the solution and the game starts.
+	 */
 	static const double WAITTIME = 10.0;
+	
 	bool m_play; // Tells if the user has aborted the wait
 
+	time_t m_start_time;
+
+	/**
+	 * Handles all the sounds (effects and music)
+	 */
 	BrainSound* m_sound;
 
-	BrainPlayer* m_player1; // The player
 	int m_players;
-	BrainAI* m_ai;
-
-    Puzzle* m_currentLvl1;
-	Puzzle* m_currentLvl2;
+	vector<Puzzle*> m_current_levels;
+	vector<SDL_Rect> m_fields;
 	int m_current_lvl;
 
     SDL_Surface* m_screen;
-    SDL_Rect*    m_field1;
-    SDL_Rect*    m_field2;
 
-	std::map<int,Brick*> m_bricks;
+	map<int,Brick*> m_bricks;
 	int          m_total_bricks;
 
 	KrEngine*    m_engine;
@@ -151,9 +165,7 @@ private:
 	KrImNode*    m_bgTree;
 	KrImNode*    m_fgTree;
 
-	time_t m_start_time;
-
-	std::vector<BrainSprite*> m_sprites;
+	vector<BrainSprite*> m_sprites;
 
 	KrResourceVault* m_bg_vault;
 	KrSprite*        m_bg_sprite;
@@ -162,6 +174,8 @@ private:
 	KrFontResource* m_font;
 	KrTextBox*      m_score_text_box;
 	KrTextBox*      m_center_text_box;
+
+	BrainPlayerManager* m_player_manager;
 };
 
 #endif
