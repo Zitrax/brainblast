@@ -23,7 +23,6 @@ Brainblast* Brainblast::s_instance;
 Brainblast::Brainblast() : m_play(false),
 						   m_start_time(0),
 						   m_sound(new BrainSound),
-						   m_players(2),
 						   m_current_levels(),
 						   m_fields(),
 						   m_current_lvl(1),
@@ -201,7 +200,7 @@ Brainblast::makeLevel(int lvl)
     if(lvl == 0) 
     {
 		// 7x8 is maximum size if you want to avoid overlapping
-		makeRandomLevel(7,8,55);
+		makeRandomLevel(4,4,4);
         return true;
     }
 
@@ -373,21 +372,22 @@ Brainblast::checkSolution(Puzzle* puzzle)
 }
 
 bool
-Brainblast::startGame(int players)
+Brainblast::startGame()
 {
-	m_players = players;
-
-	if( !setupFields(players) )
-	{
-		printf("=== ERROR: Could not setup fields. ===\n");
-		return false;
-	}
-
     if( !initGameKyra() )
 	{
 		printf("=== ERROR: Could not init kyra. ===\n");
 		return false;
 	}
+
+	m_player_manager = new BrainPlayerManager(1,0);
+
+	if( !setupFields(m_player_manager->playerCount()) )
+	{
+		printf("=== ERROR: Could not setup fields. ===\n");
+		return false;
+	}
+
 
 	if( !initGame(0) )
 	{
@@ -460,8 +460,6 @@ Brainblast::initGameKyra()
 	KrSpriteResource* wizardRes = m_engine->Vault()->GetSpriteResource( BB_WIZARD );
 	assert( wizardRes );
 
-	m_player_manager = new BrainPlayerManager(0,2);
-
 	return true;
 }
 
@@ -499,7 +497,7 @@ Brainblast::initGame(int lvl)
 	// Start music
 	if( !(m_sound->initializeSound() &&
 		  //m_sound->loadMusic("../music/Instant Remedy - Outrun.mp3") &&
-		  m_sound->loadMusic("../music/onward.xm") &&
+		  m_sound->loadMusic("../music/enigmatic_path.mp3") &&
 		  m_sound->playMusic()) )
 		printf("=== ERROR: Could not start music === \n");
 	

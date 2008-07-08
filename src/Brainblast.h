@@ -66,7 +66,7 @@ public:
     bool checkSolution(Puzzle* puzzle);
 
     //! Start a new game
-    bool startGame(int players);
+    bool startGame();
 
 	BrainSprite* addSprite();
 
@@ -150,7 +150,6 @@ private:
 	 */
 	BrainSound* m_sound;
 
-	int m_players;
 	vector<Puzzle*> m_current_levels;
 	vector<SDL_Rect> m_fields;
 	int m_current_lvl;
