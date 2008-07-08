@@ -36,7 +36,7 @@ BrainPlayerManager::BrainPlayerManager(int human_players, int computer_players)
         m_players.push_back(player);
     }
 	
-	if( m_players[0] )
+	if( (m_players.size() > 0) && m_players[0] )
 	{
 		m_players[0]->mapAction(BrainPlayer::WALK_LEFT, SDLK_LEFT);
 		m_players[0]->mapAction(BrainPlayer::WALK_RIGHT,SDLK_RIGHT);
@@ -46,7 +46,7 @@ BrainPlayerManager::BrainPlayerManager(int human_players, int computer_players)
 		m_players[0]->mapAction(BrainPlayer::SELECT,    SDLK_RETURN);
 	}
 
-	if( m_players[1] )
+	if( (m_players.size() > 1) && m_players[1] )
 	{
 		m_players[1]->mapAction(BrainPlayer::WALK_LEFT, SDLK_a);
 		m_players[1]->mapAction(BrainPlayer::WALK_RIGHT,SDLK_d);
