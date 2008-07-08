@@ -6,14 +6,14 @@ build:
 
 binary: clean
 	@ install -v -d debian/tmp/DEBIAN \
-		-d debian/tmp/usr/bin \
+		-d debian/tmp/usr/games \
 		-d debian/tmp/usr/share/app-install/icons \
 		-d debian/tmp/usr/share/applications \
 		-d debian/tmp/usr/share/doc/$(PACKAGE) \
 		-d debian/tmp/usr/share/man/man1 \
 		-d debian/tmp/usr/share/icons/default.kde/16x16/apps 
-	@ cp -v ../src/$(PACKAGE) debian/tmp/usr/bin
-	strip -s debian/tmp/usr/bin/$(PACKAGE)
+	@ cp -v ../src/$(PACKAGE) debian/tmp/usr/games
+	strip -s debian/tmp/usr/games/$(PACKAGE)
 	@ cp -v debian/usr/share/app-install/icons/$(PACKAGE).png debian/tmp/usr/share/app-install/icons
 	@ cp -v debian/usr/share/app-install/icons/$(PACKAGE).png debian/tmp/usr/share/icons/default.kde/16x16/apps/
 	@ cp -v debian/usr/share/applications/$(PACKAGE).desktop debian/tmp/usr/share/applications
@@ -22,10 +22,11 @@ binary: clean
 	@ cp -v debian/copyright debian/tmp/usr/share/doc/$(PACKAGE)/
 	pod2man debian/usr/share/man/$(PACKAGE).pod > debian/tmp/usr/share/man/man1/$(PACKAGE).1
 	gzip -9 debian/tmp/usr/share/man/man1/$(PACKAGE).1
-	dpkg-shlibdeps debian/tmp/usr/bin/$(PACKAGE)
+	dpkg-shlibdeps debian/tmp/usr/games/$(PACKAGE)
 	dpkg-gencontrol
 	chown -R root.root debian/tmp
 	dpkg --build debian/tmp .
+	@echo "== Remember to test using lintian =="
 
 clean: verify
 	rm -rf debian/tmp
