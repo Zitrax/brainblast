@@ -429,14 +429,14 @@ Brainblast::initGameKyra()
 	// Load the dat file.
 	// The dat file was carefully created in the sprite
 	// editor.
-	if ( !m_engine->Vault()->LoadDatFile( "../images/bb.dat" ) )
+	if ( !m_engine->Vault()->LoadDatFile( "/usr/share/games/brainblast/images/bb.dat" ) )
 	{
 		printf( "=== Error: Loading the sprites file. ===\n" );
 		return false;	
 	}
 
 	// Load the background vault
-	if( !m_bg_vault->LoadDatFile( "../images/bb_bg.dat" ) )
+	if( !m_bg_vault->LoadDatFile( "/usr/share/games/brainblast/images/bb_bg.dat" ) )
 	{
 		printf( "=== Error: Loading backgrounds. ===\n" );
 	}
@@ -503,8 +503,8 @@ Brainblast::initGame(int lvl)
 	
 	if( m_sound->isInitialized() )
 	{
-		m_sound->addSample("../sounds/click.wav",CLICK);
-		m_sound->addSample("../sounds/bounce.wav",BOUNCE);
+		m_sound->addSample("/usr/share/games/brainblast/sounds/click.wav",CLICK);
+		m_sound->addSample("/usr/share/games/brainblast/sounds/bounce.wav",BOUNCE);
 	}
 
 	return true;

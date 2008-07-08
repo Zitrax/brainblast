@@ -7,6 +7,8 @@ build:
 binary: clean
 	@ install -v -d debian/tmp/DEBIAN \
 		-d debian/tmp/usr/games \
+		-d debian/tmp/usr/share/games/$(PACKAGE)/images \
+		-d debian/tmp/usr/share/games/$(PACKAGE)/sounds \
 		-d debian/tmp/usr/share/app-install/icons \
 		-d debian/tmp/usr/share/applications \
 		-d debian/tmp/usr/share/doc/$(PACKAGE) \
@@ -14,6 +16,10 @@ binary: clean
 		-d debian/tmp/usr/share/icons/default.kde/16x16/apps 
 	@ cp -v ../src/$(PACKAGE) debian/tmp/usr/games
 	strip -s debian/tmp/usr/games/$(PACKAGE)
+	@ cp -v ../images/bb.dat debian/tmp/usr/share/games/$(PACKAGE)/images/
+	@ cp -v ../images/bb_bg.dat debian/tmp/usr/share/games/$(PACKAGE)/images/
+	@ cp -v ../sounds/click.wav debian/tmp/usr/share/games/$(PACKAGE)/sounds/
+	@ cp -v ../sounds/bounce.wav debian/tmp/usr/share/games/$(PACKAGE)/sounds/
 	@ cp -v debian/usr/share/app-install/icons/$(PACKAGE).png debian/tmp/usr/share/app-install/icons
 	@ cp -v debian/usr/share/app-install/icons/$(PACKAGE).png debian/tmp/usr/share/icons/default.kde/16x16/apps/
 	@ cp -v debian/usr/share/applications/$(PACKAGE).desktop debian/tmp/usr/share/applications
