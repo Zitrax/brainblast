@@ -3,13 +3,13 @@ CFLAGS    = -O2 -Weffc++ -Wall -Wextra #-pedantic
 
 CFLAGS   += -I../include
 
-SDL_LIBS  = $(shell sdl-config --libs) -lSDL_mixer
+SDL_LIBS  = $(shell sdl-config --static-libs) -lSDL_mixer
 SDL_FLAGS = $(shell sdl-config --cflags)
 IMAGES    = ../images
 
 OBJECTS = bbc.o consolefont.o Brainblast.o Brick.o Puzzle.o Field.o BrainSprite.o BrainSound.o BrainPlayer.o BrainAI.o BrainPlayerManager.o main.o
 
-all: Brainblast
+all: brainblast
 
 $(IMAGES)/bb.h: ../images/bricks.xml 
 	cd $(IMAGES) && \
@@ -19,8 +19,11 @@ $(IMAGES)/bb_bg.h: ../images/bg.xml
 	cd $(IMAGES) && \
 	krencoder -pBB_BG_ bb_bg.h bg.xml
 
-Brainblast: $(OBJECTS)
-	$(GCC) -o $@ $(OBJECTS) -lkyra -lengine $(SDL_LIBS) 
+# How to avoid hardcoding the static libraries ? Using -l just makes it find the .so it seems
+  #/usr/local/lib/libengine.a /usr/local/lib/libkyra.a
+  #-static-libgcc -Wl,-static -lengine -lkyra
+brainblast: $(OBJECTS)
+	$(GCC) -o $@ $(OBJECTS) $(SDL_LIBS) /usr/local/lib/libengine.a /usr/local/lib/libkyra.a
 
 $(OBJECTS): %.o: %.cpp
 	$(GCC) $(CFLAGS) $(SDL_FLAGS) -c $<
@@ -29,7 +32,7 @@ remake:
 	make clean; make
 
 clean:
-	rm -rfv *.o Brainblast *~ \
+	rm -rfv *.o brainblast *~ \
 	$(IMAGES)/bb.h $(IMAGES)/bb.dat $(IMAGES)/bb_bg.h $(IMAGES)/bb_bg.dat 
 
 # DO NOT DELETE
