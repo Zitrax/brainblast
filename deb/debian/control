@@ -1,0 +1,14 @@
+Source: brainblast
+Maintainer: Daniel Bengtsson <daniel@bengtssons.info>
+Section: games
+Priority: optional
+Standards-Version: 3.7.3.0
+
+Package: brainblast
+Architecture: i386
+Priority: optional
+Depends: ${shlibs:Depends}
+Description: Brainblast is a multiplayer puzzle game
+ The goal of the game is to remember a pattern and then
+ rebuild it from pieces that are falling from the sky.
+ You can play alone with a friend or against the computer.

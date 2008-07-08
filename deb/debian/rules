@@ -1,0 +1,40 @@
+#!/usr/bin/make -f
+
+PACKAGE=brainblast
+
+build:
+
+binary: clean
+	@ install -v -d debian/tmp/DEBIAN \
+		-d debian/tmp/usr/bin \
+		-d debian/tmp/usr/share/app-install/icons \
+		-d debian/tmp/usr/share/applications \
+		-d debian/tmp/usr/share/doc/$(PACKAGE) \
+		-d debian/tmp/usr/share/man/man1 \
+		-d debian/tmp/usr/share/icons/default.kde/16x16/apps 
+	@ cp -v ../src/$(PACKAGE) debian/tmp/usr/bin
+	strip -s debian/tmp/usr/bin/$(PACKAGE)
+	@ cp -v debian/usr/share/app-install/icons/$(PACKAGE).png debian/tmp/usr/share/app-install/icons
+	@ cp -v debian/usr/share/app-install/icons/$(PACKAGE).png debian/tmp/usr/share/icons/default.kde/16x16/apps/
+	@ cp -v debian/usr/share/applications/$(PACKAGE).desktop debian/tmp/usr/share/applications
+	@ cp -v debian/changelog debian/tmp/usr/share/doc/$(PACKAGE)/
+	gzip -9 debian/tmp/usr/share/doc/$(PACKAGE)/changelog
+	@ cp -v debian/copyright debian/tmp/usr/share/doc/$(PACKAGE)/
+	pod2man debian/usr/share/man/$(PACKAGE).pod > debian/tmp/usr/share/man/man1/$(PACKAGE).1
+	gzip -9 debian/tmp/usr/share/man/man1/$(PACKAGE).1
+	dpkg-shlibdeps debian/tmp/usr/bin/$(PACKAGE)
+	dpkg-gencontrol
+	chown -R root.root debian/tmp
+	dpkg --build debian/tmp .
+
+clean: verify
+	rm -rf debian/tmp
+
+verify:
+	@ if [ "`whoami`" != "root" ] ; then  \
+		echo "You must be root"; \
+		exit 1;                  \
+	fi
+	test -d debian && test -f correct_directory
+
+.PHONY: clean build binary

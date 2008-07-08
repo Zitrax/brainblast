@@ -1,0 +1,19 @@
+=head1 NAME
+
+brainblast - Brainblast a puzzle memory game.
+
+=head1 SYNOPSIS
+
+brainblast
+
+=head1 DESCRIPTION
+
+The goal of the game is to remember a pattern and then
+rebuild it from pieces that are falling from the sky.
+You can play alone with a friend or against the computer.
+
+http://brainblast.sourceforge.net/
+
+=head1 AUTHOR
+
+Daniel Bengtsson <daniel@bengtssons.info>
