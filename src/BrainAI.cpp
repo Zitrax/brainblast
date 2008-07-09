@@ -45,7 +45,10 @@ private:
 //    try to interfere with them, take their needed pieces and run 
 //    away with them for example.
 //
-
+//  * Stop the ai from "vibrating" when he can't decide direction.
+//
+//  * Allow the ai to be stupid by randomly doing something incorrect.
+// 
 
 BrainAI::BrainAI(KrSpriteResource* res, std::string name)
     : BrainPlayer(res,name),

@@ -72,7 +72,7 @@ public:
 
 	BrainSprite* reparentSprite(BrainSprite* bs, KrImNode* parent);
 	//! Drop eventual carried sprite and add it back to the bg tree.
-	void dropPlayerSprite(BrainPlayer* player);
+	void dropPlayerSprite(BrainPlayer* player, bool remove=false);
 
 	enum sounds {
 		CLICK,

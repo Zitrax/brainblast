@@ -319,6 +319,10 @@ Brainblast::clearFloor()
 
 	for(unsigned int i=0; i<m_current_levels.size(); ++i)
 		m_current_levels[i]->stopSelection();
+
+	// Make the players drop what they are carrying.
+	for(unsigned int i=0; i<m_player_manager->playerCount(); ++i)
+		dropPlayerSprite(m_player_manager->getPlayer(i),true);
 }
 
 bool
@@ -383,7 +387,7 @@ Brainblast::startGame()
 		return false;
 	}
 
-	m_player_manager = new BrainPlayerManager(1,0);
+	m_player_manager = new BrainPlayerManager(1,1);
 
 	if( !setupFields(m_player_manager->playerCount()) )
 	{
@@ -747,10 +751,18 @@ BrainSprite* Brainblast::reparentSprite(BrainSprite* bs, KrImNode* parent)
 	return clone;
 }
 
-void Brainblast::dropPlayerSprite(BrainPlayer* player)
+void Brainblast::dropPlayerSprite(BrainPlayer* player, bool remove)
 {
 	BrainSprite* bs = player->drop(m_bgTree);
-	if(bs)
+	
+	if( !bs )
+		return;
+	
+	if( remove ) 
+	{
+		m_engine->Tree()->DeleteNode(bs);
+	}
+	else
 		m_sprites.push_back(bs);
 }
 
