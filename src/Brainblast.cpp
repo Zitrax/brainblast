@@ -212,7 +212,7 @@ Brainblast::makeLevel(int lvl)
 
         char* filename  = static_cast<char*>(malloc(40));
       
-        const char* filebase = "../lvl/lvl%03d.txt";
+        const char* filebase = "/usr/share/games/brainblast/lvl/lvl%03d.txt";
       
         sprintf(filename, filebase, lvl);
         if( bbc::debug ) cerr << "Level file: " << filename << "\n";
