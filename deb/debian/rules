@@ -9,23 +9,27 @@ binary: clean
 		-d debian/tmp/usr/games \
 		-d debian/tmp/usr/share/games/$(PACKAGE)/images \
 		-d debian/tmp/usr/share/games/$(PACKAGE)/sounds \
+		-d debian/tmp/usr/share/games/$(PACKAGE)/music \
 		-d debian/tmp/usr/share/app-install/icons \
 		-d debian/tmp/usr/share/applications \
 		-d debian/tmp/usr/share/doc/$(PACKAGE) \
 		-d debian/tmp/usr/share/man/man1 \
-		-d debian/tmp/usr/share/icons/default.kde/16x16/apps 
+		-d debian/tmp/usr/share/icons/default.kde/16x16/apps \
+		-d debian/tmp/usr/lib
 	@ cp -v ../src/$(PACKAGE) debian/tmp/usr/games
 	strip -s debian/tmp/usr/games/$(PACKAGE)
 	@ cp -v ../images/bb.dat debian/tmp/usr/share/games/$(PACKAGE)/images/
 	@ cp -v ../images/bb_bg.dat debian/tmp/usr/share/games/$(PACKAGE)/images/
 	@ cp -v ../sounds/click.wav debian/tmp/usr/share/games/$(PACKAGE)/sounds/
-	@ cp -v ../sounds/bounce.wav debian/tmp/usr/share/games/$(PACKAGE)/sounds/
+	@ cp -v ../sounds/bounce.wav debian/tmp/usr/share/games/$(PACKAGE)/sounds/ 
+	@ cp -v ../music/enigmatic_path.it debian/tmp/usr/share/games/$(PACKAGE)/music/
 	@ cp -v debian/usr/share/app-install/icons/$(PACKAGE).png debian/tmp/usr/share/app-install/icons
 	@ cp -v debian/usr/share/app-install/icons/$(PACKAGE).png debian/tmp/usr/share/icons/default.kde/16x16/apps/
 	@ cp -v debian/usr/share/applications/$(PACKAGE).desktop debian/tmp/usr/share/applications
 	@ cp -v debian/changelog debian/tmp/usr/share/doc/$(PACKAGE)/
 	gzip -9 debian/tmp/usr/share/doc/$(PACKAGE)/changelog
 	@ cp -v debian/copyright debian/tmp/usr/share/doc/$(PACKAGE)/
+	@ cp -v ../bassmod/libbassmod.so debian/tmp/usr/lib/
 	pod2man debian/usr/share/man/$(PACKAGE).pod > debian/tmp/usr/share/man/man1/$(PACKAGE).1
 	gzip -9 debian/tmp/usr/share/man/man1/$(PACKAGE).1
 	dpkg-shlibdeps debian/tmp/usr/games/$(PACKAGE)

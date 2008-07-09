@@ -500,7 +500,7 @@ Brainblast::initGame(int lvl)
 	// Start music
 	if( !(m_sound_bass->initializeSound() &&
 		  //m_sound->loadMusic("../music/Instant Remedy - Outrun.mp3") &&
-		  m_sound_bass->loadMusic("../music/enigmatic_path.it") &&
+		  m_sound_bass->loadMusic("/usr/share/games/brainblast/music/enigmatic_path.it") &&
 		  m_sound_bass->playMusic()) )
 		printf("=== ERROR: Could not start music === \n");
 	
