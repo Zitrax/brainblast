@@ -10,6 +10,7 @@
 #include "../images/bb_bg.h"
 #include "grinliz/glrandom.h"
 #include "consolefont.h"
+#include "BrainSoundBASS.h"
 
 #include <sstream>  // ostringstream
 #include <iomanip>  // setfill setw
@@ -22,7 +23,8 @@ Brainblast* Brainblast::s_instance;
 
 Brainblast::Brainblast() : m_play(false),
 						   m_start_time(0),
-						   m_sound(new BrainSound),
+						   m_sound_sdl(new BrainSoundSDL),
+						   m_sound_bass(new BrainSoundBASS),
 						   m_current_levels(),
 						   m_fields(),
 						   m_current_lvl(1),
@@ -138,7 +140,8 @@ Brainblast::cleanup()
 	m_current_levels.clear();
 	m_fields.clear();
 
-	zap( m_sound );
+	zap( m_sound_sdl );
+	zap( m_sound_bass );
 	zap( m_engine );
 	zap( m_bg_vault );
 	zap( m_player_manager );
@@ -495,16 +498,16 @@ Brainblast::initGame(int lvl)
 		return false; 
 
 	// Start music
-	if( !(m_sound->initializeSound() &&
+	if( !(m_sound_bass->initializeSound() &&
 		  //m_sound->loadMusic("../music/Instant Remedy - Outrun.mp3") &&
-		  m_sound->loadMusic("../music/enigmatic_path.mp3") &&
-		  m_sound->playMusic()) )
+		  m_sound_bass->loadMusic("../music/enigmatic_path.it") &&
+		  m_sound_bass->playMusic()) )
 		printf("=== ERROR: Could not start music === \n");
 	
-	if( m_sound->isInitialized() )
+	if( m_sound_sdl->initializeSound() )
 	{
-		m_sound->addSample("/usr/share/games/brainblast/sounds/click.wav",CLICK);
-		m_sound->addSample("/usr/share/games/brainblast/sounds/bounce.wav",BOUNCE);
+		m_sound_sdl->addSample("/usr/share/games/brainblast/sounds/click.wav",CLICK);
+		m_sound_sdl->addSample("/usr/share/games/brainblast/sounds/bounce.wav",BOUNCE);
 	}
 
 	return true;
@@ -552,7 +555,7 @@ int Brainblast::eventLoop()
 
 			// M = TOGGLE SOUND
 			if( event.key.keysym.sym == SDLK_m )
-				m_sound->toggleMusic();
+				m_sound_bass->toggleMusic();
 			// F = TOGGLE FULLSCREEN
 			else if( event.key.keysym.sym == SDLK_f )
 				SDL_WM_ToggleFullScreen(m_screen);
@@ -719,7 +722,7 @@ void Brainblast::select(Puzzle& lvl, BrainPlayer& player)
 	lvl.select(&s) ? player.addScore(cscore) : player.addScore(-1*cscore/10);
 	if( s )
 	{
-		m_sound->playSample(CLICK);
+		m_sound_sdl->playSample(CLICK);
 		vector<BrainSprite*>::iterator it = find(m_sprites.begin(),m_sprites.end(),s);
 		m_sprites.erase(it);
 

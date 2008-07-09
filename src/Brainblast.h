@@ -79,7 +79,7 @@ public:
 		BOUNCE
 	};
 	
-	bool playSample(enum sounds sound) const { return m_sound->playSample(sound); }
+	bool playSample(enum sounds sound) const { return m_sound_sdl->playSample(sound); }
 
 	void drawText(const char* text, SDL_Rect pos, int size=16);
 
@@ -148,7 +148,8 @@ private:
 	/**
 	 * Handles all the sounds (effects and music)
 	 */
-	BrainSound* m_sound;
+	BrainSound* m_sound_sdl;
+	BrainSound* m_sound_bass;
 
 	vector<Puzzle*> m_current_levels;
 	vector<SDL_Rect> m_fields;
