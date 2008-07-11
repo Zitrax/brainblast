@@ -7,7 +7,7 @@ SDL_LIBS  = $(shell sdl-config --static-libs) -lSDL_mixer
 SDL_FLAGS = $(shell sdl-config --cflags)
 IMAGES    = ../images
 
-OBJECTS = bbc.o consolefont.o Brainblast.o Brick.o Puzzle.o Field.o BrainSprite.o BrainSound.o BrainPlayer.o BrainAI.o BrainPlayerManager.o main.o BrainSoundBASS.o
+OBJECTS = bbc.o consolefont.o Brainblast.o Brick.o Puzzle.o Field.o BrainSprite.o BrainSound.o BrainPlayer.o BrainAI.o BrainPlayerManager.o main.o BrainSoundBASS.o BrainSoundFMOD.o
 
 all: brainblast
 
@@ -23,7 +23,7 @@ $(IMAGES)/bb_bg.h: ../images/bg.xml
   #/usr/local/lib/libengine.a /usr/local/lib/libkyra.a
   #-static-libgcc -Wl,-static -lengine -lkyra
 brainblast: $(OBJECTS)
-	$(GCC) -o $@ $(OBJECTS) $(SDL_LIBS) /usr/local/lib/libengine.a /usr/local/lib/libkyra.a -L../bassmod -lbassmod
+	$(GCC) -o $@ $(OBJECTS) $(SDL_LIBS) /usr/local/lib/libengine.a /usr/local/lib/libkyra.a -L../bassmod -lbassmod -L../fmod/api -lfmod-3.75
 
 $(OBJECTS): %.o: %.cpp
 	$(GCC) $(CFLAGS) $(SDL_FLAGS) -c $<

@@ -149,7 +149,7 @@ private:
 	 * Handles all the sounds (effects and music)
 	 */
 	BrainSound* m_sound_sdl;
-	BrainSound* m_sound_bass;
+	BrainSound* m_sound_fmod;
 
 	vector<Puzzle*> m_current_levels;
 	vector<SDL_Rect> m_fields;
@@ -172,7 +172,8 @@ private:
 
 	// Text
 	KrFontResource* m_font;
-	KrTextBox*      m_score_text_box;
+	KrTextBox*      m_left_score_text_box;
+	KrTextBox*      m_right_score_text_box;
 	KrTextBox*      m_center_text_box;
 
 	BrainPlayerManager* m_player_manager;

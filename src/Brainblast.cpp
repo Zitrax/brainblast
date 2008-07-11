@@ -10,7 +10,7 @@
 #include "../images/bb_bg.h"
 #include "grinliz/glrandom.h"
 #include "consolefont.h"
-#include "BrainSoundBASS.h"
+#include "BrainSoundFMOD.h"
 
 #include <sstream>  // ostringstream
 #include <iomanip>  // setfill setw
@@ -24,7 +24,7 @@ Brainblast* Brainblast::s_instance;
 Brainblast::Brainblast() : m_play(false),
 						   m_start_time(0),
 						   m_sound_sdl(new BrainSoundSDL),
-						   m_sound_bass(new BrainSoundBASS),
+						   m_sound_fmod(new BrainSoundFMOD),
 						   m_current_levels(),
 						   m_fields(),
 						   m_current_lvl(1),
@@ -38,7 +38,8 @@ Brainblast::Brainblast() : m_play(false),
 						   m_bg_vault( new KrResourceVault() ),
 						   m_bg_sprite(0),
 						   m_font(0),
-						   m_score_text_box(0),
+						   m_left_score_text_box(0),
+						   m_right_score_text_box(0),
 						   m_center_text_box(0),
 						   m_player_manager(0)
 {
@@ -141,7 +142,7 @@ Brainblast::cleanup()
 	m_fields.clear();
 
 	zap( m_sound_sdl );
-	zap( m_sound_bass );
+	zap( m_sound_fmod );
 	zap( m_engine );
 	zap( m_bg_vault );
 	zap( m_player_manager );
@@ -387,7 +388,7 @@ Brainblast::startGame()
 		return false;
 	}
 
-	m_player_manager = new BrainPlayerManager(1,1);
+	m_player_manager = new BrainPlayerManager(0,2);
 
 	if( !setupFields(m_player_manager->playerCount()) )
 	{
@@ -423,13 +424,15 @@ Brainblast::initGameKyra()
 		return false;
 	}
 
- 	m_score_text_box = new KrTextBox(m_font,300,50,1);
-	assert(m_score_text_box);
-	m_score_text_box->SetPos(10,10);
-	m_engine->Tree()->AddNode(0,m_score_text_box);
+ 	m_left_score_text_box = new KrTextBox(m_font,300,50,1);
+	m_left_score_text_box->SetPos(10,10);
+	m_engine->Tree()->AddNode(0,m_left_score_text_box);
+
+ 	m_right_score_text_box = new KrTextBox(m_font,300,50,1);
+	m_right_score_text_box->SetPos(VIDEOX-310,10);
+	m_engine->Tree()->AddNode(0,m_right_score_text_box);
 
  	m_center_text_box = new KrTextBox(m_font,300,50,1);
-	assert(m_center_text_box);
 	m_center_text_box->SetPos(475,300);
 	m_engine->Tree()->AddNode(0,m_center_text_box);
 
@@ -502,10 +505,11 @@ Brainblast::initGame(int lvl)
 		return false; 
 
 	// Start music
-	if( !(m_sound_bass->initializeSound() &&
+	if( !(m_sound_fmod->initializeSound() &&
 		  //m_sound->loadMusic("../music/Instant Remedy - Outrun.mp3") &&
-		  m_sound_bass->loadMusic("/usr/share/games/brainblast/music/enigmatic_path.it") &&
-		  m_sound_bass->playMusic()) )
+		  //m_sound_fmod->loadMusic("/usr/share/games/brainblast/music/enigmatic_path.it") &&
+		  m_sound_fmod->loadMusic("../music/enigmatic_path.it") &&
+		  m_sound_fmod->playMusic()) )
 		printf("=== ERROR: Could not start music === \n");
 	
 	if( m_sound_sdl->initializeSound() )
@@ -559,7 +563,7 @@ int Brainblast::eventLoop()
 
 			// M = TOGGLE SOUND
 			if( event.key.keysym.sym == SDLK_m )
-				m_sound_bass->toggleMusic();
+				m_sound_fmod->toggleMusic();
 			// F = TOGGLE FULLSCREEN
 			else if( event.key.keysym.sym == SDLK_f )
 				SDL_WM_ToggleFullScreen(m_screen);
@@ -707,7 +711,21 @@ int Brainblast::eventLoop()
 				  << " | Bricks: " << m_current_levels[0]->correctBricks()
 				  << "/" << m_current_levels[0]->totalSolutionBricks();
 
-		m_score_text_box->SetTextChar(score_str.str(),0);
+		m_left_score_text_box->SetTextChar(score_str.str(),0);
+
+		if( m_player_manager->playerCount() > 1 )
+		{
+			score_str.str("");
+			
+			score_str << "Score: " << m_player_manager->getPlayer(1)->getScore() << " | Time: " 
+					  << setw(2) << setfill('0') << min << ":" 
+					  << setw(2) << setfill('0') << sec 
+					  << " | Bricks: " << m_current_levels[1]->correctBricks()
+					  << "/" << m_current_levels[1]->totalSolutionBricks();
+
+			m_right_score_text_box->SetTextChar(score_str.str(),0);
+		}
+
 		if( m_play && game_over )
 		{
 			m_center_text_box->SetTextChar("Game Over",0);
