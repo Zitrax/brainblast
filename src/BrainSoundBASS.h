@@ -18,7 +18,7 @@ class BrainSoundBASS : public BrainSound
 {
 public:
 
-	BrainSoundBASS() : BrainSound(), m_music(0), m_samples() {}
+	BrainSoundBASS() : BrainSound() {}
 	~BrainSoundBASS();
 
 	bool initializeSound();
@@ -37,14 +37,6 @@ public:
 	bool playSample(int) const { assert(false); return false; }
 
 	void error(const char* text);
-
-private:
-
-    BrainSoundBASS(const BrainSoundBASS& bb);
-    BrainSoundBASS& operator=(const BrainSoundBASS& bb);
-
-	Mix_Music* m_music;
-	std::map<int,Mix_Chunk*> m_samples;
 
 };
 

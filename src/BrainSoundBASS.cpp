@@ -43,7 +43,7 @@ bool BrainSoundBASS::loadMusic(const char* file)
 	if (!BASSMOD_MusicLoad(FALSE,(void*)file,0,0,
 						   BASS_MUSIC_LOOP|BASS_MUSIC_RAMPS|BASS_MUSIC_SURROUND|BASS_MUSIC_CALCLEN))
 	{
-		error("loadMusic - Can't play the file");
+		error("loadMusic - Can't load the file");
 		return false;
 	}
 
