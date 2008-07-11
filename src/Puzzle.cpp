@@ -236,9 +236,13 @@ bool Puzzle::navigateTowards()
 			}
 		}
 
-	//assert(nav_id!=-1); // We should never look for id's that do not exist
+
+	//assert(nav_id!=-1); // We should never look for id's that do not exist		
 	if(nav_id==-1)
+	{
+		printf("Puzzle::navigateTowards ===ERROR=== - This should not happen!\n");
 		return false;
+	}
 
 	if( nav_id == m_s_coord.i() )
 		return true;
