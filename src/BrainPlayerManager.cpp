@@ -11,7 +11,7 @@
 using namespace brain;
 
 BrainPlayerManager::BrainPlayerManager(int human_players, int computer_players)
-	: m_players()
+	: m_players(), m_player_count(human_players+computer_players)
 {
     KrSpriteResource* wizardRes = 
         Brainblast::instance()->engine()->Vault()->GetSpriteResource( BB_WIZARD );
@@ -21,7 +21,7 @@ BrainPlayerManager::BrainPlayerManager(int human_players, int computer_players)
 		if(bbc::debug) cerr << "BrainPlayerManager() Adding human player " << i << "\n";
         BrainPlayer* player = new BrainPlayer( wizardRes, "wizard" );
         player->SetNodeId(BB_WIZARD);
-        player->SetPos( rand()%VIDEOX, 0);
+        player->SetPos( spacing(), 0);
         Brainblast::instance()->engine()->Tree()->AddNode( 0, player );
         m_players.push_back(player);
     }
@@ -31,7 +31,7 @@ BrainPlayerManager::BrainPlayerManager(int human_players, int computer_players)
 		if(bbc::debug) cerr << "BrainPlayerManager() Adding computer player " << i << "\n";
         BrainPlayer* player = new BrainAI( wizardRes, "computer" );
         player->SetNodeId(BB_WIZARD);
-        player->SetPos( rand()%VIDEOX, 0);
+        player->SetPos( spacing(), 0);
         Brainblast::instance()->engine()->Tree()->AddNode( 0, player );
         m_players.push_back(player);
     }
@@ -56,6 +56,11 @@ BrainPlayerManager::BrainPlayerManager(int human_players, int computer_players)
 		m_players[1]->mapAction(BrainPlayer::SELECT,    SDLK_LSHIFT);
 	}
     
+}
+
+int BrainPlayerManager::spacing() const
+{
+	return m_player_count>1 ? 30 + m_players.size()*(VIDEOX-60)/(m_player_count-1) : VIDEOX/2;
 }
 
 void BrainPlayerManager::move()
@@ -136,8 +141,8 @@ bool BrainPlayerManager::handleKeyHeld(const bool* const keys_held)
     vector<BrainPlayer*>::iterator end = m_players.end();
     for( it=m_players.begin(); it!=end; ++it )
 	{
-		
 		BrainPlayer* player = *it;
+		Puzzle* level = player->getLevel();
 
 		std::vector<SDLKey> keys = player->keys();
 
@@ -158,11 +163,13 @@ bool BrainPlayerManager::handleKeyHeld(const bool* const keys_held)
 					break;
 
 				case BrainPlayer::WALK_LEFT:
-					player->left();
+					if( !level->isSelecting() )
+						player->left();
 					break;
 
 				case BrainPlayer::WALK_RIGHT:
-					player->right();
+					if( !level->isSelecting() )
+						player->right();
 					break;
 
 				case BrainPlayer::JUMP:

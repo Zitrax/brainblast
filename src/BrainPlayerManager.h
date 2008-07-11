@@ -37,14 +37,18 @@ public:
 
 	BrainPlayer* getPlayer(int idx) const;
 
-	unsigned int playerCount() const { return m_players.size(); }
+	unsigned int playerCount() const { return m_player_count; }
 
 private:
 
     BrainPlayerManager(const BrainPlayerManager&);
     BrainPlayerManager& operator=(const BrainPlayerManager&);
 
+	/** Space between starting positions */
+	int spacing() const;
+
 	vector<BrainPlayer*> m_players;
+	unsigned int m_player_count;
 };
 
 #endif //  BRAIN_PLAYER_MANAGER_H
