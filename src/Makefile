@@ -3,11 +3,11 @@ CFLAGS    = -O2 -Weffc++ -Wall -Wextra #-pedantic
 
 CFLAGS   += -I../include
 
-SDL_LIBS  = $(shell sdl-config --static-libs) -lSDL_mixer
+SDL_LIBS  = $(shell sdl-config --static-libs) #-lSDL_mixer
 SDL_FLAGS = $(shell sdl-config --cflags)
 IMAGES    = ../images
 
-OBJECTS = bbc.o consolefont.o Brainblast.o Brick.o Puzzle.o Field.o BrainSprite.o BrainSound.o BrainPlayer.o BrainAI.o BrainPlayerManager.o main.o BrainSoundBASS.o BrainSoundFMOD.o
+OBJECTS = bbc.o consolefont.o Brainblast.o Brick.o Puzzle.o Field.o BrainSprite.o BrainSound.o BrainPlayer.o BrainAI.o BrainPlayerManager.o main.o BrainSoundFMOD.o #BrainSoundSDL.o BrainSoundBASS.o
 
 all: brainblast
 
@@ -22,8 +22,9 @@ $(IMAGES)/bb_bg.h: ../images/bg.xml
 # How to avoid hardcoding the static libraries ? Using -l just makes it find the .so it seems
   #/usr/local/lib/libengine.a /usr/local/lib/libkyra.a
   #-static-libgcc -Wl,-static -lengine -lkyra
+  # -L../bassmod -lbassmod
 brainblast: $(OBJECTS)
-	$(GCC) -o $@ $(OBJECTS) $(SDL_LIBS) /usr/local/lib/libengine.a /usr/local/lib/libkyra.a -L../bassmod -lbassmod -L../fmod/api -lfmod-3.75
+	$(GCC) -o $@ $(OBJECTS) $(SDL_LIBS) /usr/local/lib/libengine.a /usr/local/lib/libkyra.a  -L../fmod/api -lfmod-3.75
 
 $(OBJECTS): %.o: %.cpp
 	$(GCC) $(CFLAGS) $(SDL_FLAGS) -c $<

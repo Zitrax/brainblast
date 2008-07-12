@@ -34,10 +34,10 @@ public:
 	bool toggleMusic();
 
 	// Sound effects
-	bool addSample(const char*,int) { assert(false); return false; }
-	bool playSample(int) const { assert(false); return false; }
+	bool addSample(const char*,int);
+	bool playSample(int) const;
 
-	void error(const char* text);
+	void error(const char* text) const;
 
 private:
 

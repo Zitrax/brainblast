@@ -7,6 +7,7 @@
 #include "BrainSoundBASS.h"
 
 #include "../bassmod/bassmod.h"
+#include <stdio.h>
 
 BrainSoundBASS::~BrainSoundBASS()
 {

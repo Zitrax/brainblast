@@ -7,6 +7,7 @@
 #include "BrainSoundFMOD.h"
 
 #include "../fmod/api/inc/fmod_errors.h"
+#include <stdio.h>
 
 #ifndef TRUE
   #define TRUE 1
@@ -24,7 +25,7 @@ BrainSoundFMOD::~BrainSoundFMOD()
     }
 }
 
-void BrainSoundFMOD::error(const char* text)
+void BrainSoundFMOD::error(const char* text) const
 {
 	printf("ERROR/FMOD - %s (%s)\n",text,FMOD_ErrorString(FSOUND_GetError()));
 }
@@ -140,3 +141,24 @@ bool BrainSoundFMOD::toggleMusic()
     return false;
 }
 
+bool BrainSoundFMOD::addSample(const char* file, int id)
+{
+    if( !FSOUND_Sample_Load( id, file, 0, 0, 0 ) )
+    {
+        error("Could not load the file\n");
+        return false;
+    }
+
+    return true;
+}
+
+bool BrainSoundFMOD::playSample(int id) const
+{
+    if( !FSOUND_PlaySound(FSOUND_FREE, FSOUND_Sample_Get(id)) )
+    {
+        error("Could not play sound\n");
+        return false;
+    }
+
+    return true;
+}
