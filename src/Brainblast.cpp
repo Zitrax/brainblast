@@ -437,6 +437,7 @@ KrFontResource* Brainblast::loadFont(const char* file, int glyphs)
 	if(!s32)
 	{
 		printf( "=== Error: Loading font (%s) === \n", IMG_GetError() );
+		SDL_FreeSurface(raw);
 		return 0;
 	}
 
@@ -444,7 +445,12 @@ KrFontResource* Brainblast::loadFont(const char* file, int glyphs)
 		
 	// FIXME: We might need different names when using many fonts ?
 	KrPaintInfo pi(s32);
-	return new KrFontResource("LOADED_FONT", &pi, 32, 0, KrFontResource::FIXED, glyphs);
+	KrFontResource* fr = new KrFontResource("LOADED_FONT", &pi, 32, 0, KrFontResource::FIXED, glyphs);
+
+	SDL_FreeSurface(s32);
+	SDL_FreeSurface(raw);
+
+	return fr;
 }
 
 bool 
