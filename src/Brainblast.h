@@ -68,6 +68,11 @@ public:
     //! Start a new game
     bool startGame();
 
+	/**
+	 * Load a font from a bitmap
+	 */
+	KrFontResource* loadFont(const char* file, int glyphs);
+
 	BrainSprite* addSprite();
 
 	BrainSprite* reparentSprite(BrainSprite* bs, KrImNode* parent);
@@ -79,13 +84,15 @@ public:
 		BOUNCE
 	};
 	
-	bool playSample(enum sounds sound) const { return m_sound_sdl->playSample(sound); }
+	bool playSample(enum sounds sound) const { return m_sound->playSample(sound); }
 
 	void drawText(const char* text, SDL_Rect pos, int size=16);
 
 	bool changeLevel(int lvl);
 
 	vector<BrainSprite*>& getAllSprites() { return m_sprites; }
+
+	bool writeScoreAndTime(time_t& now);
 
 	/**
 	 * Perform a select for the player at lvl.
@@ -148,8 +155,7 @@ private:
 	/**
 	 * Handles all the sounds (effects and music)
 	 */
-	BrainSound* m_sound_sdl;
-	BrainSound* m_sound_fmod;
+	BrainSound* m_sound;
 
 	vector<Puzzle*> m_current_levels;
 	vector<SDL_Rect> m_fields;
@@ -172,6 +178,8 @@ private:
 
 	// Text
 	KrFontResource* m_font;
+	KrFontResource* m_score_font;
+
 	KrTextBox*      m_left_score_text_box;
 	KrTextBox*      m_right_score_text_box;
 	KrTextBox*      m_center_text_box;

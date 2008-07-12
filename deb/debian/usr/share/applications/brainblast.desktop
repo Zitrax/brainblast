@@ -5,4 +5,4 @@ GenericName=Brainblast
 Exec=brainblast
 Icon=brainblast
 Terminal=false
-Categories=Qt;KDE;Games;
+Categories=Qt;KDE;Game;ArcadeGame;

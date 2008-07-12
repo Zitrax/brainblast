@@ -12,7 +12,8 @@ BrainPlayer::BrainPlayer(KrSpriteResource* res, std::string name) :
     m_score(0),
     m_name(name),
 	m_actions(),
-	m_keys()
+	m_keys(),
+	m_score_box(0)
 {
 }
 

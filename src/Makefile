@@ -3,7 +3,7 @@ CFLAGS    = -O2 -Weffc++ -Wall -Wextra #-pedantic
 
 CFLAGS   += -I../include
 
-SDL_LIBS  = $(shell sdl-config --static-libs) #-lSDL_mixer
+SDL_LIBS  = $(shell sdl-config --static-libs) -lSDL_image #-lSDL_mixer
 SDL_FLAGS = $(shell sdl-config --cflags)
 IMAGES    = ../images
 
@@ -28,6 +28,12 @@ brainblast: $(OBJECTS)
 
 $(OBJECTS): %.o: %.cpp
 	$(GCC) $(CFLAGS) $(SDL_FLAGS) -c $<
+
+package: all
+	make -C ../deb
+
+install: package
+	sudo dpkg -i ../deb/brainblast_0.1_i386.deb
 
 remake: 
 	make clean; make
@@ -63,7 +69,8 @@ Brainblast.o: /usr/include/sys/sysmacros.h /usr/include/bits/pthreadtypes.h
 Brainblast.o: /usr/include/alloca.h /usr/include/assert.h bbc.h Puzzle.h
 Brainblast.o: Brick.h Field.h BrainSprite.h BrainPlayer.h
 Brainblast.o: BrainPlayerManager.h BrainSound.h BrainAI.h ../images/bb.h
-Brainblast.o: ../images/bb_bg.h consolefont.h
+Brainblast.o: ../images/bb_bg.h consolefont.h BrainSoundFMOD.h
+Brainblast.o: ../fmod/api/inc/fmod.h
 BrainPlayer.o: BrainPlayer.h BrainSprite.h Puzzle.h Brick.h bbc.h
 BrainPlayer.o: /usr/include/stdlib.h /usr/include/features.h
 BrainPlayer.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
@@ -88,8 +95,25 @@ BrainPlayerManager.o: /usr/include/bits/time.h /usr/include/sys/sysmacros.h
 BrainPlayerManager.o: /usr/include/bits/pthreadtypes.h /usr/include/alloca.h
 BrainPlayerManager.o: Field.h Brainblast.h /usr/include/assert.h BrainSound.h
 BrainPlayerManager.o: BrainAI.h ../images/bb.h
-BrainSoundBASS.o: BrainSoundBASS.h BrainSound.h ../bassmod/bassmod.h
-BrainSound.o: BrainSound.h bbc.h
+BrainSoundBASS.o: BrainSoundBASS.h BrainSound.h /usr/include/assert.h
+BrainSoundBASS.o: /usr/include/features.h /usr/include/sys/cdefs.h
+BrainSoundBASS.o: /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h
+BrainSoundBASS.o: /usr/include/gnu/stubs-32.h ../bassmod/bassmod.h
+BrainSoundBASS.o: /usr/include/stdio.h /usr/include/bits/types.h
+BrainSoundBASS.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+BrainSoundBASS.o: /usr/include/_G_config.h /usr/include/wchar.h
+BrainSoundBASS.o: /usr/include/bits/stdio_lim.h
+BrainSoundBASS.o: /usr/include/bits/sys_errlist.h
+BrainSoundFMOD.o: BrainSoundFMOD.h BrainSound.h ../fmod/api/inc/fmod.h
+BrainSoundFMOD.o: /usr/include/assert.h /usr/include/features.h
+BrainSoundFMOD.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
+BrainSoundFMOD.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
+BrainSoundFMOD.o: ../fmod/api/inc/fmod_errors.h /usr/include/stdio.h
+BrainSoundFMOD.o: /usr/include/bits/types.h /usr/include/bits/typesizes.h
+BrainSoundFMOD.o: /usr/include/libio.h /usr/include/_G_config.h
+BrainSoundFMOD.o: /usr/include/wchar.h /usr/include/bits/stdio_lim.h
+BrainSoundFMOD.o: /usr/include/bits/sys_errlist.h
+BrainSoundSDL.o: BrainSoundSDL.h BrainSound.h bbc.h
 BrainSprite.o: BrainSprite.h Brainblast.h /usr/include/stdlib.h
 BrainSprite.o: /usr/include/features.h /usr/include/sys/cdefs.h
 BrainSprite.o: /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h
@@ -184,7 +208,14 @@ BrainPlayerManager.o: /usr/include/sys/sysmacros.h
 BrainPlayerManager.o: /usr/include/bits/pthreadtypes.h /usr/include/alloca.h
 BrainPlayerManager.o: Field.h
 BrainSoundBass.o: BrainSound.h
-BrainSoundBASS.o: BrainSound.h
+BrainSoundBASS.o: BrainSound.h /usr/include/assert.h /usr/include/features.h
+BrainSoundBASS.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
+BrainSoundBASS.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
+BrainSoundFMOD.o: BrainSound.h ../fmod/api/inc/fmod.h /usr/include/assert.h
+BrainSoundFMOD.o: /usr/include/features.h /usr/include/sys/cdefs.h
+BrainSoundFMOD.o: /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h
+BrainSoundFMOD.o: /usr/include/gnu/stubs-32.h
+BrainSoundSDL.o: BrainSound.h
 Brick.o: bbc.h /usr/include/stdlib.h /usr/include/features.h
 Brick.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
 Brick.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h

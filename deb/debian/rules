@@ -21,6 +21,7 @@ binary: clean
 	strip -s debian/tmp/usr/games/$(PACKAGE)
 	@ cp -v ../images/bb.dat debian/tmp/usr/share/games/$(PACKAGE)/images/
 	@ cp -v ../images/bb_bg.dat debian/tmp/usr/share/games/$(PACKAGE)/images/
+	@ cp -v ../images/bubblemad_8x8.png debian/tmp/usr/share/games/$(PACKAGE)/images/
 	@ cp -v ../sounds/click.wav debian/tmp/usr/share/games/$(PACKAGE)/sounds/
 	@ cp -v ../sounds/bounce.wav debian/tmp/usr/share/games/$(PACKAGE)/sounds/ 
 	@ cp -v ../music/enigmatic_path.it debian/tmp/usr/share/games/$(PACKAGE)/music/
@@ -31,7 +32,8 @@ binary: clean
 	@ cp -v debian/changelog debian/tmp/usr/share/doc/$(PACKAGE)/
 	gzip -9 debian/tmp/usr/share/doc/$(PACKAGE)/changelog
 	@ cp -v debian/copyright debian/tmp/usr/share/doc/$(PACKAGE)/
-	@ cp -v ../bassmod/libbassmod.so debian/tmp/usr/lib/
+#	@ cp -v ../bassmod/libbassmod.so debian/tmp/usr/lib/
+	@ cp -v ../fmod/api/libfmod-3.75.so debian/tmp/usr/lib/
 	pod2man debian/usr/share/man/$(PACKAGE).pod > debian/tmp/usr/share/man/man1/$(PACKAGE).1
 	gzip -9 debian/tmp/usr/share/man/man1/$(PACKAGE).1
 	dpkg-shlibdeps debian/tmp/usr/games/$(PACKAGE)

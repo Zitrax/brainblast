@@ -1,3 +1,15 @@
-To relocate the svn url you can issue the following command:
+Credits:
+--------
 
-svn switch --relocate svn+ssh://192.168.1.5/svn/projects/Brainblast svn+ssh://192.168.1.2/svn/projects/Brainblast
+Programming: Daniel Bengtsson <daniel@bengtssons.info>
+
+Music: Saga Musix http://saga-musix.ath.cx/
+
+Sound effects: Found at a free sound resource site. I am sorry
+               that I can't remember where thogh :(
+
+Graphics: Daniel Bengtsson <daniel@bengtssons.info>
+          ... with help of free resources found at...
+          * Fonts: http://www.spicypixel.net/2008/01/16/fontpack-royalty-free-bitmap-fonts/
+          * Sprites: lostgarden.com
+	  Thanks for providing :)

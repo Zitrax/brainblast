@@ -46,6 +46,9 @@ public:
     virtual void left();
     virtual void right();
 
+	KrTextBox* getScoreBox() const { return m_score_box; }
+	void setScoreBox(KrTextBox* box)  { m_score_box = box; }
+
 	/**
 	 * Return the action that this player maps 
 	 * to a certain key.
@@ -78,6 +81,8 @@ private:
 
 	keymap m_actions;
 	std::vector<SDLKey> m_keys;
+
+	KrTextBox* m_score_box;
 };
 
 #endif

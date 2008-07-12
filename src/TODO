@@ -1,10 +1,20 @@
-* Make an array or similar to keep the the puzzles in
+== To fix before first release 0.1 ==
+
+* There should be a main screen to select mode and options
+
+* There should be a high score table
+
+** And check memleaks and invalid reads
+
+=================================
+
+X Make an array or similar to keep the the puzzles in
   instead of if checks on the number of players.
 
 * Make sure we do not crash when a level can not be 
   loaded.
 
-* Show some progress indication on how correct your
+X Show some progress indication on how correct your
   solution is.
 
 X Perhaps we should only throw down pieces that are
@@ -17,14 +27,14 @@ X You can overwrite correct pieces with correct or incorrect bricks.
 
 * In puzzle we have several ** variables that should be just a *.
 
-* If the score goes down the text area is not cleared.
+X If the score goes down the text area is not cleared.
 
 * There should be falling blocks to temporarily show the solution.
 
 * There should be "joker-blocks" that is correct if put where there is
   a piece.
 
-* Find music with suitable license.
+X Find music with suitable license.
 
 * In two player mode, drop pieces which you could use to destroy a
   pice on the other players board.
@@ -34,11 +44,11 @@ X You can overwrite correct pieces with correct or incorrect bricks.
 * Falling bombs that scatter the bricks on ground or stuns the
   players.
 
-* AI player.
+X AI player.
 
 * Make sure to show the correct solution on game over
 
-* Dont score so hight for large boards
+* Dont score so high for large boards
 
 === Optimizations ===
 
