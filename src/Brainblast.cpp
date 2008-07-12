@@ -389,7 +389,7 @@ Brainblast::startGame()
 		return false;
 	}
 
-	m_player_manager = new BrainPlayerManager(0,2);
+	m_player_manager = new BrainPlayerManager(1,0);
 
 	// FIXME: Currently only two player support
 	m_player_manager->getPlayer(0)->setScoreBox(m_left_score_text_box);
