@@ -65,8 +65,9 @@ public:
     //! Check if a solution is correct
     bool checkSolution(Puzzle* puzzle);
 
-    //! Start a new game
-    bool startGame();
+    bool initGameKyra();
+
+	void titleScreen();
 
 	/**
 	 * Load a font from a bitmap
@@ -99,10 +100,19 @@ public:
 	 */
 	void select(Puzzle& lvl, BrainPlayer& player);
 
+	/**
+	 * This is the loop that runs continuously during
+	 * gameplay to move all sprites and handle key events.
+	 */ 
+    int eventLoop();
+
 private:
 
     Brainblast(const Brainblast& bb);
     Brainblast& operator=(const Brainblast& bb);
+
+    //! Start a new game
+    bool startGame();
 
 	bool setupFields(int players);
 	/**
@@ -123,19 +133,9 @@ private:
     void createBricks();
 	bool createBoards();
 
-    //! Sets up a new game
-    bool initGame(int lvl=1);
-    bool initGameKyra();
-
     //! Used to clean up for all pointers
     void cleanup();
 	
-	/**
-	 * This is the loop that runs continuously during
-	 * gameplay to move all sprites and handle key events.
-	 */ 
-    int eventLoop();
-
 	/**
 	 * The one and only instance of this class. It 
 	 * can be accessed with Brainblast::instance().
@@ -148,7 +148,8 @@ private:
 	 */
 	static const double WAITTIME = 10.0;
 	
-	bool m_play; // Tells if the user has aborted the wait
+	bool m_play;  // Tells if the user has aborted the wait
+	bool m_title; // Tells that we are showing the title screen
 
 	time_t m_start_time;
 
@@ -179,6 +180,7 @@ private:
 	// Text
 	KrFontResource* m_font;
 	KrFontResource* m_score_font;
+	KrFontResource* m_title_font;
 
 	KrTextBox*      m_left_score_text_box;
 	KrTextBox*      m_right_score_text_box;

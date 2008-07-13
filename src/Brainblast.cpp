@@ -23,6 +23,7 @@ using namespace std;
 Brainblast* Brainblast::s_instance;
 
 Brainblast::Brainblast() : m_play(false),
+						   m_title(false),
 						   m_start_time(0),
 						   m_sound(new BrainSoundFMOD),
 						   m_current_levels(),
@@ -39,6 +40,7 @@ Brainblast::Brainblast() : m_play(false),
 						   m_bg_sprite(0),
 						   m_font(0),
 						   m_score_font(0),
+						   m_title_font(0),
 						   m_left_score_text_box(0),
 						   m_right_score_text_box(0),
 						   m_center_text_box(0),
@@ -148,6 +150,7 @@ Brainblast::cleanup()
 	zap( m_player_manager );
 	zap( m_font );
 	zap( m_score_font );
+	zap( m_title_font );
 }
 
 void
@@ -383,13 +386,21 @@ Brainblast::checkSolution(Puzzle* puzzle)
 bool
 Brainblast::startGame()
 {
-    if( !initGameKyra() )
-	{
-		printf("=== ERROR: Could not init kyra. ===\n");
-		return false;
-	}
+	m_sound->loadMusic("/usr/share/games/brainblast/music/enigmatic_path.it");
+	m_sound->playMusic();
 
-	m_player_manager = new BrainPlayerManager(1,0);
+	// Leave title screen
+	m_title = false;
+	m_center_text_box->SetTextChar("",0);
+	m_center_text_box->SetTextChar("",1);
+	m_center_text_box->SetTextChar("",2);
+	m_center_text_box->SetTextChar("",3);
+	m_center_text_box->SetTextChar("",4);
+	m_center_text_box->SetTextChar("",5);
+	m_center_text_box->SetTextChar("",6);
+	m_center_text_box->SetTextChar("",7);
+
+	m_player_manager->addPlayers(1,0);
 
 	// FIXME: Currently only two player support
 	m_player_manager->getPlayer(0)->setScoreBox(m_left_score_text_box);
@@ -402,20 +413,17 @@ Brainblast::startGame()
 		return false;
 	}
 
-
-	if( !initGame(0) )
-	{
-		printf("=== ERROR: Could not init game. ===\n");
-		return false;
-	}
-
-    eventLoop();
+	if( !changeLevel(1) )
+		return false; 
 
 	return true;
 }
 
 KrFontResource* Brainblast::loadFont(const char* file, int glyphs)
 {
+	// Note: Make sure the image file is using indexed colors before 
+	//       using them in this function.
+
 	// Make surface from font file
 	SDL_Surface* raw = IMG_Load(file);
 
@@ -436,12 +444,18 @@ KrFontResource* Brainblast::loadFont(const char* file, int glyphs)
 
 	if(!s32)
 	{
-		printf( "=== Error: Loading font (%s) === \n", IMG_GetError() );
+		printf( "=== Error: Loading font (%s) === \n", file );
 		SDL_FreeSurface(raw);
 		return 0;
 	}
 
-	SDL_BlitSurface( raw, 0, s32, 0 );
+	if(SDL_BlitSurface( raw, 0, s32, 0 ))
+	{
+		printf( "=== Error: Blit error - loading font (%s) === \n", file );
+		SDL_FreeSurface(s32);
+		SDL_FreeSurface(raw);
+		return 0;
+	}
 		
 	// FIXME: We might need different names when using many fonts ?
 	KrPaintInfo pi(s32);
@@ -465,8 +479,9 @@ Brainblast::initGameKyra()
  	m_font = KrEncoder::CreateFixedFontResource( "CONSOLE", CONSOLEFONT_DAT, CONSOLEFONT_SIZE );
 	
 	m_score_font = loadFont("/usr/share/games/brainblast/images/bubblemad_8x8.png",83);
+	m_title_font = loadFont("../images/goldfont2.png",100);
 
-	if( !m_font || !m_score_font ) 
+	if( !m_font || !m_score_font || !m_title_font ) 
 	{
 		printf( "=== Error: Loading font ===\n" );
 		return false;
@@ -480,8 +495,8 @@ Brainblast::initGameKyra()
 	m_right_score_text_box->SetPos(VIDEOX-310,10);
 	m_engine->Tree()->AddNode(0,m_right_score_text_box);
 
- 	m_center_text_box = new KrTextBox(m_score_font,300,50,1);
-	m_center_text_box->SetPos(475,300);
+ 	m_center_text_box = new KrTextBox(m_title_font,500,500,8);
+	m_center_text_box->SetPos(350,280);
 	m_engine->Tree()->AddNode(0,m_center_text_box);
 
 	// Load the dat file.
@@ -514,11 +529,45 @@ Brainblast::initGameKyra()
 	m_engine->Tree()->AddNode( 0, m_bg_sprite );
 	m_bg_sprite->SetZDepth(-20);
 
-	// Get the WIZARD resource
-	KrSpriteResource* wizardRes = m_engine->Vault()->GetSpriteResource( BB_WIZARD );
-	assert( wizardRes );
+	m_player_manager = new BrainPlayerManager();
+	
+    createBricks();
+
+	// Start music
+	if( !(m_sound->initializeSound() &&
+		  m_sound->addSample("/usr/share/games/brainblast/sounds/click.wav",CLICK) &&
+		  m_sound->addSample("/usr/share/games/brainblast/sounds/bounce.wav",BOUNCE)) )
+		printf("=== ERROR: Sound/Music error === \n");
+	
+	titleScreen();
 
 	return true;
+}
+
+void Brainblast::titleScreen()
+{
+	m_sound->loadMusic("../music/Acidstorm.it");
+	m_sound->playMusic();
+
+	// Stop all play
+	clearFloor();
+	for(unsigned int i=0; i<m_current_levels.size(); ++i)
+		delete m_current_levels[i];
+	m_current_levels.clear();
+	m_player_manager->removePlayers();
+	m_left_score_text_box->SetTextChar("MUSIC BY SAGA MUSIX, HTTP://SAGA-MUSIX.ATH.CX/",0);
+	m_right_score_text_box->SetTextChar("              CODE: DANIEL BENGTSSON",0);
+
+	m_title=true;
+	m_center_text_box->SetTextChar("BRAINBLAST 0.1",0);
+	m_center_text_box->SetTextChar("",1);
+	m_center_text_box->SetTextChar("F1: Human Players",2);
+	m_center_text_box->SetTextChar("F2: Computer Players",3);
+	m_center_text_box->SetTextChar("F3: Level set",4);
+	m_center_text_box->SetTextChar("",5);
+	m_center_text_box->SetTextChar("SPACE: Start game",6);
+	m_center_text_box->SetTextChar("",8);
+
 }
 
 BrainSprite* Brainblast::addSprite()
@@ -527,14 +576,26 @@ BrainSprite* Brainblast::addSprite()
 		return 0;
 
 	KrSpriteResource* spriteRes = 0;
-	// TODO:  Can we have different types on the other level ?
-	// FIXME: This should be fixed.
-	vector<int> types = m_current_levels[0]->getSolutionTypes();
+
+	vector<int> types;
+	if( m_current_levels.empty() )
+	{
+		map<int,Brick*>::iterator it;
+		map<int,Brick*>::iterator end = m_bricks.end();
+		for( it = m_bricks.begin(); it!=end; ++it)
+			types.push_back(it->first);
+	}
+	else
+	{
+		// TODO:  Can we have different types on the other level ?
+		// FIXME: This should be fixed.
+		types = m_current_levels[0]->getSolutionTypes();
+	}
+
 	int r = bbc::randint(0,types.size()-1);
 	spriteRes = m_engine->Vault()->GetSpriteResource( types[r] );
 	assert( spriteRes );
 
-	// Create the wizard sprite and add it to the tree
 	BrainSprite* sprite = new BrainSprite( spriteRes, "rand", true );
 	sprite->SetNodeId(types[r]);
 	sprite->SetPos( rand()%VIDEOX, 0);
@@ -542,30 +603,6 @@ BrainSprite* Brainblast::addSprite()
 	m_engine->Tree()->AddNode( m_bgTree, sprite );
 	m_sprites.push_back(sprite);
 	return sprite;
-}
-
-bool
-Brainblast::initGame(int lvl)
-{
-    createBricks();
-
-	if( !changeLevel(lvl) )
-		return false; 
-
-	// Start music
-	if( !(m_sound->initializeSound() &&
-		  m_sound->loadMusic("/usr/share/games/brainblast/music/enigmatic_path.it") &&
-		  //m_sound->loadMusic("../music/crazy_memories.it") &&
-		  m_sound->playMusic()) )
-		printf("=== ERROR: Could not start music === \n");
-	
-	//if( m_sound->initializeSound() )
-	{
-		m_sound->addSample("/usr/share/games/brainblast/sounds/click.wav",CLICK);
-		m_sound->addSample("/usr/share/games/brainblast/sounds/bounce.wav",BOUNCE);
-	}
-
-	return true;
 }
 
 #define SDL_DRAW_EVENT ( SDL_USEREVENT + 0 )
@@ -588,7 +625,7 @@ int Brainblast::eventLoop()
 	bool done = false;
     // Start timing!
 	SDL_Event draw_event; draw_event.type = SDL_DRAW_EVENT;
-	SDL_AddTimer( 40, TimerCallback, &draw_event );	
+	SDL_AddTimer( 35, TimerCallback, &draw_event );	
 	SDL_Event add_sprite_event; add_sprite_event.type = SDL_ADD_SPRITE_EVENT;
 	SDL_AddTimer( 2000, TimerCallback, &add_sprite_event );	
 
@@ -616,7 +653,9 @@ int Brainblast::eventLoop()
 				SDL_WM_ToggleFullScreen(m_screen);
 			else if( event.key.keysym.sym == SDLK_SPACE )
 			{
-				if( game_over )
+				if( m_title )
+					startGame();
+				else if( game_over )
 				{
 					for(unsigned int i=0; i<m_player_manager->playerCount(); ++i)
 						m_player_manager->getPlayer(i)->setScore(0);
@@ -625,6 +664,13 @@ int Brainblast::eventLoop()
 				else if( !m_play )
 					m_play = true;
 				m_center_text_box->SetTextChar("",0);
+			}
+			else if( event.key.keysym.sym == SDLK_ESCAPE )
+			{
+				if( m_title )
+					done = true;
+				else
+					titleScreen();
 			}
 			else
 				if( !m_player_manager->handleKeyDown(event.key.keysym.sym) )
@@ -736,19 +782,20 @@ int Brainblast::eventLoop()
 		// The following section checks for keys that are held down
 		// and should continuosly do something.
 
-		if( keysHeld[SDLK_ESCAPE] )
-			done = true;
-		else if( keysHeld[SDLK_F1] )
+		if( keysHeld[SDLK_F1] )
 			addSprite();
 		else
 			m_player_manager->handleKeyHeld(keysHeld);
 
-		game_over = writeScoreAndTime(now);
-
-		if( m_play && game_over )
+		if( !m_title )
 		{
-			m_center_text_box->SetTextChar("Game Over",0);
-			clearFloor();
+			game_over = writeScoreAndTime(now);
+			
+			if( m_play && game_over )
+			{
+				m_center_text_box->SetTextChar("Game Over",0);
+				clearFloor();
+			}
 		}
 		
 	}

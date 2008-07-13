@@ -10,10 +10,10 @@ void BrainSprite::move()
     if( m_static ) return;
 
     // 1. Find new position
-//     SetPos( static_cast<int>(X()+m_x_speed), 
-//             static_cast<int>(Y()+m_y_speed) );
-    SetPos( bbc::round(X()+m_x_speed), 
-            bbc::round(Y()+m_y_speed) );
+    SetPos( static_cast<int>(X()+m_x_speed), 
+            static_cast<int>(Y()+m_y_speed) );
+//     SetPos( bbc::round(X()+m_x_speed), 
+//             bbc::round(Y()+m_y_speed) );
 
 
     if( X() > VIDEOX )

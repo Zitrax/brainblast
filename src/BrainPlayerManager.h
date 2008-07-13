@@ -20,8 +20,11 @@ using namespace std;
 class BrainPlayerManager
 {
 public:
-    BrainPlayerManager(int human_players, int compuer_players);
+    BrainPlayerManager();
 	virtual ~BrainPlayerManager(){}
+
+	void addPlayers(int human_players, int compuer_players);
+	void removePlayers();
 
 	/**
 	 * Move all players

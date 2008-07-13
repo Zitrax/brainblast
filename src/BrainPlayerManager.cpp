@@ -10,9 +10,19 @@
 
 using namespace brain;
 
-BrainPlayerManager::BrainPlayerManager(int human_players, int computer_players)
-	: m_players(), m_player_count(human_players+computer_players)
+BrainPlayerManager::BrainPlayerManager()
+	: m_players(), m_player_count(0)
 {
+}
+
+void BrainPlayerManager::addPlayers(int human_players, int computer_players)
+{
+	// FIXME: Should handle updating number of players
+	//        and thus remove the old ones here.
+	assert( m_players.size() == 0 );
+
+	m_player_count = human_players + computer_players;
+
     KrSpriteResource* wizardRes = 
         Brainblast::instance()->engine()->Vault()->GetSpriteResource( BB_WIZARD );
 
@@ -56,6 +66,15 @@ BrainPlayerManager::BrainPlayerManager(int human_players, int computer_players)
 		m_players[1]->mapAction(BrainPlayer::SELECT,    SDLK_LSHIFT);
 	}
     
+}
+
+void BrainPlayerManager::removePlayers()
+{
+	vector<BrainPlayer*>::iterator it;
+    vector<BrainPlayer*>::iterator end = m_players.end();
+    for( it=m_players.begin(); it!=end; ++it )
+		Brainblast::instance()->engine()->Tree()->DeleteNode(*it);
+	m_players.clear();
 }
 
 int BrainPlayerManager::spacing() const

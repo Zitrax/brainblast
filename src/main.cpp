@@ -16,6 +16,14 @@ int main(int /*argc*/, char* /*argv*/ [])
 	}
 	
 	Brainblast* bb = new Brainblast();
-	bb->startGame();
-    zap(bb);
+    if( !bb->initGameKyra() )
+	{
+		printf("=== ERROR: Could not init kyra. ===\n");
+		zap(bb);
+		exit(254);
+	}
+
+	bb->eventLoop();
+
+	zap(bb);
 }

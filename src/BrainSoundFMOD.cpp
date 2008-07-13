@@ -40,6 +40,7 @@ bool BrainSoundFMOD::initializeSound()
 	}
 
 	m_initialized = true;
+    return true;
 }
 
 bool BrainSoundFMOD::loadMusic(const char* file)
