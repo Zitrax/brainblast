@@ -19,7 +19,7 @@ class BrainSoundFMOD : public BrainSound
 {
 public:
 
-	BrainSoundFMOD() : BrainSound(), m_music(0) {}
+	BrainSoundFMOD() : BrainSound(), m_music(0), m_off_toggle(false) {}
 	~BrainSoundFMOD();
 
 	bool initializeSound();
@@ -45,6 +45,8 @@ private:
     BrainSoundFMOD& operator=(const BrainSoundFMOD& bb);
 
     FMUSIC_MODULE* m_music;
+
+	bool m_off_toggle;
 
 };
 

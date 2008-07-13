@@ -70,6 +70,9 @@ bool BrainSoundFMOD::playMusic()
         return false;
     }
 
+    if( m_off_toggle )
+        return true; // Not an error
+
 	if( !FMUSIC_PlaySong(m_music) )
 	{
 		error("Could not play");
@@ -133,11 +136,22 @@ bool BrainSoundFMOD::toggleMusic()
         printf("ERROR/FMOD - Toggle:No music loaded\n");
         return false;
     }
-    
-    if( FMUSIC_GetPaused(m_music) )
+
+    if( !FMUSIC_IsPlaying(m_music) )
+    {
+        m_off_toggle = false;
+        return playMusic();
+    }
+    else if( FMUSIC_GetPaused(m_music) )
+    {
+        m_off_toggle = false;
         return resumeMusic();
+    }
     else
+    {
+        m_off_toggle = true;
         return pauseMusic();
+    }
 
     return false;
 }
