@@ -484,7 +484,7 @@ Brainblast::initGameKyra()
  	m_font = KrEncoder::CreateFixedFontResource( "CONSOLE", CONSOLEFONT_DAT, CONSOLEFONT_SIZE );
 	
 	m_score_font = loadFont("/usr/share/games/brainblast/images/bubblemad_8x8.png",83);
-	m_title_font = loadFont("../images/goldfont2.png",100);
+	m_title_font = loadFont("/usr/share/games/brainblast/images/goldfont.png",100);
 
 	if( !m_font || !m_score_font || !m_title_font ) 
 	{
@@ -555,7 +555,7 @@ Brainblast::initGameKyra()
 
 void Brainblast::titleScreen()
 {
-	m_sound->loadMusic("../music/Acidstorm.it");
+	m_sound->loadMusic("/usr/share/games/brainblast/music/Acidstorm.it");
 	m_sound->playMusic();
 
 	// Stop all play

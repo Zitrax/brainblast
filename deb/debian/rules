@@ -22,9 +22,11 @@ binary: clean
 	@ cp -v ../images/bb.dat debian/tmp/usr/share/games/$(PACKAGE)/images/
 	@ cp -v ../images/bb_bg.dat debian/tmp/usr/share/games/$(PACKAGE)/images/
 	@ cp -v ../images/bubblemad_8x8.png debian/tmp/usr/share/games/$(PACKAGE)/images/
+	@ cp -v ../images/goldfont.png debian/tmp/usr/share/games/$(PACKAGE)/images/
 	@ cp -v ../sounds/click.wav debian/tmp/usr/share/games/$(PACKAGE)/sounds/
 	@ cp -v ../sounds/bounce.wav debian/tmp/usr/share/games/$(PACKAGE)/sounds/ 
 	@ cp -v ../music/enigmatic_path.it debian/tmp/usr/share/games/$(PACKAGE)/music/
+	@ cp -v ../music/Acidstorm.it debian/tmp/usr/share/games/$(PACKAGE)/music/
 	@ cp -v ../lvl/lvl???.txt debian/tmp/usr/share/games/$(PACKAGE)/lvl/
 	@ cp -v debian/usr/share/app-install/icons/$(PACKAGE).png debian/tmp/usr/share/app-install/icons
 	@ cp -v debian/usr/share/app-install/icons/$(PACKAGE).png debian/tmp/usr/share/icons/default.kde/16x16/apps/
