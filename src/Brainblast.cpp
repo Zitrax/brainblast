@@ -793,27 +793,6 @@ int Brainblast::eventLoop()
 
 			m_engine->Tree()->Walk();
 
-			// Detect collisions
-			// FIXME: This should go into the player manager class
-			for(unsigned int i=0; i<m_player_manager->playerCount(); ++i)
-			{
-
-				if(!m_player_manager->getPlayer(i)->isCarrying() && keysHeld[SDLK_UP] ) {
-					vector<KrImage*> collides;
-					if( m_engine->Tree()->CheckChildCollision(m_player_manager->getPlayer(i),m_bgTree,&collides) )
-					{  
-						printf("Collision!\n");
-						// Use of dynamic cast as we only want to try to pick
-						// up BrainSprites and not ordinary KrSprites as in the
-						// Bricks. 
-						// Otherwise we might be able to pick up the solution in the beginning :)
-						BrainSprite* c = dynamic_cast<BrainSprite*>(*collides.begin());
-						if( c ) 
-							m_player_manager->getPlayer(i)->pickUp(reparentSprite(c,m_player_manager->getPlayer(i)));
-					}
-				}
-			}
-
 			if( m_play || (difftime(now,m_start_time) > WAITTIME) )
 			{
 				for(unsigned int i=0; i<m_current_levels.size(); ++i)
@@ -852,6 +831,21 @@ int Brainblast::eventLoop()
 	}
     
     return 0;
+}
+
+BrainSprite* Brainblast::collisionCheck(BrainPlayer* player)
+{
+	vector<KrImage*> collides;
+	if( m_engine->Tree()->CheckChildCollision(player,m_bgTree,&collides) )
+	{  
+		printf("Collision!\n");
+		// Use of dynamic cast as we only want to try to pick
+		// up BrainSprites and not ordinary KrSprites as in the
+		// Bricks. 
+		// Otherwise we might be able to pick up the solution in the beginning :)
+		return dynamic_cast<BrainSprite*>(*collides.begin());
+	}
+	return 0;
 }
 
 bool Brainblast::writeScoreAndTime(time_t& now)

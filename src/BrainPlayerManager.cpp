@@ -75,6 +75,8 @@ void BrainPlayerManager::removePlayers()
     for( it=m_players.begin(); it!=end; ++it )
 		Brainblast::instance()->engine()->Tree()->DeleteNode(*it);
 	m_players.clear();
+
+	m_player_count = 0;
 }
 
 int BrainPlayerManager::spacing() const
@@ -178,7 +180,15 @@ bool BrainPlayerManager::handleKeyHeld(const bool* const keys_held)
 					
 				case BrainPlayer::NONE:
 				case BrainPlayer::SELECT:
+					break;
+
 				case BrainPlayer::PICKUP:
+					if( !player->isCarrying() )
+					{
+						BrainSprite* c = Brainblast::instance()->collisionCheck(player);
+						if( c ) 
+							player->pickUp( Brainblast::instance()->reparentSprite(c,player));
+					}
 					break;
 
 				case BrainPlayer::WALK_LEFT:

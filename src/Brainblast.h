@@ -107,6 +107,12 @@ public:
 	 */ 
     int eventLoop();
 
+	/**
+	 * Return the first colliding sprite with the player
+	 * If player is not colliding with a sprite, 0 is returned.
+	 */
+	BrainSprite* collisionCheck(BrainPlayer* player);
+
 private:
 
     Brainblast(const Brainblast& bb);
