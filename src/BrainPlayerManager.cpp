@@ -97,6 +97,18 @@ BrainPlayer* BrainPlayerManager::getPlayer(int idx) const
 	return m_players[idx];
 }
 
+int BrainPlayerManager::getPlayerNumber(BrainPlayer& player) const
+{
+	int i = 1;
+    vector<BrainPlayer*>::const_iterator it;
+    vector<BrainPlayer*>::const_iterator end = m_players.end();
+    for( it=m_players.begin(); it!=end; ++it, ++i )
+		if( *it == &player )
+			return i;
+
+	return 0;
+}
+
 bool BrainPlayerManager::handleKeyDown(SDLKey key)
 {
 
@@ -167,15 +179,15 @@ bool BrainPlayerManager::handleKeyHeld(const bool* const keys_held)
 
 		std::vector<SDLKey> keys = player->keys();
 
-		std::vector<SDLKey>::const_iterator it = keys.begin();
+		std::vector<SDLKey>::const_iterator kit = keys.begin();
 
-		while( it != keys.end() )
+		while( kit != keys.end() )
 		{
 
-			if( keys_held[*it] )
+			if( keys_held[*kit] )
 			{
 				
-				switch( player->action(*it) )
+				switch( player->action(*kit) )
 				{
 					
 				case BrainPlayer::NONE:
@@ -212,7 +224,7 @@ bool BrainPlayerManager::handleKeyHeld(const bool* const keys_held)
 				}
 			}
 
-			++it;
+			++kit;
 		}
 	}
 

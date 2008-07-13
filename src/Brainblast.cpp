@@ -702,6 +702,7 @@ int Brainblast::eventLoop()
 			}
 			else if( m_title && event.key.keysym.sym == SDLK_F1 )
 			{
+				m_sound->playSample(CLICK);
 				m_human_players++;
 				if( m_human_players > 2 )
 					m_human_players = 1;
@@ -711,6 +712,7 @@ int Brainblast::eventLoop()
 			}
 			else if( m_title && event.key.keysym.sym == SDLK_F2 )
 			{
+				m_sound->playSample(CLICK);
 				m_computer_players++;
 				if( m_computer_players > 2 )
 					m_computer_players = 1;
@@ -720,6 +722,7 @@ int Brainblast::eventLoop()
 			}
 			else if( m_title && event.key.keysym.sym == SDLK_F3 )
 			{
+				m_sound->playSample(CLICK);
 				m_level_set = !m_level_set;
 				titleScreenUpdateText();
 			}
@@ -798,6 +801,7 @@ int Brainblast::eventLoop()
 				for(unsigned int i=0; i<m_current_levels.size(); ++i)
 					m_current_levels[i]->setVisibleSolution(false);
 				m_play = true;
+				m_center_text_box->SetTextChar("",0);
 			}
 
 			m_engine->Draw();
@@ -895,6 +899,11 @@ void Brainblast::select(Puzzle& lvl, BrainPlayer& player)
 
 		if( checkSolution(&lvl) )
 		{
+			ostringstream str;
+			str << "Player " << m_player_manager->getPlayerNumber(player)
+				<< " wins level " << m_current_lvl;
+			m_center_text_box->SetTextChar(str.str(),0);
+
 			if( !changeLevel(!m_current_lvl ? 0 : m_current_lvl+1) )
 				changeLevel(0);
 		}

@@ -39,6 +39,7 @@ public:
 	bool handleKeyHeld(const bool* const keys_held);
 
 	BrainPlayer* getPlayer(int idx) const;
+	int getPlayerNumber(BrainPlayer& player) const;
 
 	unsigned int playerCount() const { return m_player_count; }
 
