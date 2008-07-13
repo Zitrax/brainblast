@@ -44,7 +44,12 @@ Brainblast::Brainblast() : m_play(false),
 						   m_left_score_text_box(0),
 						   m_right_score_text_box(0),
 						   m_center_text_box(0),
-						   m_player_manager(0)
+						   m_top_center_text_box(0),
+						   m_player_manager(0),
+						   m_human_players(1),
+						   m_computer_players(0),
+						   m_level_set(true)
+
 {
     if(bbc::debug) cerr << "Brainblast::Brainblast() Videomode(" << VIDEOX << "," << VIDEOY << ")\n";
 
@@ -400,7 +405,7 @@ Brainblast::startGame()
 	m_center_text_box->SetTextChar("",6);
 	m_center_text_box->SetTextChar("",7);
 
-	m_player_manager->addPlayers(1,0);
+	m_player_manager->addPlayers(m_human_players,m_computer_players);
 
 	// FIXME: Currently only two player support
 	m_player_manager->getPlayer(0)->setScoreBox(m_left_score_text_box);
@@ -413,7 +418,7 @@ Brainblast::startGame()
 		return false;
 	}
 
-	if( !changeLevel(1) )
+	if( !changeLevel(m_level_set) )
 		return false; 
 
 	return true;
@@ -499,6 +504,10 @@ Brainblast::initGameKyra()
 	m_center_text_box->SetPos(350,280);
 	m_engine->Tree()->AddNode(0,m_center_text_box);
 
+ 	m_top_center_text_box = new KrTextBox(m_title_font,200,50,1);
+	m_top_center_text_box->SetPos(350,10);
+	m_engine->Tree()->AddNode(0,m_top_center_text_box);
+
 	// Load the dat file.
 	// The dat file was carefully created in the sprite
 	// editor.
@@ -555,19 +564,38 @@ void Brainblast::titleScreen()
 		delete m_current_levels[i];
 	m_current_levels.clear();
 	m_player_manager->removePlayers();
+
 	m_left_score_text_box->SetTextChar("MUSIC BY SAGA MUSIX, HTTP://SAGA-MUSIX.ATH.CX/",0);
 	m_right_score_text_box->SetTextChar("              CODE: DANIEL BENGTSSON",0);
+
+	titleScreenUpdateText();
+}
+
+void Brainblast::titleScreenUpdateText()
+{
+	ostringstream str;
 
 	m_title=true;
 	m_center_text_box->SetTextChar("BRAINBLAST 0.1",0);
 	m_center_text_box->SetTextChar("",1);
-	m_center_text_box->SetTextChar("F1: Human Players",2);
-	m_center_text_box->SetTextChar("F2: Computer Players",3);
-	m_center_text_box->SetTextChar("F3: Level set",4);
+
+	str << "F1: Human Players - " << m_human_players;
+	m_center_text_box->SetTextChar(str.str(),2);
+
+	str.str(""); 
+	str << "F2: Computer Players - " << m_computer_players;
+	m_center_text_box->SetTextChar(str.str(),3);
+
+	str.str("");
+	string set = m_level_set ? "Normal" : "Random";
+	str << "F3: Level set - " << set;
+	m_center_text_box->SetTextChar(str.str(),4);
+
 	m_center_text_box->SetTextChar("",5);
 	m_center_text_box->SetTextChar("SPACE: Start game",6);
 	m_center_text_box->SetTextChar("",8);
 
+	m_top_center_text_box->SetTextChar("",0);
 }
 
 BrainSprite* Brainblast::addSprite()
@@ -659,7 +687,7 @@ int Brainblast::eventLoop()
 				{
 					for(unsigned int i=0; i<m_player_manager->playerCount(); ++i)
 						m_player_manager->getPlayer(i)->setScore(0);
-					changeLevel(1);
+					titleScreen();
 				}
 				else if( !m_play )
 					m_play = true;
@@ -671,6 +699,29 @@ int Brainblast::eventLoop()
 					done = true;
 				else
 					titleScreen();
+			}
+			else if( m_title && event.key.keysym.sym == SDLK_F1 )
+			{
+				m_human_players++;
+				if( m_human_players > 2 )
+					m_human_players = 1;
+				if( (m_human_players + m_computer_players) > 2 )
+					m_computer_players--;
+				titleScreenUpdateText();
+			}
+			else if( m_title && event.key.keysym.sym == SDLK_F2 )
+			{
+				m_computer_players++;
+				if( m_computer_players > 2 )
+					m_computer_players = 1;
+				if( (m_human_players + m_computer_players) > 2 )
+					m_human_players--;
+				titleScreenUpdateText();
+			}
+			else if( m_title && event.key.keysym.sym == SDLK_F3 )
+			{
+				m_level_set = !m_level_set;
+				titleScreenUpdateText();
 			}
 			else
 				if( !m_player_manager->handleKeyDown(event.key.keysym.sym) )
@@ -815,12 +866,17 @@ bool Brainblast::writeScoreAndTime(time_t& now)
 	
 	ostringstream score_str;
 
+	score_str << "       "
+			  << setw(2) << setfill('0') << min << ":" 
+			  << setw(2) << setfill('0') << sec;
+
+	m_top_center_text_box->SetTextChar(score_str.str(),0);
+	score_str.str("");
+
 	for(unsigned int i=0; i<m_player_manager->playerCount(); ++i)
 	{
 
-		score_str << "SCORE: " << m_player_manager->getPlayer(i)->getScore() << " TIME: " 
-				  << setw(2) << setfill('0') << min << ":" 
-				  << setw(2) << setfill('0') << sec 
+		score_str << "SCORE: " << m_player_manager->getPlayer(i)->getScore()
 				  << " BRICKS: " << m_current_levels[i]->correctBricks()
 				  << "/" << m_current_levels[i]->totalSolutionBricks();
 		
@@ -845,7 +901,7 @@ void Brainblast::select(Puzzle& lvl, BrainPlayer& player)
 
 		if( checkSolution(&lvl) )
 		{
-			if( !changeLevel(m_current_lvl+1) )
+			if( !changeLevel(!m_current_lvl ? 0 : m_current_lvl+1) )
 				changeLevel(0);
 		}
 	}	

@@ -68,7 +68,8 @@ public:
     bool initGameKyra();
 
 	void titleScreen();
-
+	void titleScreenUpdateText();
+	
 	/**
 	 * Load a font from a bitmap
 	 */
@@ -185,8 +186,15 @@ private:
 	KrTextBox*      m_left_score_text_box;
 	KrTextBox*      m_right_score_text_box;
 	KrTextBox*      m_center_text_box;
+	KrTextBox*      m_top_center_text_box;
 
 	BrainPlayerManager* m_player_manager;
+
+	// Used for settings at the title screen
+	// might go into a Prefs class later
+	int m_human_players;
+	int m_computer_players;
+	bool m_level_set;
 };
 
 #endif
