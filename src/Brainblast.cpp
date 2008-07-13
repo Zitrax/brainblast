@@ -801,7 +801,8 @@ int Brainblast::eventLoop()
 				for(unsigned int i=0; i<m_current_levels.size(); ++i)
 					m_current_levels[i]->setVisibleSolution(false);
 				m_play = true;
-				m_center_text_box->SetTextChar("",0);
+				if( !m_title )
+					m_center_text_box->SetTextChar("",0);
 			}
 
 			m_engine->Draw();
