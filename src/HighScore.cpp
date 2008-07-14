@@ -10,6 +10,7 @@
 #include <iostream>
 #include <algorithm> // copy
 #include <iterator>  // ofstream_iterator
+#include <errno.h>
 
 HighScore::HighScore(string file)
 	: m_file(file)
@@ -25,9 +26,7 @@ void HighScore::addEntry(string name,int score,int level)
 
 	// 1. Read current file
 	vector<HighScore::Entry> entries;
-	
-	if( !read(entries) )
-		return;
+	read(entries);
 
 	// 2. Insert current entry
 	entries.push_back(entry);
@@ -47,7 +46,7 @@ bool HighScore::read(vector<HighScore::Entry>& entries) const
 	in.open(m_file.c_str());
 	if( !in )
 	{
-		cerr << "ERROR - Could not read highscore (" << m_file.c_str() << ").\n";
+		cerr << "WARNING - Could not read highscore (" << m_file.c_str() << ") (" << strerror(errno) << ").\n";
 		in.close();
 		return false;
 	}
@@ -68,7 +67,7 @@ bool HighScore::write(vector<HighScore::Entry>& entries)
 	out.open(m_file.c_str());
 	if( !out )
 	{
-		cerr << "ERROR - Could not read highscore (" << m_file.c_str() << ").\n";
+		cerr << "ERROR - Could open file for writing highscore (" << m_file.c_str() << ") (" << strerror(errno) << ").\n";
 		out.close();
 		return false;
 	}
