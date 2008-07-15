@@ -118,6 +118,12 @@ private:
     Brainblast(const Brainblast& bb);
     Brainblast& operator=(const Brainblast& bb);
 
+	/** 
+	 * Called when the initial wait where the solution is shown
+	 * should end.
+	 **/
+	void finishInitialWait();
+
     //! Start a new game
     bool startGame();
 
@@ -155,8 +161,11 @@ private:
 	 */
 	static const double WAITTIME = 10.0;
 	
+	// Should probably change these to an enum state instead.
+	// ------------------------------------------------------
 	bool m_play;  // Tells if the user has aborted the wait
 	bool m_title; // Tells that we are showing the title screen
+	bool m_game_over; // Tells if we are in the game over state
 
 	time_t m_start_time;
 

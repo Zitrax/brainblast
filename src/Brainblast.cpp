@@ -25,6 +25,7 @@ Brainblast* Brainblast::s_instance;
 
 Brainblast::Brainblast() : m_play(false),
 						   m_title(false),
+						   m_game_over(false),
 						   m_start_time(0),
 						   m_sound(new BrainSoundFMOD),
 						   m_current_levels(),
@@ -559,6 +560,9 @@ void Brainblast::titleScreen()
 	m_sound->loadMusic("/usr/share/games/brainblast/music/Acidstorm.it");
 	m_sound->playMusic();
 
+	m_title=true;
+	m_game_over=false;
+
 	// Stop all play
 	clearFloor();
 	for(unsigned int i=0; i<m_current_levels.size(); ++i)
@@ -576,7 +580,6 @@ void Brainblast::titleScreenUpdateText()
 {
 	ostringstream str;
 
-	m_title=true;
 	m_center_text_box->SetTextChar("BRAINBLAST 0.1",0);
 	m_center_text_box->SetTextChar("",1);
 
@@ -659,7 +662,6 @@ int Brainblast::eventLoop()
 	SDL_AddTimer( 2000, TimerCallback, &add_sprite_event );	
 
 	bool keysHeld[323] = {false};
-	bool game_over = false;
 
     while( !done && SDL_WaitEvent(&event) )
 	{
@@ -684,13 +686,12 @@ int Brainblast::eventLoop()
 			{
 				if( m_title )
 					startGame();
-				else if( game_over )
+				else if( m_game_over )
 				{
 					titleScreen();
 				}
 				else if( !m_play )
-					m_play = true;
-				m_center_text_box->SetTextChar("",0);
+					finishInitialWait();
 			}
 			else if( event.key.keysym.sym == SDLK_ESCAPE )
 			{
@@ -736,7 +737,7 @@ int Brainblast::eventLoop()
 			break;
 
 		case SDL_ADD_SPRITE_EVENT:
-			if( !game_over )
+			if( !m_game_over )
 				addSprite();
 			break;
 			
@@ -795,15 +796,9 @@ int Brainblast::eventLoop()
 
 			m_engine->Tree()->Walk();
 
-			if( m_play || (difftime(now,m_start_time) > WAITTIME) )
-			{
-				for(unsigned int i=0; i<m_current_levels.size(); ++i)
-					m_current_levels[i]->setVisibleSolution(false);
-				m_play = true;
-				if( !m_title )
-					m_center_text_box->SetTextChar("",0);
-			}
-
+			if( !m_play && (difftime(now,m_start_time) > WAITTIME) )
+				finishInitialWait();
+			
 			m_engine->Draw();
 
         }
@@ -823,9 +818,9 @@ int Brainblast::eventLoop()
 
 		if( !m_title )
 		{
-			game_over = writeScoreAndTime(now);
+			m_game_over = writeScoreAndTime(now);
 			
-			if( m_play && game_over )
+			if( m_play && m_game_over )
 			{
 				m_player_manager->gameOver();
 				m_center_text_box->SetTextChar("Game Over",0);
@@ -836,6 +831,17 @@ int Brainblast::eventLoop()
 	}
     
     return 0;
+}
+
+void Brainblast::finishInitialWait()
+{
+	if( m_game_over || m_title )
+		return;
+
+	for(unsigned int i=0; i<m_current_levels.size(); ++i)
+		m_current_levels[i]->setVisibleSolution(false);
+	m_play = true;
+	m_center_text_box->SetTextChar("",0);
 }
 
 BrainSprite* Brainblast::collisionCheck(BrainPlayer* player)
