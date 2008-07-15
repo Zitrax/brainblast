@@ -29,7 +29,7 @@ public:
 	 * Will return true if the provided score is high enough
 	 * to enter the highscore list.
 	 * If used it should be used right before addEntry as the
-	 * list from disc is being cached until the next addEntry call.
+	 * list from disk is being cached until the next addEntry call.
 	 */
 	bool highEnough(int score);
 
