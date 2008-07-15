@@ -21,11 +21,11 @@
 #include "Brick.h"
 #include "BrainSprite.h"
 #include "BrainPlayer.h"
-#include "BrainPlayerManager.h"
 #include "BrainSound.h"
 #include "BrainAI.h"
 
 class BrainAI;
+class BrainPlayerManager;
 
 using namespace std;
 

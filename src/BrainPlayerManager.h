@@ -9,6 +9,7 @@
 
 #include <vector>
 #include "BrainPlayer.h"
+#include "Brainblast.h"
 
 using namespace std;
 
@@ -31,6 +32,12 @@ public:
 	 */
 	void move();
 
+	/**
+	 * Call this when the game is over
+	 * to reset scores and submit highscores
+	 */
+	void gameOver();
+
 	/** 
 	 * Returns true if the key was handled/eaten and should
 	 * not be processed further by caller 
@@ -47,6 +54,11 @@ private:
 
     BrainPlayerManager(const BrainPlayerManager&);
     BrainPlayerManager& operator=(const BrainPlayerManager&);
+
+	// Used for for_each
+	static void playerResetScore(BrainPlayer* player) { player->setScore(0); }
+	static void playerMove(BrainPlayer* player) { player->move(); }
+	static void playerDeleteNode(BrainPlayer* player) { Brainblast::instance()->engine()->Tree()->DeleteNode(player); }
 
 	/** Space between starting positions */
 	int spacing() const;

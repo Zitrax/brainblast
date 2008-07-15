@@ -70,12 +70,8 @@ void BrainPlayerManager::addPlayers(int human_players, int computer_players)
 
 void BrainPlayerManager::removePlayers()
 {
-	vector<BrainPlayer*>::iterator it;
-    vector<BrainPlayer*>::iterator end = m_players.end();
-    for( it=m_players.begin(); it!=end; ++it )
-		Brainblast::instance()->engine()->Tree()->DeleteNode(*it);
+	for_each(m_players.begin(),m_players.end(),playerDeleteNode);
 	m_players.clear();
-
 	m_player_count = 0;
 }
 
@@ -86,10 +82,12 @@ int BrainPlayerManager::spacing() const
 
 void BrainPlayerManager::move()
 {
-    vector<BrainPlayer*>::iterator it;
-    vector<BrainPlayer*>::iterator end = m_players.end();
-    for( it=m_players.begin(); it!=end; ++it )
-        (*it)->move();
+	for_each(m_players.begin(),m_players.end(),playerMove);
+}
+
+void BrainPlayerManager::gameOver()
+{
+	for_each(m_players.begin(),m_players.end(),playerResetScore);
 }
 
 BrainPlayer* BrainPlayerManager::getPlayer(int idx) const
@@ -99,14 +97,10 @@ BrainPlayer* BrainPlayerManager::getPlayer(int idx) const
 
 int BrainPlayerManager::getPlayerNumber(BrainPlayer& player) const
 {
-	int i = 1;
-    vector<BrainPlayer*>::const_iterator it;
-    vector<BrainPlayer*>::const_iterator end = m_players.end();
-    for( it=m_players.begin(); it!=end; ++it, ++i )
-		if( *it == &player )
-			return i;
-
-	return 0;
+    vector<BrainPlayer*>::const_iterator it = find(m_players.begin(),m_players.end(),&player);
+	if( it != m_players.end() )
+		return it - m_players.begin() + 1;
+	return -1;
 }
 
 bool BrainPlayerManager::handleKeyDown(SDLKey key)
