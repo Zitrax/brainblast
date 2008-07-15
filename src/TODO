@@ -1,5 +1,7 @@
 == To fix before first release 0.1 ==
 
+* AI players should not enter highscore list
+
 * Fix hardcoded player name and highscore file
 
 X There should be a main screen to select mode and options
