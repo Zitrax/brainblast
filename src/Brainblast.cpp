@@ -12,6 +12,7 @@
 #include "consolefont.h"
 #include "BrainSoundFMOD.h"
 #include "SDL_image.h"
+#include "BrainPlayerManager.h"
 
 #include <sstream>  // ostringstream
 #include <iomanip>  // setfill setw
@@ -685,8 +686,6 @@ int Brainblast::eventLoop()
 					startGame();
 				else if( game_over )
 				{
-					for(unsigned int i=0; i<m_player_manager->playerCount(); ++i)
-						m_player_manager->getPlayer(i)->setScore(0);
 					titleScreen();
 				}
 				else if( !m_play )
@@ -828,6 +827,7 @@ int Brainblast::eventLoop()
 			
 			if( m_play && game_over )
 			{
+				m_player_manager->gameOver();
 				m_center_text_box->SetTextChar("Game Over",0);
 				clearFloor();
 			}

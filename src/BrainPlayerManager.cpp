@@ -13,6 +13,12 @@ using namespace brain;
 BrainPlayerManager::BrainPlayerManager()
 	: m_players(), m_player_count(0)
 {
+	m_highscore = new HighScore("test",3);
+}
+
+BrainPlayerManager::~BrainPlayerManager()
+{
+	delete m_highscore;
 }
 
 void BrainPlayerManager::addPlayers(int human_players, int computer_players)
@@ -87,7 +93,14 @@ void BrainPlayerManager::move()
 
 void BrainPlayerManager::gameOver()
 {
+	for_each(m_players.begin(),m_players.end(),playerCheckScore(*m_highscore));
 	for_each(m_players.begin(),m_players.end(),playerResetScore);
+}
+
+void BrainPlayerManager::playerCheckScore::operator() (BrainPlayer* player)
+{
+	if( m_hs.highEnough(player->getScore()) )
+		m_hs.addEntry("Daniel",player->getScore(),5);
 }
 
 BrainPlayer* BrainPlayerManager::getPlayer(int idx) const
