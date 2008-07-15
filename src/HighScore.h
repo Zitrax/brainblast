@@ -17,7 +17,7 @@ using namespace std;
 class HighScore
 {
 public:
-	HighScore(string file);
+	HighScore(string file, unsigned int max_entries);
 	~HighScore(){}
 
 	void addEntry(string name,int score,int level);
@@ -39,8 +39,7 @@ private:
 	 */
 	friend ostream& operator<<(ostream& out, const Entry& entry)
 		{
-			out << entry.name << " " << entry.score << " " << entry.level;
-			return out;
+			return out << entry.name << " " << entry.score << " " << entry.level;
 		}
 
 	/**
@@ -48,8 +47,7 @@ private:
 	 */
 	friend istream& operator>>(istream& in, Entry& entry)
 		{
-			in >> entry.name >> entry.score >> entry.level;
-			return in;
+			return in >> entry.name >> entry.score >> entry.level;
 		}
 
 	/**
@@ -61,11 +59,11 @@ private:
 		bool operator() (const Entry& lhs, const Entry& rhs) const { return lhs.score > rhs.score; }
 	};
 
-	bool read(vector<HighScore::Entry>& entries) const;
+	bool read(vector<Entry>& entries) const;
 	bool write(vector<Entry>& entries);
 
 	string m_file;
-
+	unsigned int m_max_entries;
 };
 
 #endif // HIGHSCORE_H

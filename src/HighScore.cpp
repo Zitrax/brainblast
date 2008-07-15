@@ -12,8 +12,8 @@
 #include <iterator>  // ofstream_iterator
 #include <errno.h>
 
-HighScore::HighScore(string file)
-	: m_file(file)
+HighScore::HighScore(string file, unsigned int max_entries)
+	: m_file(file), m_max_entries(max_entries)
 {
 }
 
@@ -39,7 +39,7 @@ void HighScore::addEntry(string name,int score,int level)
 	
 }
 
-bool HighScore::read(vector<HighScore::Entry>& entries) const
+bool HighScore::read(vector<Entry>& entries) const
 {
 	ifstream in;
 
@@ -61,7 +61,7 @@ bool HighScore::read(vector<HighScore::Entry>& entries) const
 	return true;
 }
 
-bool HighScore::write(vector<HighScore::Entry>& entries)
+bool HighScore::write(vector<Entry>& entries)
 {
 	ofstream out;
 	out.open(m_file.c_str());
@@ -74,10 +74,12 @@ bool HighScore::write(vector<HighScore::Entry>& entries)
 
 	// Trying to use C++ as much as possible
 	// A bit simpler than the version in read. Here we simply
-	// copy each Entry in entries to the out ostream, and separate
-	// them each with a \n.
-	copy(entries.begin(),entries.end(),ostream_iterator<Entry>(out,"\n"));
-
+	// copy all or the max number of Entry in entries to the out ostream, 
+	// and separate them each with a \n.
+	copy(entries.begin(),
+		 entries.size()>m_max_entries ? entries.begin()+m_max_entries : entries.end(),
+		 ostream_iterator<Entry>(out,"\n"));
+	
 	out.close();
 	return true;
 }
