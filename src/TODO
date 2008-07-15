@@ -1,10 +1,12 @@
 == To fix before first release 0.1 ==
 
-* There should be a main screen to select mode and options
+* Fix hardcoded player name and highscore file
+
+X There should be a main screen to select mode and options
 
 * There should be a high score table
 
-* No timer in the score fields. One big centered for the initial timing
+X No timer in the score fields. One big centered for the initial timing
   and one smaller somewhere else (?)
 
 * When finishing a level there should be a pause so you get what is happening
