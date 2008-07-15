@@ -796,7 +796,7 @@ int Brainblast::eventLoop()
 
 			m_engine->Tree()->Walk();
 
-			if( !m_play && (difftime(now,m_start_time) > WAITTIME) )
+			if( m_start_time && !m_play && (difftime(now,m_start_time) > WAITTIME) )
 				finishInitialWait();
 			
 			m_engine->Draw();
@@ -890,7 +890,7 @@ bool Brainblast::writeScoreAndTime(time_t& now)
 		score_str.str("");
 	}
 	
-	return game_over;
+	return m_play ? game_over : false;
 }
 
 void Brainblast::select(Puzzle& lvl, BrainPlayer& player)
