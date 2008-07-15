@@ -13,8 +13,20 @@
 #include <errno.h>
 
 HighScore::HighScore(string file, unsigned int max_entries)
-	: m_file(file), m_max_entries(max_entries)
+	: m_file(file), m_max_entries(max_entries), m_cached_entries()
 {
+}
+
+bool HighScore::highEnough(int score)
+{
+	m_cached_entries.clear();
+	read(m_cached_entries);
+	
+	vector<Entry>::iterator it = min_element(m_cached_entries.begin(),m_cached_entries.end(),score_cmp());
+	if( (it != m_cached_entries.end()) && (*it).score > score )
+		return false;
+
+	return true;
 }
 
 void HighScore::addEntry(string name,int score,int level)
@@ -24,18 +36,24 @@ void HighScore::addEntry(string name,int score,int level)
 	entry.score = score;
 	entry.level = level;
 
-	// 1. Read current file
-	vector<HighScore::Entry> entries;
-	read(entries);
+	// Read current file (if not cached)
+	if( m_cached_entries.empty() && !highEnough(score) )
+	{
+		m_cached_entries.clear();
+		return; // Score too low
+	}
 
-	// 2. Insert current entry
-	entries.push_back(entry);
+	// Insert current entry
+	m_cached_entries.push_back(entry);
 
-	// 3. Sort
-	sort(entries.begin(),entries.end(),score_cmp());
+	// Reverse Sorting
+	sort(m_cached_entries.rbegin(),m_cached_entries.rend(),score_cmp());
 
-	// 4. And write back the result
-	write(entries);
+	// And write back the result
+	write(m_cached_entries);
+	
+	// Clear the cache
+	m_cached_entries.clear();
 	
 }
 

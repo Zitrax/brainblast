@@ -20,7 +20,18 @@ public:
 	HighScore(string file, unsigned int max_entries);
 	~HighScore(){}
 
+	/**
+	 * Tries to add an entry into the list.
+	 */
 	void addEntry(string name,int score,int level);
+
+	/**
+	 * Will return true if the provided score is high enough
+	 * to enter the highscore list.
+	 * If used it should be used right before addEntry as the
+	 * list from disc is being cached until the next addEntry call.
+	 */
+	bool highEnough(int score);
 
 private:
 
@@ -56,7 +67,7 @@ private:
 	class score_cmp
 	{
 	public:
-		bool operator() (const Entry& lhs, const Entry& rhs) const { return lhs.score > rhs.score; }
+		bool operator() (const Entry& lhs, const Entry& rhs) const { return lhs.score < rhs.score; }
 	};
 
 	bool read(vector<Entry>& entries) const;
@@ -64,6 +75,8 @@ private:
 
 	string m_file;
 	unsigned int m_max_entries;
+
+	vector<Entry> m_cached_entries;
 };
 
 #endif // HIGHSCORE_H
