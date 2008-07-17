@@ -11,7 +11,10 @@
 using namespace brain;
 
 BrainPlayerManager::BrainPlayerManager()
-	: m_players(), m_player_count(0)
+	: m_players(), 
+	  m_player_count(0),
+	  m_highscore(0),
+	  m_high_scores()
 {
 	m_highscore = new HighScore("test",3);
 }
@@ -93,14 +96,20 @@ void BrainPlayerManager::move()
 
 void BrainPlayerManager::gameOver()
 {
-	for_each(m_players.begin(),m_players.end(),playerCheckScore(*m_highscore));
+	for_each(m_players.begin(),m_players.end(),playerCheckScore(*m_highscore,m_high_scores));
 	for_each(m_players.begin(),m_players.end(),playerResetScore);
 }
 
 void BrainPlayerManager::playerCheckScore::operator() (BrainPlayer* player)
 {
 	if( m_hs.highEnough(player->getScore()) )
-		m_hs.addEntry("Daniel",player->getScore(),5);
+	{
+		int id = Brainblast::instance()->startTextInput("Name: ");
+		struct high_score hs;
+		hs.score = player->getScore();
+		hs.level = player->getLevelCount();
+		m_hs_map[id] = hs;
+	}
 }
 
 BrainPlayer* BrainPlayerManager::getPlayer(int idx) const
@@ -114,6 +123,18 @@ int BrainPlayerManager::getPlayerNumber(BrainPlayer& player) const
 	if( it != m_players.end() )
 		return it - m_players.begin() + 1;
 	return -1;
+}
+
+void BrainPlayerManager::textReady(string str, int id)
+{
+	// Submit highscore
+	map<int,high_score>::iterator it = m_high_scores.find(id);
+	if( it == m_high_scores.end() )
+		return;
+
+	struct high_score hs = m_high_scores[id];
+	m_highscore->addEntry(str,hs.score,hs.level);
+	m_high_scores.erase(id);
 }
 
 bool BrainPlayerManager::handleKeyDown(SDLKey key)

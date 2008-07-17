@@ -47,6 +47,30 @@ namespace brain
 int main(int argc, char *argv[]);
 
 /**
+ *
+ */
+class TextListener
+{
+public:
+	virtual ~TextListener(){}
+
+	virtual void textReady(string s,int id) = 0;
+
+	static int id() { return m_text_id++; }
+
+private:
+	static int m_text_id;
+};
+
+struct text_ready
+{
+	text_ready(string s, int id) : m_s(s), m_id(id) {}
+	void operator() (TextListener* tl) { tl->textReady(m_s,m_id); }
+	string m_s;
+	int m_id;
+};
+
+/**
  * Starting a Brainblast game should be as simple as 
  * creating an object of this class and calling
  * startGame();
@@ -113,10 +137,23 @@ public:
 	 */
 	BrainSprite* collisionCheck(BrainPlayer* player);
 
+	/**
+	 * Enter text input mode
+	 * Returns an id of the string to be returned
+	 */
+	int startTextInput(string label);
+
 private:
 
     Brainblast(const Brainblast& bb);
     Brainblast& operator=(const Brainblast& bb);
+
+	// Called for every key when we are supposed to write text
+	void textInput(SDLKey k);
+	// Called when finished with one text
+	void nextTextInput();
+
+	void clearTextBox( KrTextBox* tb );
 
 	/** 
 	 * Called when the initial wait where the solution is shown
@@ -210,6 +247,9 @@ private:
 	int m_human_players;
 	int m_computer_players;
 	bool m_level_set;
+
+	vector<TextListener*> m_text_listeners;
+	map<int,string> m_text_queue;
 };
 
 #endif

@@ -41,7 +41,9 @@ public:
 	void setName(string name) { m_name = name; }
 
 	virtual Puzzle* getLevel() const  { return m_level;}
-	virtual void setLevel(Puzzle* lvl){ m_level = lvl; }
+	virtual void setLevel(Puzzle* lvl){ m_level = lvl; m_level_count++; }
+	int getLevelCount() const { return m_level_count; }
+	void resetLevelCount() { m_level_count = 0; }
 
     virtual void left();
     virtual void right();
@@ -78,6 +80,7 @@ private:
 
 	int m_score;
 	string m_name;
+	int m_level_count;
 
 	keymap m_actions;
 	std::vector<SDLKey> m_keys;

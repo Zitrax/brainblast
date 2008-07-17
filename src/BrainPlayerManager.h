@@ -19,7 +19,7 @@ using namespace std;
  * the players act according to their actions. It handles
  * both human players and computer players.
  */
-class BrainPlayerManager
+class BrainPlayerManager : public TextListener
 {
 public:
     BrainPlayerManager();
@@ -51,22 +51,32 @@ public:
 
 	unsigned int playerCount() const { return m_player_count; }
 
+	// TextListener
+	void textReady(string str, int id);
+
 private:
 
     BrainPlayerManager(const BrainPlayerManager&);
     BrainPlayerManager& operator=(const BrainPlayerManager&);
 
+	struct high_score
+	{
+		int score;
+		int level;
+	};
+
 	// <Used for for_each>
 	// TODO: Should really use references instead
-	static void playerResetScore(BrainPlayer* player) { player->setScore(0); }
+	static void playerResetScore(BrainPlayer* player) { player->setScore(0); player->resetLevelCount(); }
 	static void playerMove(BrainPlayer* player) { player->move(); }
 	static void playerDeleteNode(BrainPlayer* player) { Brainblast::instance()->engine()->Tree()->DeleteNode(player); }
 
 	struct playerCheckScore
 	{
-		playerCheckScore(HighScore& hs) : m_hs(hs) {}
+		playerCheckScore(HighScore& hs, map<int,high_score>& hs_map) : m_hs(hs), m_hs_map(hs_map) {}
 		void operator() (BrainPlayer* player);
 		HighScore& m_hs;
+		map<int,high_score>& m_hs_map;
 	};
 	// </Used for for_each>
 
@@ -76,6 +86,8 @@ private:
 	vector<BrainPlayer*> m_players;
 	unsigned int m_player_count;
 	HighScore* m_highscore;
+
+	map<int,high_score> m_high_scores;
 };
 
 #endif //  BRAIN_PLAYER_MANAGER_H

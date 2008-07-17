@@ -21,7 +21,9 @@ using namespace grinliz;
 using namespace brain;
 using namespace std;
 
+// Statics
 Brainblast* Brainblast::s_instance;
+int TextListener::m_text_id = 0;
 
 Brainblast::Brainblast() : m_play(false),
 						   m_title(false),
@@ -50,7 +52,9 @@ Brainblast::Brainblast() : m_play(false),
 						   m_player_manager(0),
 						   m_human_players(1),
 						   m_computer_players(0),
-						   m_level_set(true)
+						   m_level_set(true),
+						   m_text_listeners(),
+						   m_text_queue()
 
 {
     if(bbc::debug) cerr << "Brainblast::Brainblast() Videomode(" << VIDEOX << "," << VIDEOY << ")\n";
@@ -541,6 +545,7 @@ Brainblast::initGameKyra()
 	m_bg_sprite->SetZDepth(-20);
 
 	m_player_manager = new BrainPlayerManager();
+	m_text_listeners.push_back(m_player_manager);
 	
     createBricks();
 
@@ -676,8 +681,13 @@ int Brainblast::eventLoop()
 
 			printf( "%s\n", SDL_GetKeyName(event.key.keysym.sym));
 
+			if( !m_text_queue.empty() )
+			{
+				textInput(event.key.keysym.sym);
+			}
+
 			// M = TOGGLE SOUND
-			if( event.key.keysym.sym == SDLK_m )
+			else if( event.key.keysym.sym == SDLK_m )
 				m_sound->toggleMusic();
 			// F = TOGGLE FULLSCREEN
 			else if( event.key.keysym.sym == SDLK_f )
@@ -818,12 +828,13 @@ int Brainblast::eventLoop()
 
 		if( !m_title )
 		{
+			bool was_game_over = m_game_over;
 			m_game_over = writeScoreAndTime(now);
 			
-			if( m_play && m_game_over )
+			if( m_play && m_game_over && !was_game_over )
 			{
-				m_player_manager->gameOver();
 				m_center_text_box->SetTextChar("Game Over",0);
+				m_player_manager->gameOver();
 				clearFloor();
 			}
 		}
@@ -831,6 +842,73 @@ int Brainblast::eventLoop()
 	}
     
     return 0;
+}
+
+void Brainblast::clearTextBox( KrTextBox* tb )
+{
+	if( !tb )
+		return;
+
+	int lines = tb->NumLines();
+
+	for(int i=0; i<lines; ++i)
+		tb->SetTextChar("",i);
+}
+
+void Brainblast::nextTextInput()
+{
+	if( m_text_queue.empty() )
+	{
+		return;
+	}
+	
+	clearTextBox(m_center_text_box);
+	m_center_text_box->SetTextChar(m_text_queue.begin()->second,4);	
+}
+
+int Brainblast::startTextInput(string label)
+{
+	int id = TextListener::id();
+	m_text_queue[id] = label;
+
+	// If we filled an empty queue
+	// we clear and start a new text
+	// If not it will just lie in the queue
+	// until the next string is about to 
+	// be entered.
+	if( m_text_queue.size() == 1 ) 
+		nextTextInput();
+
+	return id;
+}
+
+void Brainblast::textInput(SDLKey k)
+{
+	if( k == SDLK_RETURN )
+	{
+		// We are always working on the lowest key
+		// and maps are sorted by key.
+		int id = m_text_queue.begin()->first;
+		m_text_queue.erase(id);
+		
+		string s;
+		m_center_text_box->GetTextChar(&s,4);
+		for_each(m_text_listeners.begin(),m_text_listeners.end(),text_ready(s,id));
+
+		m_center_text_box->SetTextChar("",4);
+		nextTextInput();
+		return;
+	}
+
+	// For now only letters and numbers
+	if( k >= SDLK_0 && k <= SDLK_9 ||
+		k >= SDLK_a && k <= SDLK_z)
+	{
+		string s;
+		m_center_text_box->GetTextChar(&s,4);
+		s += k;
+		m_center_text_box->SetTextChar(s,4);
+	}
 }
 
 void Brainblast::finishInitialWait()
