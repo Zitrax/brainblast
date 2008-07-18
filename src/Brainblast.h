@@ -155,6 +155,8 @@ private:
 
 	void clearTextBox( KrTextBox* tb );
 
+	void showHighScore();
+
 	/** 
 	 * Called when the initial wait where the solution is shown
 	 * should end.

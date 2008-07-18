@@ -51,6 +51,8 @@ public:
 
 	unsigned int playerCount() const { return m_player_count; }
 
+	vector<HighScore::Entry> getHighScoreEntries() const { return m_highscore->getEntries(); }
+
 	// TextListener
 	void textReady(string str, int id);
 

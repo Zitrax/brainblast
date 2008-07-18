@@ -22,6 +22,11 @@ bool HighScore::highEnough(int score)
 	m_cached_entries.clear();
 	read(m_cached_entries);
 	
+	// If the list is not yet full we can always add...
+	if( m_cached_entries.size() < m_max_entries )
+		return true;
+
+	// ... if not we ned to check if we have more points than the worst entry.
 	vector<Entry>::iterator it = min_element(m_cached_entries.begin(),m_cached_entries.end(),score_cmp());
 	if( (it != m_cached_entries.end()) && (*it).score > score )
 		return false;
@@ -56,6 +61,14 @@ void HighScore::addEntry(string name,int score,int level,LEVEL_SET level_set)
 	// Clear the cache
 	m_cached_entries.clear();
 	
+}
+
+vector<HighScore::Entry> HighScore::getEntries() const
+{
+	vector<Entry> entries;
+	read(entries);
+	sort(entries.rbegin(),entries.rend(),score_cmp());
+	return entries;
 }
 
 bool HighScore::read(vector<Entry>& entries) const

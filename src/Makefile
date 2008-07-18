@@ -46,18 +46,18 @@ clean:
 # DO NOT DELETE
 
 bbc.o: bbc.h
-BrainAI.o: BrainAI.h BrainPlayer.h BrainSprite.h Puzzle.h Brick.h bbc.h
-BrainAI.o: /usr/include/stdlib.h /usr/include/features.h
-BrainAI.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
-BrainAI.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
-BrainAI.o: /usr/include/sys/types.h /usr/include/bits/types.h
-BrainAI.o: /usr/include/bits/typesizes.h /usr/include/time.h
-BrainAI.o: /usr/include/endian.h /usr/include/bits/endian.h
-BrainAI.o: /usr/include/sys/select.h /usr/include/bits/select.h
-BrainAI.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
-BrainAI.o: /usr/include/sys/sysmacros.h /usr/include/bits/pthreadtypes.h
-BrainAI.o: /usr/include/alloca.h Field.h Brainblast.h /usr/include/assert.h
-BrainAI.o: BrainPlayerManager.h BrainSound.h
+BrainAI.o: BrainAI.h BrainPlayer.h Brainblast.h /usr/include/stdlib.h
+BrainAI.o: /usr/include/features.h /usr/include/sys/cdefs.h
+BrainAI.o: /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h
+BrainAI.o: /usr/include/gnu/stubs-32.h /usr/include/sys/types.h
+BrainAI.o: /usr/include/bits/types.h /usr/include/bits/typesizes.h
+BrainAI.o: /usr/include/time.h /usr/include/endian.h
+BrainAI.o: /usr/include/bits/endian.h /usr/include/sys/select.h
+BrainAI.o: /usr/include/bits/select.h /usr/include/bits/sigset.h
+BrainAI.o: /usr/include/bits/time.h /usr/include/sys/sysmacros.h
+BrainAI.o: /usr/include/bits/pthreadtypes.h /usr/include/alloca.h
+BrainAI.o: /usr/include/assert.h bbc.h Puzzle.h Brick.h Field.h BrainSprite.h
+BrainAI.o: BrainSound.h
 Brainblast.o: Brainblast.h /usr/include/stdlib.h /usr/include/features.h
 Brainblast.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
 Brainblast.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
@@ -68,34 +68,36 @@ Brainblast.o: /usr/include/sys/select.h /usr/include/bits/select.h
 Brainblast.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
 Brainblast.o: /usr/include/sys/sysmacros.h /usr/include/bits/pthreadtypes.h
 Brainblast.o: /usr/include/alloca.h /usr/include/assert.h bbc.h Puzzle.h
-Brainblast.o: Brick.h Field.h BrainSprite.h BrainPlayer.h
-Brainblast.o: BrainPlayerManager.h BrainSound.h BrainAI.h ../images/bb.h
+Brainblast.o: Brick.h Field.h BrainSprite.h BrainSound.h ../images/bb.h
 Brainblast.o: ../images/bb_bg.h consolefont.h BrainSoundFMOD.h
-Brainblast.o: ../fmod/api/inc/fmod.h HighScore.h
-BrainPlayer.o: BrainPlayer.h BrainSprite.h Puzzle.h Brick.h bbc.h
-BrainPlayer.o: /usr/include/stdlib.h /usr/include/features.h
-BrainPlayer.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
-BrainPlayer.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
-BrainPlayer.o: /usr/include/sys/types.h /usr/include/bits/types.h
-BrainPlayer.o: /usr/include/bits/typesizes.h /usr/include/time.h
-BrainPlayer.o: /usr/include/endian.h /usr/include/bits/endian.h
-BrainPlayer.o: /usr/include/sys/select.h /usr/include/bits/select.h
-BrainPlayer.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
-BrainPlayer.o: /usr/include/sys/sysmacros.h /usr/include/bits/pthreadtypes.h
-BrainPlayer.o: /usr/include/alloca.h Field.h
-BrainPlayerManager.o: BrainPlayerManager.h BrainPlayer.h BrainSprite.h
-BrainPlayerManager.o: Puzzle.h Brick.h bbc.h /usr/include/stdlib.h
-BrainPlayerManager.o: /usr/include/features.h /usr/include/sys/cdefs.h
-BrainPlayerManager.o: /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h
-BrainPlayerManager.o: /usr/include/gnu/stubs-32.h /usr/include/sys/types.h
-BrainPlayerManager.o: /usr/include/bits/types.h /usr/include/bits/typesizes.h
-BrainPlayerManager.o: /usr/include/time.h /usr/include/endian.h
-BrainPlayerManager.o: /usr/include/bits/endian.h /usr/include/sys/select.h
-BrainPlayerManager.o: /usr/include/bits/select.h /usr/include/bits/sigset.h
-BrainPlayerManager.o: /usr/include/bits/time.h /usr/include/sys/sysmacros.h
+Brainblast.o: ../fmod/api/inc/fmod.h BrainPlayerManager.h BrainPlayer.h
+Brainblast.o: HighScore.h
+BrainPlayer.o: BrainPlayer.h Brainblast.h /usr/include/stdlib.h
+BrainPlayer.o: /usr/include/features.h /usr/include/sys/cdefs.h
+BrainPlayer.o: /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h
+BrainPlayer.o: /usr/include/gnu/stubs-32.h /usr/include/sys/types.h
+BrainPlayer.o: /usr/include/bits/types.h /usr/include/bits/typesizes.h
+BrainPlayer.o: /usr/include/time.h /usr/include/endian.h
+BrainPlayer.o: /usr/include/bits/endian.h /usr/include/sys/select.h
+BrainPlayer.o: /usr/include/bits/select.h /usr/include/bits/sigset.h
+BrainPlayer.o: /usr/include/bits/time.h /usr/include/sys/sysmacros.h
+BrainPlayer.o: /usr/include/bits/pthreadtypes.h /usr/include/alloca.h
+BrainPlayer.o: /usr/include/assert.h bbc.h Puzzle.h Brick.h Field.h
+BrainPlayer.o: BrainSprite.h BrainSound.h
+BrainPlayerManager.o: BrainPlayerManager.h BrainPlayer.h Brainblast.h
+BrainPlayerManager.o: /usr/include/stdlib.h /usr/include/features.h
+BrainPlayerManager.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
+BrainPlayerManager.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
+BrainPlayerManager.o: /usr/include/sys/types.h /usr/include/bits/types.h
+BrainPlayerManager.o: /usr/include/bits/typesizes.h /usr/include/time.h
+BrainPlayerManager.o: /usr/include/endian.h /usr/include/bits/endian.h
+BrainPlayerManager.o: /usr/include/sys/select.h /usr/include/bits/select.h
+BrainPlayerManager.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+BrainPlayerManager.o: /usr/include/sys/sysmacros.h
 BrainPlayerManager.o: /usr/include/bits/pthreadtypes.h /usr/include/alloca.h
-BrainPlayerManager.o: Field.h Brainblast.h /usr/include/assert.h BrainSound.h
-BrainPlayerManager.o: BrainAI.h ../images/bb.h
+BrainPlayerManager.o: /usr/include/assert.h bbc.h Puzzle.h Brick.h Field.h
+BrainPlayerManager.o: BrainSprite.h BrainSound.h HighScore.h BrainAI.h
+BrainPlayerManager.o: ../images/bb.h
 BrainSoundBASS.o: BrainSoundBASS.h BrainSound.h /usr/include/assert.h
 BrainSoundBASS.o: /usr/include/features.h /usr/include/sys/cdefs.h
 BrainSoundBASS.o: /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h
@@ -126,7 +128,7 @@ BrainSprite.o: /usr/include/bits/select.h /usr/include/bits/sigset.h
 BrainSprite.o: /usr/include/bits/time.h /usr/include/sys/sysmacros.h
 BrainSprite.o: /usr/include/bits/pthreadtypes.h /usr/include/alloca.h
 BrainSprite.o: /usr/include/assert.h bbc.h Puzzle.h Brick.h Field.h
-BrainSprite.o: BrainPlayer.h BrainPlayerManager.h BrainSound.h BrainAI.h
+BrainSprite.o: BrainSound.h
 Brick.o: Brick.h bbc.h /usr/include/stdlib.h /usr/include/features.h
 Brick.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
 Brick.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
@@ -138,7 +140,12 @@ Brick.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
 Brick.o: /usr/include/sys/sysmacros.h /usr/include/bits/pthreadtypes.h
 Brick.o: /usr/include/alloca.h
 consolefont.o: consolefont.h
-HighScore.o: HighScore.h
+HighScore.o: HighScore.h bbc.h /usr/include/errno.h /usr/include/features.h
+HighScore.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
+HighScore.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
+HighScore.o: /usr/include/bits/errno.h /usr/include/linux/errno.h
+HighScore.o: /usr/include/asm/errno.h /usr/include/asm-generic/errno.h
+HighScore.o: /usr/include/asm-generic/errno-base.h
 main.o: Brainblast.h /usr/include/stdlib.h /usr/include/features.h
 main.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
 main.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
@@ -149,8 +156,7 @@ main.o: /usr/include/sys/select.h /usr/include/bits/select.h
 main.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
 main.o: /usr/include/sys/sysmacros.h /usr/include/bits/pthreadtypes.h
 main.o: /usr/include/alloca.h /usr/include/assert.h bbc.h Puzzle.h Brick.h
-main.o: Field.h BrainSprite.h BrainPlayer.h BrainPlayerManager.h BrainSound.h
-main.o: BrainAI.h
+main.o: Field.h BrainSprite.h BrainSound.h
 Puzzle.o: Puzzle.h Brick.h bbc.h /usr/include/stdlib.h
 Puzzle.o: /usr/include/features.h /usr/include/sys/cdefs.h
 Puzzle.o: /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h
@@ -161,5 +167,81 @@ Puzzle.o: /usr/include/bits/endian.h /usr/include/sys/select.h
 Puzzle.o: /usr/include/bits/select.h /usr/include/bits/sigset.h
 Puzzle.o: /usr/include/bits/time.h /usr/include/sys/sysmacros.h
 Puzzle.o: /usr/include/bits/pthreadtypes.h /usr/include/alloca.h Field.h
-Puzzle.o: Brainblast.h /usr/include/assert.h BrainSprite.h BrainPlayer.h
-Puzzle.o: BrainPlayerManager.h BrainSound.h BrainAI.h ../images/bb.h
+Puzzle.o: Brainblast.h /usr/include/assert.h BrainSprite.h BrainSound.h
+Puzzle.o: ../images/bb.h
+BrainAI.o: BrainPlayer.h Brainblast.h /usr/include/stdlib.h
+BrainAI.o: /usr/include/features.h /usr/include/sys/cdefs.h
+BrainAI.o: /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h
+BrainAI.o: /usr/include/gnu/stubs-32.h /usr/include/sys/types.h
+BrainAI.o: /usr/include/bits/types.h /usr/include/bits/typesizes.h
+BrainAI.o: /usr/include/time.h /usr/include/endian.h
+BrainAI.o: /usr/include/bits/endian.h /usr/include/sys/select.h
+BrainAI.o: /usr/include/bits/select.h /usr/include/bits/sigset.h
+BrainAI.o: /usr/include/bits/time.h /usr/include/sys/sysmacros.h
+BrainAI.o: /usr/include/bits/pthreadtypes.h /usr/include/alloca.h
+BrainAI.o: /usr/include/assert.h bbc.h Puzzle.h Brick.h Field.h BrainSprite.h
+BrainAI.o: BrainSound.h
+Brainblast.o: /usr/include/stdlib.h /usr/include/features.h
+Brainblast.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
+Brainblast.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
+Brainblast.o: /usr/include/sys/types.h /usr/include/bits/types.h
+Brainblast.o: /usr/include/bits/typesizes.h /usr/include/time.h
+Brainblast.o: /usr/include/endian.h /usr/include/bits/endian.h
+Brainblast.o: /usr/include/sys/select.h /usr/include/bits/select.h
+Brainblast.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+Brainblast.o: /usr/include/sys/sysmacros.h /usr/include/bits/pthreadtypes.h
+Brainblast.o: /usr/include/alloca.h /usr/include/assert.h bbc.h Puzzle.h
+Brainblast.o: Brick.h Field.h BrainSprite.h BrainSound.h
+BrainPlayer.o: Brainblast.h /usr/include/stdlib.h /usr/include/features.h
+BrainPlayer.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
+BrainPlayer.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
+BrainPlayer.o: /usr/include/sys/types.h /usr/include/bits/types.h
+BrainPlayer.o: /usr/include/bits/typesizes.h /usr/include/time.h
+BrainPlayer.o: /usr/include/endian.h /usr/include/bits/endian.h
+BrainPlayer.o: /usr/include/sys/select.h /usr/include/bits/select.h
+BrainPlayer.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+BrainPlayer.o: /usr/include/sys/sysmacros.h /usr/include/bits/pthreadtypes.h
+BrainPlayer.o: /usr/include/alloca.h /usr/include/assert.h bbc.h Puzzle.h
+BrainPlayer.o: Brick.h Field.h BrainSprite.h BrainSound.h
+BrainPlayerManager.o: BrainPlayer.h Brainblast.h /usr/include/stdlib.h
+BrainPlayerManager.o: /usr/include/features.h /usr/include/sys/cdefs.h
+BrainPlayerManager.o: /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h
+BrainPlayerManager.o: /usr/include/gnu/stubs-32.h /usr/include/sys/types.h
+BrainPlayerManager.o: /usr/include/bits/types.h /usr/include/bits/typesizes.h
+BrainPlayerManager.o: /usr/include/time.h /usr/include/endian.h
+BrainPlayerManager.o: /usr/include/bits/endian.h /usr/include/sys/select.h
+BrainPlayerManager.o: /usr/include/bits/select.h /usr/include/bits/sigset.h
+BrainPlayerManager.o: /usr/include/bits/time.h /usr/include/sys/sysmacros.h
+BrainPlayerManager.o: /usr/include/bits/pthreadtypes.h /usr/include/alloca.h
+BrainPlayerManager.o: /usr/include/assert.h bbc.h Puzzle.h Brick.h Field.h
+BrainPlayerManager.o: BrainSprite.h BrainSound.h HighScore.h
+BrainSoundBass.o: BrainSound.h
+BrainSoundBASS.o: BrainSound.h /usr/include/assert.h /usr/include/features.h
+BrainSoundBASS.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
+BrainSoundBASS.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
+BrainSoundFMOD.o: BrainSound.h ../fmod/api/inc/fmod.h /usr/include/assert.h
+BrainSoundFMOD.o: /usr/include/features.h /usr/include/sys/cdefs.h
+BrainSoundFMOD.o: /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h
+BrainSoundFMOD.o: /usr/include/gnu/stubs-32.h
+BrainSoundSDL.o: BrainSound.h
+Brick.o: bbc.h /usr/include/stdlib.h /usr/include/features.h
+Brick.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
+Brick.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
+Brick.o: /usr/include/sys/types.h /usr/include/bits/types.h
+Brick.o: /usr/include/bits/typesizes.h /usr/include/time.h
+Brick.o: /usr/include/endian.h /usr/include/bits/endian.h
+Brick.o: /usr/include/sys/select.h /usr/include/bits/select.h
+Brick.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+Brick.o: /usr/include/sys/sysmacros.h /usr/include/bits/pthreadtypes.h
+Brick.o: /usr/include/alloca.h
+HighScore.o: bbc.h
+Puzzle.o: Brick.h bbc.h /usr/include/stdlib.h /usr/include/features.h
+Puzzle.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
+Puzzle.o: /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h
+Puzzle.o: /usr/include/sys/types.h /usr/include/bits/types.h
+Puzzle.o: /usr/include/bits/typesizes.h /usr/include/time.h
+Puzzle.o: /usr/include/endian.h /usr/include/bits/endian.h
+Puzzle.o: /usr/include/sys/select.h /usr/include/bits/select.h
+Puzzle.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+Puzzle.o: /usr/include/sys/sysmacros.h /usr/include/bits/pthreadtypes.h
+Puzzle.o: /usr/include/alloca.h Field.h

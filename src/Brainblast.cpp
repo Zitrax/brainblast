@@ -579,10 +579,12 @@ void Brainblast::titleScreen()
 
 void Brainblast::titleScreenUpdateText()
 {
-	ostringstream str;
+	clearTextBox(m_center_text_box);
 
 	m_center_text_box->SetTextChar("BRAINBLAST 0.1",0);
 	m_center_text_box->SetTextChar("",1);
+
+	ostringstream str;
 
 	str << "F1: Human Players - " << m_human_players;
 	m_center_text_box->SetTextChar(str.str(),2);
@@ -859,10 +861,34 @@ void Brainblast::clearTextBox( KrTextBox* tb )
 		tb->SetTextChar("",i);
 }
 
+void Brainblast::showHighScore()
+{
+	vector<HighScore::Entry> entries = m_player_manager->getHighScoreEntries();
+	
+	int len = entries.size()>6 ? 6 : entries.size();
+
+	m_center_text_box->SetTextChar("Highscores",0);
+	m_center_text_box->SetTextChar("      Name   Score Level Mode",1);
+
+	ostringstream str;
+	for(int i=0; i<len; ++i)
+	{
+		str << i+1 
+			<< setw(10) << entries[i].name
+			<< setw(8)  << entries[i].score
+			<< setw(6)  << entries[i].level << " "
+			<< setw(6)  << levelSetToString(entries[i].level_set);
+			
+		m_center_text_box->SetTextChar(str.str(),i+2);
+		str.str("");
+	}
+}
+
 void Brainblast::nextTextInput()
 {
 	if( m_text_queue.empty() )
 	{
+		showHighScore();
 		return;
 	}
 	
@@ -964,7 +990,7 @@ BrainSprite* Brainblast::collisionCheck(BrainPlayer* player)
 bool Brainblast::writeScoreAndTime(time_t& now)
 {
 	// Time left
-	int basetime = m_play ? 30 : static_cast<int>(WAITTIME);
+	int basetime = m_play ? 60 : static_cast<int>(WAITTIME);
 	int sec = static_cast<int>(basetime - difftime(now,m_start_time));
 	bool game_over = sec <= 0;
 	if( m_play && game_over ) sec = 0;

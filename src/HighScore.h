@@ -39,6 +39,11 @@ public:
 	void addEntry(string name,int score,int level, LEVEL_SET level_set);
 
 	/**
+	 * Get all highscore entries. (Sorted)
+	 */
+	vector<Entry> getEntries() const;
+
+	/**
 	 * Will return true if the provided score is high enough
 	 * to enter the highscore list.
 	 * If used it should be used right before addEntry as the

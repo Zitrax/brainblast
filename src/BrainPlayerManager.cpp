@@ -112,6 +112,10 @@ void BrainPlayerManager::gameOver()
 
 void BrainPlayerManager::playerCheckScore::operator() (BrainPlayer* player)
 {
+	// Avoid scoring computer players
+	if( dynamic_cast<BrainAI*>(player) )
+		return;
+
 	if( m_manager.m_highscore->highEnough(player->getScore()) )
 	{
 		ostringstream ss;
