@@ -52,7 +52,7 @@ Brainblast::Brainblast() : m_play(false),
 						   m_player_manager(0),
 						   m_human_players(1),
 						   m_computer_players(0),
-						   m_level_set(true),
+						   m_level_set(NORMAL),
 						   m_text_listeners(),
 						   m_text_queue()
 
@@ -402,14 +402,7 @@ Brainblast::startGame()
 
 	// Leave title screen
 	m_title = false;
-	m_center_text_box->SetTextChar("",0);
-	m_center_text_box->SetTextChar("",1);
-	m_center_text_box->SetTextChar("",2);
-	m_center_text_box->SetTextChar("",3);
-	m_center_text_box->SetTextChar("",4);
-	m_center_text_box->SetTextChar("",5);
-	m_center_text_box->SetTextChar("",6);
-	m_center_text_box->SetTextChar("",7);
+	clearTextBox(m_center_text_box);
 
 	m_player_manager->addPlayers(m_human_players,m_computer_players);
 
@@ -424,7 +417,10 @@ Brainblast::startGame()
 		return false;
 	}
 
-	if( !changeLevel(m_level_set) )
+	for(unsigned int i=0; i<m_player_manager->playerCount(); ++i)
+		m_player_manager->getPlayer(i)->setLevelSet(m_level_set);
+
+	if( !changeLevel(m_level_set == NORMAL ? 1 : 0) )
 		return false; 
 
 	return true;
@@ -596,7 +592,7 @@ void Brainblast::titleScreenUpdateText()
 	m_center_text_box->SetTextChar(str.str(),3);
 
 	str.str("");
-	string set = m_level_set ? "Normal" : "Random";
+	string set = levelSetToString(m_level_set);
 	str << "F3: Level set - " << set;
 	m_center_text_box->SetTextChar(str.str(),4);
 
@@ -733,7 +729,15 @@ int Brainblast::eventLoop()
 			else if( m_title && event.key.keysym.sym == SDLK_F3 )
 			{
 				m_sound->playSample(CLICK);
-				m_level_set = !m_level_set;
+				switch( m_level_set )
+				{
+				case NORMAL:
+					m_level_set = RANDOM; break;
+				case RANDOM:
+					m_level_set = NORMAL; break;
+				default:
+					m_level_set = NORMAL; break;
+				}
 				titleScreenUpdateText();
 			}
 			else
@@ -862,8 +866,8 @@ void Brainblast::nextTextInput()
 		return;
 	}
 	
-	clearTextBox(m_center_text_box);
-	m_center_text_box->SetTextChar(m_text_queue.begin()->second,4);	
+	m_center_text_box->SetTextChar(m_text_queue.begin()->second,3);	
+	m_center_text_box->SetTextChar("",4);
 }
 
 int Brainblast::startTextInput(string label)
@@ -893,21 +897,41 @@ void Brainblast::textInput(SDLKey k)
 		
 		string s;
 		m_center_text_box->GetTextChar(&s,4);
-		for_each(m_text_listeners.begin(),m_text_listeners.end(),text_ready(s,id));
-
-		m_center_text_box->SetTextChar("",4);
-		nextTextInput();
+		if( s.size() )
+		{
+			for_each(m_text_listeners.begin(),m_text_listeners.end(),text_ready(s,id));
+			clearTextBox(m_center_text_box);
+			nextTextInput();
+		}
+		else
+		{
+			// TODO: Error sound here
+		}
 		return;
 	}
 
 	// For now only letters and numbers
-	if( k >= SDLK_0 && k <= SDLK_9 ||
-		k >= SDLK_a && k <= SDLK_z)
+	else if( k >= SDLK_0 && k <= SDLK_9 ||
+			 k >= SDLK_a && k <= SDLK_z)
 	{
 		string s;
 		m_center_text_box->GetTextChar(&s,4);
+		// TODO: Error sound here if size too big
 		s += k;
 		m_center_text_box->SetTextChar(s,4);
+		m_sound->playSample(CLICK);
+	}
+
+	else if( k == SDLK_BACKSPACE )
+	{
+		string s;
+		m_center_text_box->GetTextChar(&s,4);
+		if( s.size() )
+		{
+			s.resize(s.size()-1);
+			m_center_text_box->SetTextChar(s,4);
+			m_sound->playSample(CLICK);
+		}
 	}
 }
 
@@ -940,7 +964,7 @@ BrainSprite* Brainblast::collisionCheck(BrainPlayer* player)
 bool Brainblast::writeScoreAndTime(time_t& now)
 {
 	// Time left
-	int basetime = m_play ? 60 : static_cast<int>(WAITTIME);
+	int basetime = m_play ? 30 : static_cast<int>(WAITTIME);
 	int sec = static_cast<int>(basetime - difftime(now,m_start_time));
 	bool game_over = sec <= 0;
 	if( m_play && game_over ) sec = 0;

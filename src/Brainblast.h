@@ -20,14 +20,14 @@
 #include "Puzzle.h"
 #include "Brick.h"
 #include "BrainSprite.h"
-#include "BrainPlayer.h"
 #include "BrainSound.h"
-#include "BrainAI.h"
 
 class BrainAI;
 class BrainPlayerManager;
+class BrainPlayer;
 
 using namespace std;
+using namespace bbc;
 
 namespace brain
 {
@@ -85,7 +85,7 @@ public:
 	static Brainblast* instance() { return s_instance; }
 
 	KrEngine* engine() const { return m_engine; }
-
+	
     //! Check if a solution is correct
     bool checkSolution(Puzzle* puzzle);
 
@@ -246,7 +246,7 @@ private:
 	// might go into a Prefs class later
 	int m_human_players;
 	int m_computer_players;
-	bool m_level_set;
+	LEVEL_SET m_level_set;
 
 	vector<TextListener*> m_text_listeners;
 	map<int,string> m_text_queue;

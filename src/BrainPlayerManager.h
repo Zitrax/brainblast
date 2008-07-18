@@ -59,12 +59,6 @@ private:
     BrainPlayerManager(const BrainPlayerManager&);
     BrainPlayerManager& operator=(const BrainPlayerManager&);
 
-	struct high_score
-	{
-		int score;
-		int level;
-	};
-
 	// <Used for for_each>
 	// TODO: Should really use references instead
 	static void playerResetScore(BrainPlayer* player) { player->setScore(0); player->resetLevelCount(); }
@@ -73,10 +67,10 @@ private:
 
 	struct playerCheckScore
 	{
-		playerCheckScore(HighScore& hs, map<int,high_score>& hs_map) : m_hs(hs), m_hs_map(hs_map) {}
+		friend class BrainPlayerManager;
+		playerCheckScore(BrainPlayerManager& manager) : m_manager(manager) {}
 		void operator() (BrainPlayer* player);
-		HighScore& m_hs;
-		map<int,high_score>& m_hs_map;
+		BrainPlayerManager& m_manager;
 	};
 	// </Used for for_each>
 
@@ -87,7 +81,7 @@ private:
 	unsigned int m_player_count;
 	HighScore* m_highscore;
 
-	map<int,high_score> m_high_scores;
+	map<int,HighScore::Entry> m_high_scores;
 };
 
 #endif //  BRAIN_PLAYER_MANAGER_H

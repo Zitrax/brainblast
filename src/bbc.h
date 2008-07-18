@@ -37,6 +37,21 @@ namespace bbc{
 		error(std::string s) : msg(s){}
 	};
 
+	/**
+	 * Marks which types of level that is being played.
+	 * This is stored in the highscore table and is 
+	 * also used to determine which level to select
+	 * when you are done with a previous level.
+	 */
+	typedef enum
+	{
+		RANDOM,
+		EASY,
+		NORMAL,
+		HARD,
+		UNKNOWN = 2048
+	} LEVEL_SET;
+	
 	void line(SDL_Surface *s, 
 			  int x1, int y1, 
 			  int x2, int y2, 
@@ -63,6 +78,11 @@ namespace bbc{
 	{
 		return min+int((max-min+1)*(rand()/(RAND_MAX+1.0)));
 	}
+
+	std::string levelSetToString( LEVEL_SET level_set );
+	LEVEL_SET stringToLevelSet(std::string str);
+	LEVEL_SET intToLevelSet(int i);
+
 }
 
 #endif

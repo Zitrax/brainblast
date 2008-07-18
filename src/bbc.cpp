@@ -396,7 +396,48 @@ namespace bbc {
 // 	}
 
 
+	std::string levelSetToString( LEVEL_SET level_set )
+	{
+		switch(level_set)
+		{
+		case RANDOM:
+			return "Random";
+		case EASY:
+			return "Easy";
+		case NORMAL:
+			return "Normal";
+		case HARD:
+			return "Hard";
+		case UNKNOWN:
+			return "Unknown";
+		}
+		
+		return "Unknown";
+	}
+	
+	LEVEL_SET stringToLevelSet(std::string str)
+	{
+		if( str == "Random" )
+			return RANDOM;
+		else if( str == "Easy" )
+			return EASY;
+		else if( str == "Normal" )
+			return NORMAL;
+		else if( str == "Hard" )
+			return HARD;
+		else
+			return UNKNOWN;
+	}
+
+	LEVEL_SET intToLevelSet(int i)
+	{
+		if( i > HARD )
+			return UNKNOWN;
+		return static_cast<LEVEL_SET>(i);
+	}
+
 }
 
 // Smarter(more common/intuitive) way of doing this ?
 void generator() { bbc::round(0.5); }
+

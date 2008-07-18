@@ -29,12 +29,13 @@ bool HighScore::highEnough(int score)
 	return true;
 }
 
-void HighScore::addEntry(string name,int score,int level)
+void HighScore::addEntry(string name,int score,int level,LEVEL_SET level_set)
 {
 	Entry entry;
 	entry.name = name;
 	entry.score = score;
 	entry.level = level;
+	entry.level_set = level_set;
 
 	// Read current file (if not cached)
 	if( m_cached_entries.empty() && !highEnough(score) )
@@ -75,6 +76,8 @@ bool HighScore::read(vector<Entry>& entries) const
 	// to insert each entry into the entries vector.
 	copy(istream_iterator<Entry>(in),istream_iterator<Entry>(),back_inserter(entries));
 
+	//debugOut(entries);
+
 	in.close();
 	return true;
 }
@@ -102,3 +105,10 @@ bool HighScore::write(vector<Entry>& entries)
 	return true;
 }
 
+void HighScore::debugOut(vector<Entry>& entries) const
+{
+	vector<Entry>::const_iterator it;
+	vector<Entry>::const_iterator end = entries.end();
+	for( it = entries.begin(); it!=end; ++it )
+		cout << *it;
+}

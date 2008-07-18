@@ -6,7 +6,9 @@
 
 #include "BrainPlayerManager.h"
 #include "Brainblast.h"
+#include "BrainAI.h"
 #include "../images/bb.h"
+#include <sstream>
 
 using namespace brain;
 
@@ -16,7 +18,15 @@ BrainPlayerManager::BrainPlayerManager()
 	  m_highscore(0),
 	  m_high_scores()
 {
-	m_highscore = new HighScore("test",3);
+	char* home = getenv("HOME");
+
+	ostringstream ss;
+	if( home )
+		ss << home << "/.brainblast_score";
+	else
+		ss << "brainblast_score";
+	
+	m_highscore = new HighScore(ss.str(),10);
 }
 
 BrainPlayerManager::~BrainPlayerManager()
@@ -96,19 +106,22 @@ void BrainPlayerManager::move()
 
 void BrainPlayerManager::gameOver()
 {
-	for_each(m_players.begin(),m_players.end(),playerCheckScore(*m_highscore,m_high_scores));
+	for_each(m_players.begin(),m_players.end(),playerCheckScore(*this));
 	for_each(m_players.begin(),m_players.end(),playerResetScore);
 }
 
 void BrainPlayerManager::playerCheckScore::operator() (BrainPlayer* player)
 {
-	if( m_hs.highEnough(player->getScore()) )
+	if( m_manager.m_highscore->highEnough(player->getScore()) )
 	{
-		int id = Brainblast::instance()->startTextInput("Name: ");
-		struct high_score hs;
+		ostringstream ss;
+		ss << "Player " << m_manager.getPlayerNumber(*player) << " enter name: ";
+		int id = Brainblast::instance()->startTextInput(ss.str());
+		HighScore::Entry hs;
 		hs.score = player->getScore();
 		hs.level = player->getLevelCount();
-		m_hs_map[id] = hs;
+		hs.level_set = player->getLevelSet();
+		m_manager.m_high_scores[id] = hs;
 	}
 }
 
@@ -128,12 +141,12 @@ int BrainPlayerManager::getPlayerNumber(BrainPlayer& player) const
 void BrainPlayerManager::textReady(string str, int id)
 {
 	// Submit highscore
-	map<int,high_score>::iterator it = m_high_scores.find(id);
+	map<int,HighScore::Entry>::iterator it = m_high_scores.find(id);
 	if( it == m_high_scores.end() )
 		return;
 
-	struct high_score hs = m_high_scores[id];
-	m_highscore->addEntry(str,hs.score,hs.level);
+	HighScore::Entry hs = m_high_scores[id];
+	m_highscore->addEntry(str,hs.score,hs.level,hs.level_set);
 	m_high_scores.erase(id);
 }
 

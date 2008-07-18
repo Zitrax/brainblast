@@ -12,7 +12,10 @@
 #include <ostream>
 #include <istream>
 
+#include "bbc.h"
+
 using namespace std;
+using namespace bbc;
 
 class HighScore
 {
@@ -20,10 +23,20 @@ public:
 	HighScore(string file, unsigned int max_entries);
 	~HighScore(){}
 
+	struct Entry
+	{
+		Entry() : name(),score(0),level(0),level_set(UNKNOWN) {}
+
+		string name;
+		int score;
+		int level;
+		LEVEL_SET level_set;
+	};
+
 	/**
 	 * Tries to add an entry into the list.
 	 */
-	void addEntry(string name,int score,int level);
+	void addEntry(string name,int score,int level, LEVEL_SET level_set);
 
 	/**
 	 * Will return true if the provided score is high enough
@@ -35,22 +48,14 @@ public:
 
 private:
 
-	struct Entry
-	{
-		Entry() : name(),score(0),level(0) {}
-
-		string name;
-		int score;
-		int level;
-
-	};
+	void debugOut(vector<Entry>& entries) const;
 
 	/**
 	 * This operator is used in write()
 	 */
 	friend ostream& operator<<(ostream& out, const Entry& entry)
 		{
-			return out << entry.name << " " << entry.score << " " << entry.level;
+			return out << entry.name << " " << entry.score << " " << entry.level << " " << entry.level_set;
 		}
 
 	/**
@@ -58,7 +63,10 @@ private:
 	 */
 	friend istream& operator>>(istream& in, Entry& entry)
 		{
-			return in >> entry.name >> entry.score >> entry.level;
+			int tmp;
+			in >> entry.name >> entry.score >> entry.level >> tmp;
+			entry.level_set = intToLevelSet(tmp);
+			return in;
 		}
 
 	/**

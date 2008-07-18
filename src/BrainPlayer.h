@@ -7,10 +7,12 @@
 #ifndef BRAINPLAYER_H
 #define BRAINPLAYER_H
 
+#include "Brainblast.h"
 #include "BrainSprite.h"
 #include "Puzzle.h"
 
 using namespace std;
+using namespace bbc;
 
 class BrainPlayer : public BrainSprite
 {
@@ -40,10 +42,12 @@ public:
 	string getName() const    { return m_name; }
 	void setName(string name) { m_name = name; }
 
-	virtual Puzzle* getLevel() const  { return m_level;}
-	virtual void setLevel(Puzzle* lvl){ m_level = lvl; m_level_count++; }
-	int getLevelCount() const { return m_level_count; }
-	void resetLevelCount() { m_level_count = 0; }
+	virtual Puzzle* getLevel() const      { return m_level;}
+	virtual void setLevel(Puzzle* lvl)    { m_level = lvl; m_level_count++; }
+	int getLevelCount() const             { return m_level_count; }
+	void resetLevelCount()                { m_level_count = 0; }
+	LEVEL_SET getLevelSet() const         { return m_level_set; }
+	void setLevelSet(LEVEL_SET level_set) { m_level_set = level_set; }
 
     virtual void left();
     virtual void right();
@@ -86,6 +90,8 @@ private:
 	std::vector<SDLKey> m_keys;
 
 	KrTextBox* m_score_box;
+
+	LEVEL_SET m_level_set;
 };
 
 #endif
