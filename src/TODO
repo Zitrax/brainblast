@@ -1,12 +1,12 @@
 == To fix before first release 0.1 ==
 
-* AI players should not enter highscore list
+X AI players should not enter highscore list
 
-* Fix hardcoded player name and highscore file
+X Fix hardcoded player name and highscore file
 
 X There should be a main screen to select mode and options
 
-* There should be a high score table
+X There should be a high score table
 
 X No timer in the score fields. One big centered for the initial timing
   and one smaller somewhere else (?)
