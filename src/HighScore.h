@@ -68,7 +68,7 @@ private:
 	 */
 	friend istream& operator>>(istream& in, Entry& entry)
 		{
-			int tmp;
+			int tmp = 0;
 			in >> entry.name >> entry.score >> entry.level >> tmp;
 			entry.level_set = intToLevelSet(tmp);
 			return in;

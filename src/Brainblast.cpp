@@ -226,7 +226,7 @@ Brainblast::makeLevel(int lvl)
     else 
     {
 
-        char* filename  = static_cast<char*>(malloc(40));
+        char* filename  = static_cast<char*>(malloc(128));
       
         const char* filebase = "/usr/share/games/brainblast/lvl/lvl%03d.txt";
       
@@ -260,11 +260,13 @@ Brainblast::makeLevel(int lvl)
 					if( it == m_bricks.end() )
 					{
 						cerr << "=== ERROR: Level file contain invalid brick type (" << val << ") ===\n";
+						free(filename);
 						return false;
 					}
 					if( tmp > height*width )
 					{
 						cerr << "=== ERROR: Level file contain invalid brick position (" << tmp << ") ===\n";
+						free(filename);
 						return false;
 					}
 
