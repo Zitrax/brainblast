@@ -20,6 +20,10 @@ class distcmp
 public:
     distcmp(int x) : m_x(x){}
 
+	/**
+	 * Should have been const pointers, but Kyras ->X() function
+	 * is not const.
+	 */
     bool operator() (BrainSprite*& lhs, BrainSprite*& rhs) const
         {
             return 
