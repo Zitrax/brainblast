@@ -99,5 +99,7 @@ bool BrainSoundBASS::toggleMusic()
 	default:
 		error("toggleMusic unhandled value");
 	}
+
+	return false;
 }
 
