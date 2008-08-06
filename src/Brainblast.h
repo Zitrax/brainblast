@@ -44,10 +44,13 @@ namespace brain
 	const int MARGIN = 0;
 }
 
-int main(int argc, char *argv[]);
-
 /**
+ * This class is used to report back when a string
+ * input is done which was requested using
+ * Brainblast::startTextInput()
  *
+ * When a string is ready textReady() will be
+ * called with the string and it's id.
  */
 class TextListener
 {
@@ -62,6 +65,7 @@ private:
 	static int m_text_id;
 };
 
+/** Functor for use in for_each iterations */
 struct text_ready
 {
 	text_ready(string s, int id) : m_s(s), m_id(id) {}
@@ -71,9 +75,9 @@ struct text_ready
 };
 
 /**
- * Starting a Brainblast game should be as simple as 
- * creating an object of this class and calling
- * startGame();
+ * Starting a Brainblast game:
+ * 1. Call initGameKyra()
+ * 2. Start the event loop: eventLoop()
  */
 class Brainblast
 {
@@ -118,7 +122,7 @@ public:
 
 	vector<BrainSprite*>& getAllSprites() { return m_sprites; }
 
-	bool writeScoreAndTime(time_t& now);
+	void writeScoreAndTime(time_t& now);
 
 	/**
 	 * Perform a select for the player at lvl.
@@ -200,11 +204,16 @@ private:
 	 */
 	static const double WAITTIME = 10.0;
 	
-	// Should probably change these to an enum state instead.
-	// ------------------------------------------------------
-	bool m_play;  // Tells if the user has aborted the wait
-	bool m_title; // Tells that we are showing the title screen
-	bool m_game_over; // Tells if we are in the game over state
+	enum gamestate
+	{
+		PLAY_WAIT, // Waiting while showing solution
+		PLAYING,   // Playing the game
+		TITLE,     // Showing the title screen
+		GAME_OVER, // 
+		HIGH_SCORE 
+	};
+	
+	enum gamestate m_gamestate;
 
 	time_t m_start_time;
 
