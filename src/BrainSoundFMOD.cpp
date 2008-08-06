@@ -45,6 +45,9 @@ bool BrainSoundFMOD::initializeSound()
 
 bool BrainSoundFMOD::loadMusic(const char* file)
 {
+	if( m_music && (m_loaded_music == file) )
+		return true; // We have already loaded this file
+
     if( m_music )
     {
         FMUSIC_FreeSong(m_music);
@@ -56,8 +59,11 @@ bool BrainSoundFMOD::loadMusic(const char* file)
     if( !m_music )
 	{
 		error("loadMusic - Can't load the file");
+		m_loaded_music = "";
 		return false;
 	}
+
+	m_loaded_music = file;
 
 	return true;
 }
@@ -72,6 +78,9 @@ bool BrainSoundFMOD::playMusic()
 
     if( m_off_toggle )
         return true; // Not an error
+
+    if( FMUSIC_IsPlaying(m_music) )
+		return true; // Do not restart if already playing
 
 	if( !FMUSIC_PlaySong(m_music) )
 	{

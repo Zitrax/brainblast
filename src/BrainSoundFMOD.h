@@ -11,6 +11,7 @@
 #include "../fmod/api/inc/fmod.h"
 
 #include <assert.h>
+#include <string>
 
 /**
  * Implements the BrainSound api using the FMOD library
@@ -19,7 +20,11 @@ class BrainSoundFMOD : public BrainSound
 {
 public:
 
-	BrainSoundFMOD() : BrainSound(), m_music(0), m_off_toggle(false) {}
+	BrainSoundFMOD() : 
+		BrainSound(), 
+		m_music(0), 
+		m_off_toggle(false),
+		m_loaded_music() {}
 	~BrainSoundFMOD();
 
 	bool initializeSound();
@@ -48,6 +53,7 @@ private:
 
 	bool m_off_toggle;
 
+	std::string m_loaded_music;
 };
 
 #endif // BRAINSOUNDFMOD_H
