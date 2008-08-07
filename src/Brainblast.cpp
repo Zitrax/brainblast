@@ -899,6 +899,8 @@ void Brainblast::showHighScore()
 		m_center_text_box->SetTextChar(str.str(),i+2);
 		str.str("");
 	}
+	for(int i=len; i<=8; i++)
+		m_center_text_box->SetTextChar("",i+2);
 }
 
 void Brainblast::nextTextInput()
