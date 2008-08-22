@@ -214,7 +214,7 @@ Brainblast::makeLevel(int lvl)
 		zap(m_current_levels[i] );
 	m_current_levels.clear();
 	
-    if(lvl == 0) 
+    if( m_level_set == RANDOM ) 
     {
 		// 7x8 is maximum size if you want to avoid overlapping
 		makeRandomLevel(4,4,4);
@@ -420,7 +420,7 @@ Brainblast::startGame()
 	for(unsigned int i=0; i<m_player_manager->playerCount(); ++i)
 		m_player_manager->getPlayer(i)->setLevelSet(m_level_set);
 
-	if( !changeLevel(m_level_set == NORMAL ? 1 : 0) )
+	if( !changeLevel(1) )
 		return false; 
 
 	return true;
@@ -1065,8 +1065,8 @@ void Brainblast::select(Puzzle& lvl, BrainPlayer& player)
 				<< " wins level " << m_current_lvl;
 			m_center_text_box->SetTextChar(str.str(),0);
 
-			if( !changeLevel(!m_current_lvl ? 0 : m_current_lvl+1) )
-				changeLevel(0);
+			if( !changeLevel(m_current_lvl+1) )
+				changeLevel(1);
 		}
 	}	
 }
