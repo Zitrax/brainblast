@@ -695,7 +695,9 @@ int Brainblast::eventLoop()
 				switch(m_gamestate)
 				{
 				case TITLE:
-					startGame(); break;
+					m_player_manager->resetScores();
+					startGame(); 
+					break;
 				case GAME_OVER: 
 				case HIGH_SCORE:
 					titleScreen(); break;
@@ -711,10 +713,19 @@ int Brainblast::eventLoop()
 				{
 				case TITLE:
 					done = true; break;
-				case GAME_OVER: 
-				case HIGH_SCORE:
 				case PLAY_WAIT:
 				case PLAYING:
+				{
+					bool title = true;
+					for(unsigned int i=0; i<m_player_manager->playerCount(); ++i)
+						if( m_player_manager->getPlayer(i)->getScore() )
+							title = false;
+					// If no one had any points, go directly to title screen
+					title ? titleScreen() : gameOver();
+				}
+					break;
+				case GAME_OVER: 
+				case HIGH_SCORE:
 					titleScreen();
 					break;
 				}
@@ -853,16 +864,20 @@ int Brainblast::eventLoop()
 			writeScoreAndTime(now);
 			
 			if( m_gamestate==GAME_OVER && !was_game_over )
-			{
-				m_center_text_box->SetTextChar("Game Over",0);
-				m_player_manager->gameOver();
-				clearFloor();
-			}
+				gameOver();
 		}
 		
 	}
     
     return 0;
+}
+
+void Brainblast::gameOver()
+{
+	m_gamestate = GAME_OVER;
+	m_center_text_box->SetTextChar("Game Over",0);
+	m_player_manager->gameOver();
+	clearFloor();
 }
 
 void Brainblast::clearTextBox( KrTextBox* tb )

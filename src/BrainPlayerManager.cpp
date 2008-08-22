@@ -107,6 +107,10 @@ void BrainPlayerManager::move()
 void BrainPlayerManager::gameOver()
 {
 	for_each(m_players.begin(),m_players.end(),playerCheckScore(*this));
+}
+
+void BrainPlayerManager::resetScores()
+{
 	for_each(m_players.begin(),m_players.end(),playerResetScore);
 }
 

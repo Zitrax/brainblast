@@ -39,6 +39,11 @@ public:
 	 */
 	void gameOver();
 
+	/**
+	 * All players get 0 points
+	 */
+	void resetScores();
+
 	/** 
 	 * Returns true if the key was handled/eaten and should
 	 * not be processed further by caller 
