@@ -44,6 +44,11 @@ public:
 	 */
 	void resetScores();
 
+	/**
+	 * Returns true if no player has received any points.
+	 */
+	bool allScoresNull() const;
+
 	/** 
 	 * Returns true if the key was handled/eaten and should
 	 * not be processed further by caller 

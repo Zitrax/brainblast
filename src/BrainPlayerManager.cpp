@@ -114,6 +114,16 @@ void BrainPlayerManager::resetScores()
 	for_each(m_players.begin(),m_players.end(),playerResetScore);
 }
 
+bool BrainPlayerManager::allScoresNull() const
+{
+    vector<BrainPlayer*>::const_iterator it;
+    vector<BrainPlayer*>::const_iterator end = m_players.end();
+    for( it=m_players.begin(); it!=end; ++it )
+		if( (*it)->getScore() )
+			return false;
+	return true;
+}
+
 void BrainPlayerManager::playerCheckScore::operator() (BrainPlayer* player)
 {
 	// Avoid scoring computer players

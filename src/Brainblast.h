@@ -122,6 +122,8 @@ public:
 
 	vector<BrainSprite*>& getAllSprites() { return m_sprites; }
 
+	unsigned int secondsLeft(time_t& now) const;
+
 	void writeScoreAndTime(time_t& now);
 
 	/**
@@ -213,7 +215,7 @@ private:
 		PLAYING,   // Playing the game
 		TITLE,     // Showing the title screen
 		GAME_OVER, // 
-		HIGH_SCORE 
+		HIGH_SCORE
 	};
 	
 	enum gamestate m_gamestate;
@@ -264,6 +266,9 @@ private:
 
 	vector<TextListener*> m_text_listeners;
 	map<int,string> m_text_queue;
+
+	SDL_TimerID m_time_bonus_timer;
+	SDL_Event m_time_bonus_event;
 };
 
 #endif
