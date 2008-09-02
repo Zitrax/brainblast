@@ -609,7 +609,7 @@ void Brainblast::titleScreenUpdateText()
 
 BrainSprite* Brainblast::addSprite()
 {
-	if( m_gamestate == PLAY_WAIT )
+	if( m_gamestate != PLAYING && m_gamestate != TITLE )
 		return 0;
 
 	KrSpriteResource* spriteRes = 0;
@@ -707,29 +707,29 @@ int Brainblast::eventLoop()
 				case PLAY_WAIT:
 					finishInitialWait(); break;
 				case PLAYING:
+				case TIME_BONUS:
 					break;
 				}
 			}
 			else if( event.key.keysym.sym == SDLK_ESCAPE )
 			{
-				if( !m_time_bonus_timer ) // TODO: We could speed up the timer instead
+				switch(m_gamestate)
 				{
-					switch(m_gamestate)
-					{
-					case TITLE:
-						done = true; break;
-					case PLAY_WAIT:
-					case PLAYING:
-					{
-						// If no one had any points, go directly to title screen
-						m_player_manager->allScoresNull() ? titleScreen() : gameOver();
-					}
+				case TITLE:
+					done = true; break;
+				case PLAY_WAIT:
+				case PLAYING:
+				{
+					// If no one had any points, go directly to title screen
+					m_player_manager->allScoresNull() ? titleScreen() : gameOver();
+				}
+				break;
+				case GAME_OVER: 
+				case HIGH_SCORE:
+					titleScreen();
 					break;
-					case GAME_OVER: 
-					case HIGH_SCORE:
-						titleScreen();
-						break;
-					}
+				case TIME_BONUS:
+					break;
 				}
 			}
 			else if( m_gamestate==TITLE && event.key.keysym.sym == SDLK_F1 )
@@ -806,7 +806,7 @@ int Brainblast::eventLoop()
 				str << "Time Bonus: " << *current;
 				(*current)--;
 				m_center_text_box->SetTextChar(str.str(),1);
-				m_sound->playSample(CLICK);
+				m_sound->playSample(BOUNCE);
 				BrainPlayer* player = static_cast<BrainPlayer*>(event.user.data1);
 				if( player )
 					player->addScore(player->getLevel()->brickScore()/10);
@@ -1094,7 +1094,7 @@ void Brainblast::writeScoreAndTime(time_t& now)
 		score_str.str("");
 	}
 	
-	if( (m_gamestate == PLAYING) && !sec )
+	if( (m_gamestate == PLAYING) && !sec && !min )
 		m_gamestate = GAME_OVER;
 }
 
@@ -1126,7 +1126,9 @@ void Brainblast::select(Puzzle& lvl, BrainPlayer& player)
 			m_time_bonus_event.type       = SDL_TIME_BONUS_EVENT;
 			m_time_bonus_event.user.data1 = static_cast<void*>(m_player_manager->getPlayer(m_player_manager->getPlayerNumber(player)-1)); // FIXME
 			m_time_bonus_event.user.data2 = static_cast<void*>(seconds);
-			m_time_bonus_timer = SDL_AddTimer( 125, TimerCallback, &m_time_bonus_event );	
+			m_time_bonus_timer = SDL_AddTimer( 100, TimerCallback, &m_time_bonus_event );	
+			m_gamestate = TIME_BONUS;
+			clearFloor();
 
 			// Level is changed when counting the bonus is finished
 

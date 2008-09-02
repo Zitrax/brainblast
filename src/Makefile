@@ -1,5 +1,5 @@
 GCC       = g++
-CFLAGS    = -O3 -Weffc++ -Wall -Wextra #-pedantic 
+CFLAGS    = -g -Weffc++ -Wall -Wextra #-pedantic 
 
 CFLAGS   += -I../include
 

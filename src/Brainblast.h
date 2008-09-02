@@ -215,7 +215,8 @@ private:
 		PLAYING,   // Playing the game
 		TITLE,     // Showing the title screen
 		GAME_OVER, // 
-		HIGH_SCORE
+		HIGH_SCORE,
+		TIME_BONUS
 	};
 	
 	enum gamestate m_gamestate;
