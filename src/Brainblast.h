@@ -35,7 +35,7 @@ namespace brain
 //! The total number of different brick types (different symbols)
 	const int MAX_NOF_BRICK_TYPES = 25;
 	
-//! The vide mode to use
+//! The video mode to use
 	const int VIDEOX = 1024;
 	const int VIDEOY = 768;
 	const int VIDEOBITS = 32;
