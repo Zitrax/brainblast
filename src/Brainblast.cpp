@@ -306,7 +306,8 @@ Brainblast::createBricks()
 			// FIXME: We do not want the player sprites here
 			// so aborting. But ideally they should be separated
 			// into different vaults or in another better way than this.
-			if( sr->ResourceId() == BB_WIZARD )
+			if( sr->ResourceId() == BB_WIZARD ||
+				sr->ResourceId() == BB_WIZARD2 )
 				continue;
 
 			KrSprite* b = new KrSprite(sr);
