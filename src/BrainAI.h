@@ -13,8 +13,18 @@
 
 class BrainAI : public BrainPlayer
 {
+	enum Difficulty
+	{
+		IDIOT,
+		STUPID,
+		EASY,
+		MEDIUM,
+		HARD,
+		IMPOSSIBLE
+	};
+
 public:
-    BrainAI(KrSpriteResource* res, std::string name);
+    BrainAI(KrSpriteResource* res, std::string name, enum Difficulty diff = EASY);
 	
     virtual ~BrainAI(){}
 	
@@ -31,10 +41,14 @@ private:
 	BrainAI(const BrainAI& bb);
     BrainAI& operator=(const BrainAI& bb);
 
+	void setDifficulty();
+
 	std::vector<int> m_needed_ids;
 
   	clock_t m_selection_start;
   	float m_selection_delay;
+	enum Difficulty m_difficulty;
+
 };
 
 #endif // BRAIN_AI_H
