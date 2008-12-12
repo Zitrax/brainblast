@@ -54,13 +54,15 @@ private:
 //  * Allow the ai to be stupid by randomly doing something incorrect.
 // 
 
-BrainAI::BrainAI(KrSpriteResource* res, std::string name)
+BrainAI::BrainAI(KrSpriteResource* res, std::string name, enum Difficulty diff)
     : BrainPlayer(res,name),
       m_needed_ids(),
       m_selection_start(),
-      m_selection_delay(0.005) // I need a better timer than clock
-                               // perhaps clock_gettime would be ok.
+      m_selection_delay(0.010), // I need a better timer than clock
+                                // perhaps clock_gettime would be ok.
+	  m_difficulty(diff)
 {
+	setDifficulty();
 }
 
 void BrainAI::move()
@@ -70,7 +72,7 @@ void BrainAI::move()
     if( m_level->isSelecting() )
     {
         printf("BrainAI::move %f\n",static_cast<float>(clock()-m_selection_start)/CLOCKS_PER_SEC);
-//        if( (static_cast<float>(clock()-m_selection_start)/CLOCKS_PER_SEC) > m_selection_delay )
+        if( (static_cast<float>(clock()-m_selection_start)/CLOCKS_PER_SEC) > m_selection_delay )
         {
             if( m_level->navigateTowards() )
             {
@@ -146,4 +148,29 @@ void BrainAI::move()
     int left_dist = cx-px<0 ? px-cx : px-cx+brain::VIDEOX;
 
     (left_dist < brain::VIDEOX/2) ? left() : right();
+}
+
+void BrainAI::setDifficulty()
+{
+	switch(m_difficulty)
+	{
+	case IDIOT:
+		m_selection_delay = 0.2;
+		break;
+	case STUPID:
+		m_selection_delay = 0.1;
+		break;
+	case EASY:
+		m_selection_delay = 0.05;
+		break;
+	case MEDIUM:
+		m_selection_delay = 0.01;
+		break;
+	case HARD:
+		m_selection_delay = 0.005;
+		break;
+	case IMPOSSIBLE:
+		m_selection_delay = 0;
+		break;
+	}
 }
