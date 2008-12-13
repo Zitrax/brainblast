@@ -260,9 +260,8 @@ Brainblast::makeLevel(int lvl)
 					map<int,Brick*>::iterator it = m_bricks.find(val);
 					if( it == m_bricks.end() )
 					{
-						cerr << "=== ERROR: Level file contain invalid brick type (" << val << ") ===\n";
-						free(filename);
-						return false;
+						cerr << "=== WARNING: Level file '" << filename << "' contain invalid brick type (" << val << ") will use another one ===\n";
+						it = m_bricks.begin();
 					}
 					if( tmp > height*width )
 					{
@@ -682,7 +681,8 @@ int Brainblast::eventLoop()
 		{
         case SDL_KEYDOWN:
 
-			printf( "%s\n", SDL_GetKeyName(event.key.keysym.sym));
+			if( bbc::debug )
+				printf( "%s\n", SDL_GetKeyName(event.key.keysym.sym));
 
 			if( !m_text_queue.empty() )
 			{
@@ -1049,7 +1049,6 @@ BrainSprite* Brainblast::collisionCheck(BrainPlayer* player)
 	vector<KrImage*> collides;
 	if( m_engine->Tree()->CheckChildCollision(player,m_bgTree,&collides) )
 	{  
-		printf("Collision!\n");
 		// Use of dynamic cast as we only want to try to pick
 		// up BrainSprites and not ordinary KrSprites as in the
 		// Bricks. 
