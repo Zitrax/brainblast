@@ -17,16 +17,23 @@ HighScore::HighScore(string file, unsigned int max_entries)
 {
 }
 
-bool HighScore::highEnough(int score)
+void HighScore::reloadCache()
 {
 	m_cached_entries.clear();
 	read(m_cached_entries);
-	
+}
+
+bool HighScore::highEnough(int score)
+{
+	// Read current file (if not cached)
+	if( m_cached_entries.empty() )
+		reloadCache();
+
 	// If the list is not yet full we can always add...
 	if( m_cached_entries.size() < m_max_entries )
 		return true;
 
-	// ... if not we ned to check if we have more points than the worst entry.
+	// ... if not we need to check if we have more points than the worst entry.
 	vector<Entry>::iterator it = min_element(m_cached_entries.begin(),m_cached_entries.end(),score_cmp());
 	if( (it != m_cached_entries.end()) && (*it).score > score )
 		return false;
@@ -42,14 +49,10 @@ void HighScore::addEntry(string name,int score,int level,LEVEL_SET level_set)
 	entry.level = level;
 	entry.level_set = level_set;
 
-	// Read current file (if not cached)
-	if( m_cached_entries.empty() && !highEnough(score) )
-	{
-		m_cached_entries.clear();
+	if( !highEnough(score) )
 		return; // Score too low
-	}
 
-	// Insert current entry
+	// The score is high enough, so insert current entry
 	m_cached_entries.push_back(entry);
 
 	// Reverse Sorting
