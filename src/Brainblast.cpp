@@ -574,7 +574,7 @@ void Brainblast::titleScreen()
 	m_current_levels.clear();
 	m_player_manager->removePlayers();
 
-	m_left_score_text_box->SetTextChar("MUSIC BY SAGA MUSIX, HTTP://SAGA-MUSIX.ATH.CX/",0);
+	m_left_score_text_box->SetTextChar("MUSIC BY SAGA MUSIX, HTTP://SAGAMUSIX.DE/",0);
 	m_right_score_text_box->SetTextChar("              CODE: DANIEL BENGTSSON",0);
 
 	titleScreenUpdateText();
@@ -584,7 +584,7 @@ void Brainblast::titleScreenUpdateText()
 {
 	clearTextBox(m_center_text_box);
 
-	m_center_text_box->SetTextChar("BRAINBLAST 0.1",0);
+	m_center_text_box->SetTextChar("BRAINBLAST 0.2",0);
 	m_center_text_box->SetTextChar("",1);
 
 	ostringstream str;
