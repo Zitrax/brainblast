@@ -929,9 +929,11 @@ void Brainblast::showHighScore()
 {
 	m_gamestate = HIGH_SCORE;
 
+	int max = m_player_manager->hs_max_entries();
+
 	vector<HighScore::Entry> entries = m_player_manager->getHighScoreEntries();
 	
-	int len = entries.size()>6 ? 6 : entries.size();
+	int len = (entries.size() > max) ? max : entries.size();
 
 	m_center_text_box->SetTextChar("Highscores",0);
 	m_center_text_box->SetTextChar("      Name   Score Level Mode",1);
