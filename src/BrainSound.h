@@ -9,7 +9,7 @@
 
 /**
  * This class can be used to implement the sounds
- * is a sound library of choice.
+ * in a sound library of choice.
  *
  * There has currently been three libraries tested:
  *
