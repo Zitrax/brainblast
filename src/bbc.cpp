@@ -7,7 +7,7 @@
 
 namespace bbc {
   
-	int debug = 1;
+	int debug = 0;
 	bool ERRFLAG = false;
 
 	//----------------------------------------------------------
