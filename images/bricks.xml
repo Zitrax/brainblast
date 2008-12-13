@@ -32,6 +32,23 @@
         </Action>
         <Action name="NONE" />
     </Sprite>
+    <Sprite name="WIZARD2">
+        <Action name="HOLDING.RIGHT">
+            <Frame x="237" y="275" width="54" height="55" hotspotx="260" hotspoty="288" deltax="6" deltay="0" />
+        </Action>
+        <Action name="HOLDING.LEFT">
+            <Frame x="293" y="274" width="51" height="56" hotspotx="324" hotspoty="289" deltax="-6" deltay="0" />
+        </Action>
+        <Action name="WALKING.LEFT">
+            <Frame x="140" y="275" width="43" height="58" hotspotx="164" hotspoty="289" deltax="0" deltay="0" />
+            <Frame x="183" y="274" width="50" height="59" hotspotx="209" hotspoty="289" deltax="-8" deltay="0" />
+        </Action>
+        <Action name="WALKING.RIGHT">
+            <Frame x="36" y="277" width="51" height="58" hotspotx="61" hotspoty="289" deltax="0" deltay="0" />
+            <Frame x="87" y="276" width="44" height="59" hotspotx="105" hotspoty="289" deltax="8" deltay="0" />
+        </Action>
+        <Action name="NONE" />
+    </Sprite>
     <Sprite name="YBLOB">
         <Action name="NONE">
             <Frame x="418" y="13" width="69" height="69" hotspotx="453" hotspoty="49" deltax="0" deltay="0" />
