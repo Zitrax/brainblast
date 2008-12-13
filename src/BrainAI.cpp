@@ -66,15 +66,40 @@ BrainAI::BrainAI(KrSpriteResource* res, std::string name, enum Difficulty diff)
 	setDifficulty();
 }
 
+float BrainAI::time_since_start()
+{
+	timespec now;
+	clock_gettime(CLOCK_REALTIME,&now);
+	timespec diff = time_diff(m_selection_start,now);
+
+	float time = diff.tv_sec;
+	time += diff.tv_nsec/1000000000.0;
+	return time;
+}
+
+timespec BrainAI::time_diff(timespec start, timespec end)
+{
+	timespec temp;
+	if ((end.tv_nsec-start.tv_nsec)<0) {
+		temp.tv_sec = end.tv_sec-start.tv_sec-1;
+		temp.tv_nsec = 1000000000+end.tv_nsec-start.tv_nsec;
+	} else {
+		temp.tv_sec = end.tv_sec-start.tv_sec;
+		temp.tv_nsec = end.tv_nsec-start.tv_nsec;
+	}
+	return temp;
+}
+
 void BrainAI::move()
 {
 	BrainSprite::move();
 
     if( m_level->isSelecting() )
     {
-        //printf("BrainAI::move %f\n",static_cast<float>(clock()-m_selection_start)/CLOCKS_PER_SEC);
-        if( (static_cast<float>(clock()-m_selection_start)/CLOCKS_PER_SEC) > m_selection_delay )
-        {
+        printf("BrainAI::move %f\n",time_since_start());
+		
+		if( time_since_start() > m_selection_delay )
+		{
             if( m_level->navigateTowards() )
             {
                 // Stupid kyra has not made NodeId const so we have to const_cast here
@@ -84,7 +109,7 @@ void BrainAI::move()
                 Brainblast::instance()->select(*m_level,*this);
                 
             }
-            m_selection_start = clock();
+			clock_gettime(CLOCK_REALTIME,&m_selection_start);
         }
         return;
     }
@@ -94,7 +119,7 @@ void BrainAI::move()
         BrainSprite* o = drop(0);
         o->setStatic(true);
         m_level->startSelection(o);
-        m_selection_start = clock();
+        clock_gettime(CLOCK_REALTIME,&m_selection_start);
         return;
     }
 
@@ -156,19 +181,19 @@ void BrainAI::setDifficulty()
 	switch(m_difficulty)
 	{
 	case IDIOT:
-		m_selection_delay = 0.2;
+		m_selection_delay = 1.20;
 		break;
 	case STUPID:
-		m_selection_delay = 0.1;
+		m_selection_delay = 1.00;
 		break;
 	case EASY:
-		m_selection_delay = 0.05;
+		m_selection_delay = 0.60;
 		break;
 	case MEDIUM:
-		m_selection_delay = 0.01;
+		m_selection_delay = 0.40;
 		break;
 	case HARD:
-		m_selection_delay = 0.005;
+		m_selection_delay = 0.25;
 		break;
 	case IMPOSSIBLE:
 		m_selection_delay = 0;
