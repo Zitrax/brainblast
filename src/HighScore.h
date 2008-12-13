@@ -44,12 +44,23 @@ public:
 	vector<Entry> getEntries() const;
 
 	/**
+	 * Will clear and reload the highscore list from disk
+	 */
+	void reloadCache();
+
+	/**
 	 * Will return true if the provided score is high enough
 	 * to enter the highscore list.
-	 * If used it should be used right before addEntry as the
-	 * list from disk is being cached until the next addEntry call.
+	 *
+	 * The function operates on the exisint list read in 
+	 * reloadCache().
 	 */
 	bool highEnough(int score);
+
+	/** 
+	 * Maximum number of entries in the table
+	 */
+	int max_entries() const { return m_max_entries; }
 
 private:
 
