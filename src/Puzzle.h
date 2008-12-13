@@ -49,7 +49,7 @@ public:
 	bool navigateTowards();
 
 	bool isSelecting() const { return m_selection_sprite != 0; } 
-	const BrainSprite* const getSelectionSprite() { return m_selection_sprite; }
+	const BrainSprite* getSelectionSprite() const { return m_selection_sprite; }
 	/**
 	 * This creates a brick of the moved type at the current
 	 * position. 
