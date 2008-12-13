@@ -5,8 +5,6 @@
  */
 
 #include "BrainPlayerManager.h"
-#include "Brainblast.h"
-#include "BrainAI.h"
 #include "../images/bb.h"
 #include <sstream>
 #include <algorithm>
@@ -16,6 +14,7 @@ using namespace brain;
 BrainPlayerManager::BrainPlayerManager()
 	: m_players(), 
 	  m_player_count(0),
+	  m_difficulty(BrainAI::MEDIUM),
 	  m_highscore(0),
 	  m_high_scores()
 {
@@ -61,7 +60,7 @@ void BrainPlayerManager::addPlayers(int human_players, int computer_players)
     for(int i=0;i<computer_players;++i)
     {
 		if(bbc::debug) cerr << "BrainPlayerManager() Adding computer player " << i << "\n";
-        BrainPlayer* player = new BrainAI( m_players.size()%2 ? wizardRes2 : wizardRes, "computer" );
+        BrainPlayer* player = new BrainAI( m_players.size()%2 ? wizardRes2 : wizardRes, "computer", m_difficulty );
         player->SetNodeId(m_players.size()%2 ? BB_WIZARD2 : BB_WIZARD);
         player->SetPos( spacing(), 0);
         Brainblast::instance()->engine()->Tree()->AddNode( 0, player );
@@ -169,6 +168,35 @@ void BrainPlayerManager::textReady(string str, int id)
 	HighScore::Entry hs = m_high_scores[id];
 	m_highscore->addEntry(str,hs.score,hs.level,hs.level_set);
 	m_high_scores.erase(id);
+}
+
+string BrainPlayerManager::difficultyString() const
+{
+	switch(m_difficulty)
+	{
+	case BrainAI::IDIOT:
+		return "Idiot";
+	case BrainAI::STUPID:
+		return "Stupid";
+	case BrainAI::EASY:
+		return "Easy";
+	case BrainAI::MEDIUM:
+		return "Medium";
+	case BrainAI::HARD:
+		return "Hard";
+	case BrainAI::IMPOSSIBLE:
+		return "Impossible";
+	default:
+		return "UNKNOWN";
+	}
+
+}
+
+void BrainPlayerManager::toggleDifficulty()
+{
+	m_difficulty = static_cast<BrainAI::Difficulty>(m_difficulty+1);
+	if( m_difficulty == BrainAI::UNKNOWN )
+		m_difficulty = BrainAI::IDIOT;
 }
 
 bool BrainPlayerManager::handleKeyDown(SDLKey key)
