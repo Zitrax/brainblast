@@ -1,0 +1,10 @@
+* The background image was made with Gimp based on a tutorial at
+  http://www.gimpusers.com/tutorials/starfield-tutorial.html
+
+Kyra:
+-----
+
+1. manually copy grinliz and tinyxml headers to /usr/local/include
+2. add empty constructor to glrandom.h
+
+Some functions are in libkyra and some in libengine
