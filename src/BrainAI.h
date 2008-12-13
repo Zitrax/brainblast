@@ -8,11 +8,12 @@
 #define BRAIN_AI_H
 
 #include "BrainPlayer.h"
-#include "Brainblast.h"
 #include "Puzzle.h"
 
 class BrainAI : public BrainPlayer
 {
+public:
+
 	enum Difficulty
 	{
 		IDIOT,
@@ -20,11 +21,11 @@ class BrainAI : public BrainPlayer
 		EASY,
 		MEDIUM,
 		HARD,
-		IMPOSSIBLE
+		IMPOSSIBLE,
+		UNKNOWN
 	};
 
-public:
-    BrainAI(KrSpriteResource* res, std::string name, enum Difficulty diff = MEDIUM);
+    BrainAI(KrSpriteResource* res, std::string name, enum Difficulty diff);
 	
     virtual ~BrainAI(){}
 	
