@@ -929,7 +929,7 @@ void Brainblast::showHighScore()
 {
 	m_gamestate = HIGH_SCORE;
 
-	int max = m_player_manager->hs_max_entries();
+	unsigned int max = m_player_manager->hs_max_entries();
 
 	vector<HighScore::Entry> entries = m_player_manager->getHighScoreEntries();
 	
