@@ -6,6 +6,8 @@
 
 #include "BrainAI.h"
 
+#include "Brainblast.h"
+
 #include <queue>
 #include <algorithm> // find
 
@@ -197,6 +199,10 @@ void BrainAI::setDifficulty()
 		break;
 	case IMPOSSIBLE:
 		m_selection_delay = 0;
+		break;
+	case UNKNOWN:
+		assert(!"Should not get here");
+		m_selection_delay = 0.50;
 		break;
 	}
 }
