@@ -24,7 +24,7 @@ class BrainAI : public BrainPlayer
 	};
 
 public:
-    BrainAI(KrSpriteResource* res, std::string name, enum Difficulty diff = EASY);
+    BrainAI(KrSpriteResource* res, std::string name, enum Difficulty diff = MEDIUM);
 	
     virtual ~BrainAI(){}
 	
@@ -45,7 +45,11 @@ private:
 
 	std::vector<int> m_needed_ids;
 
-  	clock_t m_selection_start;
+	float time_since_start();
+	timespec time_diff(timespec start, timespec end);
+
+  	timespec m_selection_start;
+	/** Time in seconds to wait between moving each brick */
   	float m_selection_delay;
 	enum Difficulty m_difficulty;
 
