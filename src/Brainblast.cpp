@@ -600,10 +600,15 @@ void Brainblast::titleScreenUpdateText()
 	str << "F3: Level set - " << set;
 	m_center_text_box->SetTextChar(str.str(),4);
 
-	m_center_text_box->SetTextChar("F4: Highscores",5);
-	m_center_text_box->SetTextChar("",6);
-	m_center_text_box->SetTextChar("SPACE: Start game",7);
-	m_center_text_box->SetTextChar("",8);
+	str.str("");
+	string difficulty = m_player_manager->difficultyString();
+	str << "F4: Difficulty - " << difficulty;
+	m_center_text_box->SetTextChar(str.str(),5);
+
+	m_center_text_box->SetTextChar("F5: Highscores",6);
+	m_center_text_box->SetTextChar("",7);
+	m_center_text_box->SetTextChar("SPACE: Start game",8);
+	m_center_text_box->SetTextChar("",9);
 
 	m_top_center_text_box->SetTextChar("",0);
 }
@@ -769,6 +774,11 @@ int Brainblast::eventLoop()
 				titleScreenUpdateText();
 			}
 			else if( m_gamestate==TITLE && event.key.keysym.sym == SDLK_F4 )
+			{
+				m_player_manager->toggleDifficulty();
+				titleScreenUpdateText();
+			}
+			else if( m_gamestate==TITLE && event.key.keysym.sym == SDLK_F5 )
 			{
 				showHighScore();
 			}
