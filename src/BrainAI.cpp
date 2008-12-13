@@ -7,6 +7,7 @@
 #include "BrainAI.h"
 
 #include <queue>
+#include <algorithm> // find
 
 using namespace std;
 
