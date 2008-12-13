@@ -8,6 +8,8 @@
 #include "Brainblast.h"
 #include "../images/bb.h"
 
+#include <algorithm> // sort
+
 Puzzle::Puzzle(int width, int height, SDL_Rect rect)
   : Field(width,height), 
 	m_rect(rect),
