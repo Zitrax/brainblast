@@ -7,6 +7,7 @@
 #ifndef BRAINSPRITE_H
 #define BRAINSPRITE_H
 
+#include "bbc.h"
 #include <wkyra.h>
 #include <string>
 #include <iostream>
@@ -30,7 +31,7 @@ public:
 		m_static(false)
 		{}
 
-	virtual ~BrainSprite(){std::cout << "BrainSprite destroyed " << m_name << "\n"; }
+	virtual ~BrainSprite(){if(bbc::debug)std::cout << "BrainSprite destroyed " << m_name << "\n"; }
 
     BrainSprite(const BrainSprite&);
     BrainSprite& operator=(const BrainSprite&);
