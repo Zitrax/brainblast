@@ -14,8 +14,9 @@
 #include "SDL_image.h"
 #include "BrainPlayerManager.h"
 
-#include <sstream>  // ostringstream
-#include <iomanip>  // setfill setw
+#include <sstream>   // ostringstream
+#include <iomanip>   // setfill setw
+#include <algorithm> // for_each
 
 using namespace grinliz;
 using namespace brain;
@@ -190,7 +191,7 @@ Brainblast::makeRandomLevel(int w,int h,int n)
 			++it;
 		assert(it!=m_bricks.end());
 
-		int idxidx  = bbc::randint(0,indexes.size()-1);
+		int idxidx = bbc::randint(0,indexes.size()-1);
 		int idx = indexes[idxidx];
 		indexes.erase(find(indexes.begin(),indexes.end(),idx));
 
@@ -1004,8 +1005,8 @@ void Brainblast::textInput(SDLKey k)
 	}
 
 	// For now only letters and numbers
-	else if( k >= SDLK_0 && k <= SDLK_9 ||
-			 k >= SDLK_a && k <= SDLK_z)
+	else if( (k >= SDLK_0 && k <= SDLK_9) ||
+			 (k >= SDLK_a && k <= SDLK_z) )
 	{
 		string s;
 		m_center_text_box->GetTextChar(&s,4);
