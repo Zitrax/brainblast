@@ -9,6 +9,7 @@
 #include "BrainAI.h"
 #include "../images/bb.h"
 #include <sstream>
+#include <algorithm>
 
 using namespace brain;
 
