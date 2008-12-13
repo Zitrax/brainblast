@@ -7,7 +7,6 @@
 #ifndef BRAINPLAYER_H
 #define BRAINPLAYER_H
 
-#include "Brainblast.h"
 #include "BrainSprite.h"
 #include "Puzzle.h"
 
