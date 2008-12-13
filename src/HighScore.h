@@ -60,7 +60,7 @@ public:
 	/** 
 	 * Maximum number of entries in the table
 	 */
-	int max_entries() const { return m_max_entries; }
+	unsigned int max_entries() const { return m_max_entries; }
 
 private:
 
