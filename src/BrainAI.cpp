@@ -98,7 +98,7 @@ void BrainAI::move()
 
     if( m_level->isSelecting() )
     {
-        printf("BrainAI::move %f\n",time_since_start());
+        //printf("BrainAI::move %f\n",time_since_start());
 		
 		if( time_since_start() > m_selection_delay )
 		{
