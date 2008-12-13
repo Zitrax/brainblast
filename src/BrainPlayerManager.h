@@ -62,7 +62,7 @@ public:
 	unsigned int playerCount() const { return m_player_count; }
 
 	vector<HighScore::Entry> getHighScoreEntries() const { return m_highscore->getEntries(); }
-	int hs_max_entries() const { return m_highscore->max_entries(); }
+	unsigned int hs_max_entries() const { return m_highscore->max_entries(); }
 
 	// TextListener
 	void textReady(string str, int id);
