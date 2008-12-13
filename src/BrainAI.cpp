@@ -72,7 +72,7 @@ void BrainAI::move()
 
     if( m_level->isSelecting() )
     {
-        printf("BrainAI::move %f\n",static_cast<float>(clock()-m_selection_start)/CLOCKS_PER_SEC);
+        //printf("BrainAI::move %f\n",static_cast<float>(clock()-m_selection_start)/CLOCKS_PER_SEC);
         if( (static_cast<float>(clock()-m_selection_start)/CLOCKS_PER_SEC) > m_selection_delay )
         {
             if( m_level->navigateTowards() )
