@@ -11,6 +11,7 @@
 #include "BrainPlayer.h"
 #include "Brainblast.h"
 #include "HighScore.h"
+#include "BrainAI.h"
 
 using namespace std;
 
@@ -67,6 +68,11 @@ public:
 	// TextListener
 	void textReady(string str, int id);
 
+	enum BrainAI::Difficulty difficulty() const { return m_difficulty; }
+	void setDifficulty(enum BrainAI::Difficulty diff) { m_difficulty = diff; }
+	string difficultyString() const;
+	void toggleDifficulty();
+
 private:
 
     BrainPlayerManager(const BrainPlayerManager&);
@@ -92,6 +98,7 @@ private:
 
 	vector<BrainPlayer*> m_players;
 	unsigned int m_player_count;
+	enum BrainAI::Difficulty m_difficulty;
 	HighScore* m_highscore;
 
 	map<int,HighScore::Entry> m_high_scores;
