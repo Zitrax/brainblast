@@ -26,7 +26,7 @@ class Brainblast;
 
 namespace bbc{
   
-	extern int debug;
+	extern bool debug;
 
 	enum{ERROR, NOTUSED};
 
