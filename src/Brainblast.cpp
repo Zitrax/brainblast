@@ -807,6 +807,8 @@ int Brainblast::eventLoop()
 				SDL_RemoveTimer(m_time_bonus_timer);
 				m_time_bonus_timer = 0;
 
+				delete current;
+
 				if( !changeLevel(m_current_lvl+1) )
 					changeLevel(1);
 
