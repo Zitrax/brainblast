@@ -27,11 +27,15 @@ public:
         m_jumping(true),
         m_child(0),
 		m_creation_time(time(0)),
-		m_temporary(temporary),
-		m_static(false)
+		m_temporary(temporary)
+		,m_static(false)
+		,m_next_bounce_cache(-1)
+#ifdef _DEBUG
+		,m_b(0)
+#endif // _DEBUG
 		{}
 
-	virtual ~BrainSprite(){if(bbc::debug)std::cout << "BrainSprite destroyed " << m_name << "\n"; }
+	virtual ~BrainSprite();
 
     BrainSprite(const BrainSprite&);
     BrainSprite& operator=(const BrainSprite&);
@@ -52,6 +56,12 @@ public:
     virtual void right() { m_x_speed =  5; }
 
     void jump();
+
+	/** 
+	 * Will give the X coordinate of the next bounce 
+	 * Can't be const due to Kyras X() and Y() functions.
+	 **/
+	int nextBounce();
 
 	time_t creationTime() const { return m_creation_time; }
 	bool temporary() const { return m_temporary; }
@@ -96,6 +106,12 @@ private:
 	bool m_temporary; 
 
 	bool m_static;
+
+	int m_next_bounce_cache;
+
+#ifdef _DEBUG
+	KrTextBox* m_b; 
+#endif
 };
 
 #endif
