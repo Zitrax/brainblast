@@ -10,6 +10,7 @@
 
 #include <queue>
 #include <algorithm> // find
+#include <memory> // auto_ptr
 
 using namespace std;
 
@@ -21,8 +22,10 @@ using namespace std;
 class distcmp
 {
 public:
-    distcmp(int x) : m_x(x){}
-
+    distcmp(int x, BrainAI::Difficulty difficulty) : 
+		m_x(x), 
+		m_difficulty(difficulty) {}
+	
 	/**
 	 * Should have been const pointers, but Kyras ->X() function
 	 * is not const.
@@ -30,13 +33,22 @@ public:
     bool operator() (BrainSprite*& lhs, BrainSprite*& rhs) const
         {
             return 
-                min(abs(lhs->X()-m_x),abs(m_x-lhs->X()+brain::VIDEOX)) >
-                min(abs(rhs->X()-m_x),abs(m_x-rhs->X()+brain::VIDEOX));
+                min(abs(x(lhs)-m_x),abs(m_x-x(lhs)+brain::VIDEOX)) >
+                min(abs(x(rhs)-m_x),abs(m_x-x(rhs)+brain::VIDEOX));
         }
-private:
-    int m_x;
-};
 
+private:
+	int x(BrainSprite* bs) const 
+		{
+			if( m_difficulty > BrainAI::MEDIUM ) 
+				return bs->nextBounce();
+			else
+				return bs->X(); 
+		}
+
+    int m_x;
+	BrainAI::Difficulty m_difficulty;
+};
 
 // Future improvements:
 //
@@ -61,8 +73,7 @@ BrainAI::BrainAI(KrSpriteResource* res, std::string name, enum Difficulty diff)
     : BrainPlayer(res,name),
       m_needed_ids(),
       m_selection_start(),
-      m_selection_delay(0.010), // I need a better timer than clock
-                                // perhaps clock_gettime would be ok.
+      m_selection_delay(0.010), 
 	  m_difficulty(diff)
 {
 	setDifficulty();
@@ -133,7 +144,8 @@ void BrainAI::move()
 
     // Constructing a priority queue with distance comparison
     // The comparison class is constructed with the players x-position
-    priority_queue< BrainSprite*, vector<BrainSprite*>, distcmp > pqueue(X());
+	// TODO: This can be optimized by precreating the queue
+	priority_queue<BrainSprite*, vector<BrainSprite*>, distcmp > pqueue ( distcmp(X(),m_difficulty) );
 
     std::vector<BrainSprite*>::const_iterator it;
     std::vector<BrainSprite*>::const_iterator end = sprites.end();
