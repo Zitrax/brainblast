@@ -210,7 +210,7 @@ private:
 	 * This is the time the game waits before hiding
 	 * the solution and the game starts.
 	 */
-	static const double WAITTIME = 10.0;
+	static const double WAITTIME;
 	
 	enum gamestate
 	{
