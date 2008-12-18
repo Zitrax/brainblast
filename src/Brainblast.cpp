@@ -25,6 +25,7 @@ using namespace std;
 // Statics
 Brainblast* Brainblast::s_instance;
 int TextListener::m_text_id = 0;
+const double Brainblast::WAITTIME = 10.0;
 
 Brainblast::Brainblast() : m_gamestate(TITLE),
 						   m_start_time(0),
