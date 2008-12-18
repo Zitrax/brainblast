@@ -31,7 +31,7 @@ Brick::Brick(KrSprite* sprite, int id) :
 }
 
 // Copy constructor (Meyers)
-#warning "Copy and assignment makes bricks with same ID !! (bug/feature)?"
+// warning "Copy and assignment makes bricks with same ID !! (bug/feature)?"
 Brick::Brick(const Brick& br) : m_brickID(br.m_brickID), 
                                 m_pixmap( new SDL_Surface(*br.m_pixmap) ),
                                 m_X(br.m_X), m_Y(br.m_Y),
