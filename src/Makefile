@@ -1,8 +1,9 @@
 GCC       = g++
-CFLAGS    = -g -Weffc++ -Wall -Wextra -D_DEBUG #-pedantic 
+CFLAGS    = -Weffc++ -Wall -Wextra -pedantic #-D_DEBUG -g 
 
 CFLAGS   += -I../include
 
+LIBS      = /usr/local/lib/libengine.a /usr/local/lib/libkyra.a  -L../fmod/api -lfmod-3.75 -lrt
 SDL_LIBS  = $(shell sdl-config --static-libs) -lSDL_image #-lSDL_mixer
 SDL_FLAGS = $(shell sdl-config --cflags)
 IMAGES    = ../images
@@ -25,7 +26,7 @@ $(IMAGES)/bb_bg.h: ../images/bg.xml
   #-static-libgcc -Wl,-static -lengine -lkyra
   # -L../bassmod -lbassmod
 brainblast: $(OBJECTS)
-	$(GCC) -o $@ $(OBJECTS) $(SDL_LIBS) /usr/local/lib/libengine.a /usr/local/lib/libkyra.a  -L../fmod/api -lfmod-3.75
+	$(GCC) -o $@ $(OBJECTS) $(SDL_LIBS) $(LIBS)
 
 $(OBJECTS): %.o: %.cpp
 	$(GCC) $(CFLAGS) $(SDL_FLAGS) -c $<
