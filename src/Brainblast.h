@@ -33,7 +33,7 @@ namespace brain
 {
 
 //! The total number of different brick types (different symbols)
-	const int MAX_NOF_BRICK_TYPES = 25;
+	const unsigned int MAX_NOF_BRICK_TYPES = 25;
 	
 //! The video mode to use
 	const int VIDEOX = 1024;
@@ -81,6 +81,47 @@ struct text_ready
  */
 class Brainblast
 {
+
+private:
+
+	/**
+	 * Handles data for level creation
+	 */
+	class LevelData
+	{
+	public:
+		LevelData(unsigned int max_width,
+				  unsigned int max_height);
+		
+		unsigned int size() const { return m_width*m_height; }
+		unsigned int w() const { return m_width; }
+		unsigned int h() const { return m_height; }
+		unsigned int n() const { return m_bricks; }
+		unsigned int types() const { return m_types; }
+
+		void setMaxTypes(unsigned int max_types) { m_max_types = max_types; }
+
+		bool increaseDifficulty();
+		void reset();
+
+	private:
+
+		friend ostream& operator<<(ostream& out, const LevelData& lvl)
+		{
+			return 
+				out << "(" << lvl.m_width << "," << lvl.m_height << 
+				":" << lvl.m_bricks << ":" << lvl.m_types << ")";
+		}
+
+		unsigned int m_width;
+		unsigned int m_height;
+		unsigned int m_bricks;
+		unsigned int m_types;
+
+		unsigned int m_max_types;
+		unsigned int m_max_width;
+		unsigned int m_max_height;
+	};
 
 #ifdef _DEBUG
 	friend class BrainSprite;
@@ -192,7 +233,7 @@ private:
 	 * Creates random levels with specified
 	 * width and height, and n number of bricks.
 	 */
-	void makeRandomLevel(int w,int h,int n);
+	void makeRandomLevel(LevelData& lvl);
 
     void createBricks();
 	bool createBoards();
@@ -231,6 +272,8 @@ private:
 	 */
 	BrainSound* m_sound;
 
+	LevelData m_level_data;
+
 	vector<Puzzle*> m_current_levels;
 	vector<SDL_Rect> m_fields;
 	int m_current_lvl;
@@ -238,7 +281,6 @@ private:
     SDL_Surface* m_screen;
 
 	map<int,Brick*> m_bricks;
-	int          m_total_bricks;
 
 	KrEngine*    m_engine;
 

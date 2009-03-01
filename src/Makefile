@@ -1,5 +1,5 @@
 GCC       = g++
-CFLAGS    = -Weffc++ -Wall -Wextra -pedantic #-D_DEBUG -g 
+CFLAGS    = -Weffc++ -Wall -Wextra -pedantic -D_DEBUG -g 
 
 CFLAGS   += -I../include
 

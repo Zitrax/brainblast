@@ -30,12 +30,12 @@ const double Brainblast::WAITTIME = 10.0;
 Brainblast::Brainblast() : m_gamestate(TITLE),
 						   m_start_time(0),
 						   m_sound(new BrainSoundFMOD),
+						   m_level_data(7,8),  // 7x8 is maximum size if you want to avoid overlappings
 						   m_current_levels(),
 						   m_fields(),
 						   m_current_lvl(1),
                            m_screen( SDL_SetVideoMode( VIDEOX, VIDEOY, VIDEOBITS, SDL_HWSURFACE ) ),
 						   m_bricks(),
-						   m_total_bricks(0),
 						   m_engine(0),
 						   m_bgTree(0),
 						   m_fgTree(0),
@@ -167,26 +167,23 @@ Brainblast::cleanup()
 }
 
 void
-Brainblast::makeRandomLevel(int w,int h,int n)
+Brainblast::makeRandomLevel(LevelData& lvl)
 {
-	if(bbc::debug) cerr << "Brainblast::makeRandomLevel(" 
-						<< w << "," << h << "," << n << ")\n";
-
-	assert(n<=w*h);
+	if(bbc::debug) cerr << "Brainblast::makeRandomLevel" << lvl << "\n"; 
 
 	for(unsigned int i=0; i<m_player_manager->playerCount(); ++i)
-		m_current_levels.push_back(new Puzzle(w,h,m_fields[i]));
+		m_current_levels.push_back(new Puzzle(lvl.w(),lvl.h(),m_fields[i]));
 
 	// Vector to make sure we use up the indexes
 	// I guess a nicer solution would be to randomize
 	// and iterate over a vector/array instead but...
 	vector<int> indexes;
-	for(int i=0; i<w*h; ++i)
+	for(unsigned int i=0; i<lvl.size(); ++i)
 		indexes.push_back(i);
 
-	for(int i=0; i<n; ++i)
+	for(unsigned int i=0; i<lvl.n(); ++i)
 	{
-		int type = bbc::randint(0,m_bricks.size()-1);
+		int type = bbc::randint(0,lvl.types()-1);
 		map<int,Brick*>::iterator it = m_bricks.begin();
 		for(int j=0;j<type;++j)
 			++it;
@@ -220,8 +217,10 @@ Brainblast::makeLevel(int lvl)
 	
     if( m_level_set == RANDOM ) 
     {
-		// 7x8 is maximum size if you want to avoid overlapping
-		makeRandomLevel(4,4,4);
+		if( (m_current_lvl > 1) && !m_level_data.increaseDifficulty() )
+			return false;
+
+		makeRandomLevel(m_level_data);
         return true;
     }
 
@@ -313,10 +312,11 @@ Brainblast::createBricks()
 
 			KrSprite* b = new KrSprite(sr);
 			m_bricks.insert(pair<int,Brick*>(sr->ResourceId(),new Brick(b, sr->ResourceId())));
-			m_total_bricks++;
-			assert(m_total_bricks<MAX_NOF_BRICK_TYPES);
+			assert(m_bricks.size()<MAX_NOF_BRICK_TYPES);
 		}
 	}
+
+	m_level_data.setMaxTypes(m_bricks.size());
 }
 
 void
@@ -811,7 +811,9 @@ int Brainblast::eventLoop()
 				delete current;
 
 				if( !changeLevel(m_current_lvl+1) )
-					changeLevel(1);
+				{
+					gameOver();
+				}
 
 				m_center_text_box->SetTextChar("",1);
 			}
@@ -1100,7 +1102,11 @@ void Brainblast::writeScoreAndTime(time_t& now)
 
 	for(unsigned int i=0; i<m_player_manager->playerCount(); ++i)
 	{
-
+		// When we are done with the last level 
+		// we will have no level to look at.
+		if( !m_current_levels[i] )
+			continue;
+		
 		score_str << "SCORE: " << m_player_manager->getPlayer(i)->getScore()
 				  << " BRICKS: " << m_current_levels[i]->correctBricks()
 				  << "/" << m_current_levels[i]->totalSolutionBricks();
@@ -1178,6 +1184,71 @@ void Brainblast::dropPlayerSprite(BrainPlayer* player, bool remove)
 	}
 	else
 		m_sprites.push_back(bs);
+}
+
+Brainblast::LevelData::LevelData(unsigned int max_width,
+								 unsigned int max_height)
+	: m_width(0),
+	  m_height(0),
+	  m_bricks(0),
+	  m_types(0),
+	  m_max_types(0),
+	  m_max_width(max_width),
+	  m_max_height(max_height)
+{ 
+	reset(); 
+}
+
+bool Brainblast::LevelData::increaseDifficulty()
+{
+	assert(m_max_types);
+	if( !m_max_types )
+		return false;
+
+	// 1. Types 2. Bricks 3. Size
+
+	if( (m_types < m_max_types) &&
+		(m_types < m_bricks) &&
+		(m_types < m_width*m_height) )
+	{
+		m_types++;
+	}
+
+	else if( m_bricks < m_width*m_height )
+	{
+		m_types = 1;
+		m_bricks++;
+	}
+
+	else if( m_width < m_height )
+	{
+		if( m_width == m_max_width )
+			return false;
+
+		m_types = 1;
+		m_bricks = 1;
+		m_width++;
+	}
+
+	else
+	{
+		if( m_height == m_max_height )
+			return false;
+
+		m_types = 1;
+		m_bricks = 1;
+		m_height++;		
+	}
+
+	return true;
+}
+
+void Brainblast::LevelData::reset()
+{
+	m_width	 = 2;
+	m_height = 2;
+	m_bricks = 1;
+	m_types	 = 1;
 }
 
 /* Definition of a level file ...
