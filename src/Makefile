@@ -11,6 +11,8 @@ IMAGES    = ../images
 OBJECTS = bbc.o consolefont.o Brainblast.o Brick.o Puzzle.o Field.o BrainSprite.o BrainSound.o \
           BrainPlayer.o BrainAI.o BrainPlayerManager.o main.o BrainSoundFMOD.o HighScore.o #BrainSoundSDL.o BrainSoundBASS.o
 
+VERSION = $(shell perl -wne 'if(/brainblast \((.*)\)/){print "$$1";exit;}' < ../deb/debian/changelog)
+
 all: brainblast
 
 $(IMAGES)/bb.h: ../images/bricks.xml 
@@ -35,7 +37,7 @@ package: all
 	make -C ../deb
 
 install: package
-	sudo dpkg -i ../deb/brainblast_0.1_i386.deb
+	sudo dpkg -i ../deb/brainblast_${VERSION}_i386.deb
 
 remake: 
 	make clean; make
