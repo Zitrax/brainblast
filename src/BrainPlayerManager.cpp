@@ -34,7 +34,7 @@ BrainPlayerManager::~BrainPlayerManager()
 	delete m_highscore;
 }
 
-void BrainPlayerManager::addPlayers(int human_players, int computer_players)
+bool BrainPlayerManager::addPlayers(int human_players, int computer_players)
 {
 	// FIXME: Should handle updating number of players
 	//        and thus remove the old ones here.
@@ -46,6 +46,9 @@ void BrainPlayerManager::addPlayers(int human_players, int computer_players)
         Brainblast::instance()->engine()->Vault()->GetSpriteResource( BB_WIZARD );
     KrSpriteResource* wizardRes2 = 
         Brainblast::instance()->engine()->Vault()->GetSpriteResource( BB_WIZARD2 );
+
+	if( !(wizardRes && wizardRes2) )
+		return false;
 
     for(int i=0;i<human_players;++i)
     {
@@ -87,6 +90,7 @@ void BrainPlayerManager::addPlayers(int human_players, int computer_players)
 		m_players[1]->mapAction(BrainPlayer::SELECT,    SDLK_LSHIFT);
 	}
     
+	return true;
 }
 
 void BrainPlayerManager::removePlayers()
@@ -145,8 +149,9 @@ void BrainPlayerManager::playerCheckScore::operator() (BrainPlayer* player)
 	}
 }
 
-BrainPlayer* BrainPlayerManager::getPlayer(int idx) const
+BrainPlayer* BrainPlayerManager::getPlayer(unsigned int idx) const
 {
+	assert(m_players.size() > idx);
 	return m_players[idx];
 }
 

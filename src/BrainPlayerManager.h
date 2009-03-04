@@ -26,7 +26,7 @@ public:
     BrainPlayerManager();
 	virtual ~BrainPlayerManager();
 
-	void addPlayers(int human_players, int compuer_players);
+	bool addPlayers(int human_players, int compuer_players);
 	void removePlayers();
 
 	/**
@@ -57,7 +57,7 @@ public:
 	bool handleKeyDown(SDLKey key);
 	bool handleKeyHeld(const bool* const keys_held);
 
-	BrainPlayer* getPlayer(int idx) const;
+	BrainPlayer* getPlayer(unsigned int idx) const;
 	int getPlayerNumber(BrainPlayer& player) const;
 
 	unsigned int playerCount() const { return m_player_count; }

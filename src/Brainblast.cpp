@@ -408,7 +408,11 @@ Brainblast::startGame()
 	m_gamestate = PLAY_WAIT;
 	clearTextBox(m_center_text_box);
 
-	m_player_manager->addPlayers(m_human_players,m_computer_players);
+	if( !m_player_manager->addPlayers(m_human_players,m_computer_players) )
+	{
+		printf("=== ERROR: Could not create players. ===\n");
+		return false;
+	}
 
 	// FIXME: Currently only two player support
 	m_player_manager->getPlayer(0)->setScoreBox(m_left_score_text_box);
@@ -707,7 +711,11 @@ int Brainblast::eventLoop()
 				{
 				case TITLE:
 					m_player_manager->resetScores();
-					startGame(); 
+					if( !startGame() )
+					{
+						printf("=== ERROR: Could not start game ===\n");
+						done = true; // Just abort if we could not start the game
+					}
 					break;
 				case GAME_OVER: 
 				case HIGH_SCORE:
@@ -1104,7 +1112,7 @@ void Brainblast::writeScoreAndTime(time_t& now)
 	{
 		// When we are done with the last level 
 		// we will have no level to look at.
-		if( !m_current_levels[i] )
+		if( !(m_current_levels.size()>i && m_current_levels[i]) )
 			continue;
 		
 		score_str << "SCORE: " << m_player_manager->getPlayer(i)->getScore()
