@@ -157,7 +157,8 @@ public:
 
 	enum sounds {
 		CLICK,
-		BOUNCE
+		BOUNCE,
+		WARNING
 	};
 	
 	bool playSample(enum sounds sound) const { return m_sound->playSample(sound); }
@@ -202,6 +203,10 @@ private:
 	void textInput(SDLKey k);
 	// Called when finished with one text
 	void nextTextInput();
+
+	// Speeds up the timebonus timer so we count as
+	// fast as we can.
+	void speedyTimeBonus();
 
 	// Should be called whenever the game ends
 	void gameOver();
@@ -301,6 +306,7 @@ private:
 	KrTextBox*      m_right_score_text_box;
 	KrTextBox*      m_center_text_box;
 	KrTextBox*      m_top_center_text_box;
+	KrTextBox*      m_high_score_text_box;
 
 	BrainPlayerManager* m_player_manager;
 

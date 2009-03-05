@@ -26,7 +26,7 @@ BrainPlayerManager::BrainPlayerManager()
 	else
 		ss << "brainblast_score";
 	
-	m_highscore = new HighScore(ss.str(),10);
+	m_highscore = new HighScore(ss.str(),15);
 }
 
 BrainPlayerManager::~BrainPlayerManager()

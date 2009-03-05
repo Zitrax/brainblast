@@ -8,6 +8,8 @@
 
 #include "../fmod/api/inc/fmod_errors.h"
 #include <stdio.h>
+#include <malloc.h>
+#include <string.h>
 
 #ifndef TRUE
   #define TRUE 1
@@ -169,7 +171,10 @@ bool BrainSoundFMOD::addSample(const char* file, int id)
 {
     if( !FSOUND_Sample_Load( id, file, 0, 0, 0 ) )
     {
-        error("Could not load the file\n");
+		char* msg = (char*) malloc(strlen(file)+50);
+		sprintf(msg,"Could not load the file (%s)\n",file);
+        error(msg);
+		free(msg);
         return false;
     }
 

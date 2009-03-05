@@ -25,6 +25,7 @@ binary: clean
 	@ cp -v ../images/goldfont.png debian/tmp/usr/share/games/$(PACKAGE)/images/
 	@ cp -v ../sounds/click.wav debian/tmp/usr/share/games/$(PACKAGE)/sounds/
 	@ cp -v ../sounds/bounce.wav debian/tmp/usr/share/games/$(PACKAGE)/sounds/ 
+	@ cp -v ../sounds/warning.wav debian/tmp/usr/share/games/$(PACKAGE)/sounds/
 	@ cp -v ../music/enigmatic_path.it debian/tmp/usr/share/games/$(PACKAGE)/music/
 	@ cp -v ../music/Acidstorm.it debian/tmp/usr/share/games/$(PACKAGE)/music/
 	@ cp -v ../lvl/lvl???.txt debian/tmp/usr/share/games/$(PACKAGE)/lvl/

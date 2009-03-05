@@ -49,6 +49,7 @@ Brainblast::Brainblast() : m_gamestate(TITLE),
 						   m_right_score_text_box(0),
 						   m_center_text_box(0),
 						   m_top_center_text_box(0),
+						   m_high_score_text_box(0),
 						   m_player_manager(0),
 						   m_human_players(1),
 						   m_computer_players(0),
@@ -518,6 +519,10 @@ Brainblast::initGameKyra()
 	m_top_center_text_box->SetPos(350,10);
 	m_engine->Tree()->AddNode(0,m_top_center_text_box);
 
+ 	m_high_score_text_box = new KrTextBox(m_title_font,600,600,10);
+	m_high_score_text_box->SetPos((VIDEOX-600)/2,(VIDEOY-600)/2);
+	m_engine->Tree()->AddNode(0,m_high_score_text_box);
+
 	// Load the dat file.
 	// The dat file was carefully created in the sprite
 	// editor.
@@ -556,7 +561,8 @@ Brainblast::initGameKyra()
 	// Start music
 	if( !(m_sound->initializeSound() &&
 		  m_sound->addSample("/usr/share/games/brainblast/sounds/click.wav",CLICK) &&
-		  m_sound->addSample("/usr/share/games/brainblast/sounds/bounce.wav",BOUNCE)) )
+		  m_sound->addSample("/usr/share/games/brainblast/sounds/bounce.wav",BOUNCE) && 
+		  m_sound->addSample("/usr/share/games/brainblast/sounds/warning.wav",WARNING)) )
 		printf("=== ERROR: Sound/Music error === \n");
 	
 	titleScreen();
@@ -587,6 +593,7 @@ void Brainblast::titleScreen()
 void Brainblast::titleScreenUpdateText()
 {
 	clearTextBox(m_center_text_box);
+	clearTextBox(m_high_score_text_box);
 
 	m_center_text_box->SetTextChar("BRAINBLAST 0.2",0);
 	m_center_text_box->SetTextChar("",1);
@@ -722,8 +729,9 @@ int Brainblast::eventLoop()
 					titleScreen(); break;
 				case PLAY_WAIT:
 					finishInitialWait(); break;
-				case PLAYING:
 				case TIME_BONUS:
+					speedyTimeBonus(); break;
+				case PLAYING:
 					break;
 				}
 			}
@@ -790,6 +798,10 @@ int Brainblast::eventLoop()
 			else if( m_gamestate==TITLE && event.key.keysym.sym == SDLK_F5 )
 			{
 				showHighScore();
+			}
+			else if( m_gamestate==TIME_BONUS && event.key.keysym.sym == SDLK_RETURN )
+			{
+				speedyTimeBonus();
 			}
 			else
 				if( !m_player_manager->handleKeyDown(event.key.keysym.sym) )
@@ -929,6 +941,14 @@ int Brainblast::eventLoop()
     return 0;
 }
 
+void Brainblast::speedyTimeBonus()
+{
+	// Did not see a better way to change the timer than to delete it and
+	// create a new one.
+	SDL_RemoveTimer(m_time_bonus_timer);
+	m_time_bonus_timer = SDL_AddTimer( 1, TimerCallback, &m_time_bonus_event );	
+}
+	
 void Brainblast::gameOver()
 {
 	m_gamestate = GAME_OVER;
@@ -952,29 +972,35 @@ void Brainblast::showHighScore()
 {
 	m_gamestate = HIGH_SCORE;
 
+	clearTextBox(m_center_text_box);
+
 	unsigned int max = m_player_manager->hs_max_entries();
 
 	vector<HighScore::Entry> entries = m_player_manager->getHighScoreEntries();
 	
 	int len = (entries.size() > max) ? max : entries.size();
 
-	m_center_text_box->SetTextChar("Highscores",0);
-	m_center_text_box->SetTextChar("      Name   Score Level Mode",1);
-
 	ostringstream str;
+
+	m_high_score_text_box->SetTextChar("Highscores",0);
+
+	str << setw(12) << "Name" << setw(8) << "Score" << setw(6) << "Level" << setw(6) << "Mode";
+	m_high_score_text_box->SetTextChar(str.str(),1);
+	
+	str.str("");
 	for(int i=0; i<len; ++i)
 	{
-		str << i+1 
+		str << setw(2)  << setfill('0') << i+1 << setfill(' ') 
 			<< setw(10) << entries[i].name
 			<< setw(8)  << entries[i].score
 			<< setw(6)  << entries[i].level << " "
 			<< setw(6)  << levelSetToString(entries[i].level_set);
 			
-		m_center_text_box->SetTextChar(str.str(),i+2);
+		m_high_score_text_box->SetTextChar(str.str(),i+2);
 		str.str("");
 	}
 	for(int i=len; i<=8; i++)
-		m_center_text_box->SetTextChar("",i+2);
+		m_high_score_text_box->SetTextChar("",i+2);
 }
 
 void Brainblast::nextTextInput()
@@ -1024,7 +1050,7 @@ void Brainblast::textInput(SDLKey k)
 		}
 		else
 		{
-			// TODO: Error sound here
+			playSample(WARNING);
 		}
 		return;
 	}
@@ -1035,7 +1061,13 @@ void Brainblast::textInput(SDLKey k)
 	{
 		string s;
 		m_center_text_box->GetTextChar(&s,4);
-		// TODO: Error sound here if size too big
+		
+		if( s.size() == 8 ) 
+		{
+			playSample(WARNING);
+			return;
+		}
+
 		s += k;
 		m_center_text_box->SetTextChar(s,4);
 		m_sound->playSample(CLICK);
