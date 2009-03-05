@@ -112,20 +112,23 @@ private:
 
 	private:
 
-		void left()  { decV(&m_x,m_p->m_width);  }
-		void right() { incV(&m_x,m_p->m_width);  }
-		void up()    { decV(&m_y,m_p->m_height); }
-		void down()  { incV(&m_y,m_p->m_height); } 
+		SelectCoord(const SelectCoord&);
+		SelectCoord& operator=(const SelectCoord&);
+
+		void left()  { decV(m_x,m_p->m_width);  }
+		void right() { incV(m_x,m_p->m_width);  }
+		void up()    { decV(m_y,m_p->m_height); }
+		void down()  { incV(m_y,m_p->m_height); } 
 		
-		bool incV(int* v, int max) {	
-			++(*v); 
-			if( *v == max ) *v = 0; 
-			return *v == 0;
+		bool incV(int& v, int max) {	
+			++v; 
+			if( v == max ) v = 0; 
+			return v == 0;
 		}
-		bool decV(int* v, int max) {
-			--(*v); 
-			if( *v == -1 ) *v = max-1; 
-			return *v == max-1;
+		bool decV(int& v, int max) {
+			--v; 
+			if( v == -1 ) v = max-1; 
+			return v == max-1;
 		}
 
 		int  m_x;
