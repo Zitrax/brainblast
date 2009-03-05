@@ -14,17 +14,17 @@ X There should be a high score table
 X No timer in the score fields. One big centered for the initial timing
   and one smaller somewhere else (?)
 
-* When finishing a level there should be a pause so you get what is happening
+X When finishing a level there should be a pause so you get what is happening
   also possibly with time bonus counted.
 
-** And check memleaks and invalid reads
+X And check memleaks and invalid reads
 
 =================================
 
 X Make an array or similar to keep the the puzzles in
   instead of if checks on the number of players.
 
-* Make sure we do not crash when a level can not be 
+X Make sure we do not crash when a level can not be 
   loaded.
 
 X Show some progress indication on how correct your
