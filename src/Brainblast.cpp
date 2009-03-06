@@ -578,7 +578,6 @@ void Brainblast::titleScreen()
 	m_gamestate = TITLE;
 
 	// Stop all play
-	clearFloor();
 	for(unsigned int i=0; i<m_current_levels.size(); ++i)
 		delete m_current_levels[i];
 	m_current_levels.clear();
@@ -627,7 +626,7 @@ void Brainblast::titleScreenUpdateText()
 
 BrainSprite* Brainblast::addSprite()
 {
-	if( m_gamestate != PLAYING && m_gamestate != TITLE )
+	if( m_gamestate != PLAYING && !(m_gamestate == TITLE || m_gamestate == HIGH_SCORE) )
 		return 0;
 
 	KrSpriteResource* spriteRes = 0;
@@ -712,7 +711,8 @@ int Brainblast::eventLoop()
 			// F = TOGGLE FULLSCREEN
 			else if( event.key.keysym.sym == SDLK_f )
 				SDL_WM_ToggleFullScreen(m_screen);
-			else if( event.key.keysym.sym == SDLK_SPACE )
+			else if( event.key.keysym.sym == SDLK_SPACE || 
+					 event.key.keysym.sym == SDLK_RETURN )
 			{
 				switch(m_gamestate)
 				{
@@ -746,6 +746,7 @@ int Brainblast::eventLoop()
 				{
 					// If no one had any points, go directly to title screen
 					m_player_manager->allScoresNull() ? titleScreen() : gameOver();
+					clearFloor();
 				}
 				break;
 				case GAME_OVER: 
@@ -799,10 +800,6 @@ int Brainblast::eventLoop()
 			{
 				showHighScore();
 			}
-			else if( m_gamestate==TIME_BONUS && event.key.keysym.sym == SDLK_RETURN )
-			{
-				speedyTimeBonus();
-			}
 			else
 				if( !m_player_manager->handleKeyDown(event.key.keysym.sym) )
 					keysHeld[event.key.keysym.sym] = true;
@@ -822,6 +819,7 @@ int Brainblast::eventLoop()
 		{
 			int* current = static_cast<int*>(event.user.data2);
 
+			assert(*current < 1000);
 			if( *current <= 0 )
 			{
 				// Delete event and stop timer
@@ -1117,6 +1115,7 @@ unsigned int Brainblast::secondsLeft(time_t& now) const
 {
 	int basetime = m_gamestate==PLAYING ? 60 : static_cast<int>(WAITTIME);
 	int sec = static_cast<int>(basetime - difftime(now,m_start_time));
+	assert(sec <= basetime);
 	bool game_over = sec <= 0;
 	return (m_gamestate==PLAYING && game_over) ? 0 : sec;
 }
@@ -1162,6 +1161,19 @@ void Brainblast::writeScoreAndTime(time_t& now)
 
 void Brainblast::select(Puzzle& lvl, BrainPlayer& player)
 {
+	if( m_gamestate == TIME_BONUS )
+	{
+		speedyTimeBonus();
+		return;
+	}
+	else if( m_gamestate == PLAY_WAIT )
+	{
+		finishInitialWait();
+		return;
+	}
+	else if( !lvl.isSelecting() )
+		return;
+
 	BrainSprite* s = 0;
 	int cscore = lvl.brickScore();
 	lvl.select(&s) ? player.addScore(cscore) : player.addScore(-1*cscore/10);
@@ -1173,6 +1185,8 @@ void Brainblast::select(Puzzle& lvl, BrainPlayer& player)
 
 		if( checkSolution(&lvl) )
 		{
+			clearTextBox(m_center_text_box);
+			
 			ostringstream str;
 			str << "Player " << m_player_manager->getPlayerNumber(player)
 				<< " wins level " << m_current_lvl;

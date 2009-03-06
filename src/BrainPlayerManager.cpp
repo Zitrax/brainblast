@@ -77,7 +77,7 @@ bool BrainPlayerManager::addPlayers(int human_players, int computer_players)
 		m_players[0]->mapAction(BrainPlayer::JUMP,      SDLK_RCTRL);
 		m_players[0]->mapAction(BrainPlayer::PICKUP,    SDLK_UP);
 		m_players[0]->mapAction(BrainPlayer::DROP,      SDLK_DOWN);
-		m_players[0]->mapAction(BrainPlayer::SELECT,    SDLK_RETURN);
+		m_players[0]->mapAction(BrainPlayer::SELECT,    SDLK_RCTRL);
 	}
 
 	if( (m_players.size() > 1) && m_players[1] )
@@ -252,8 +252,7 @@ bool BrainPlayerManager::handleKeyDown(SDLKey key)
 			break;
 
 		case BrainPlayer::SELECT:
-			if( level->isSelecting() )
-				Brainblast::instance()->select(*level,*player);
+			Brainblast::instance()->select(*level,*player);
 			break;
 
 		}

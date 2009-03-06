@@ -1,5 +1,13 @@
 GCC       = g++
-CFLAGS    = -Weffc++ -Wall -Wextra -pedantic -O #-D_DEBUG -g 
+CFLAGS    = -Weffc++ -Wall -Wextra -pedantic 
+
+DEBUG_BB  = YES
+
+ifeq ($(DEBUG_BB), YES)
+CFLAGS   += -D_DEBUG -g 
+else
+CFLAGS   += -O
+endif
 
 CFLAGS   += -I../include
 
