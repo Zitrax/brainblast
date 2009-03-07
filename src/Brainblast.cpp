@@ -1219,7 +1219,9 @@ void Brainblast::select(Puzzle& lvl, BrainPlayer& player)
 			// Level is changed when counting the bonus is finished
 
 		}
-	}	
+	}
+	else
+		m_sound->playSample(WARNING);
 }
 
 BrainSprite* Brainblast::reparentSprite(BrainSprite* bs, KrImNode* parent)
