@@ -14,13 +14,29 @@ You can play alone with a friend or against the computer.
 
 =head2 Theese are the keys used:
 
-=head3 Player 1
+=over 4
 
-Uses C<up>, C<down>, C<left>, C<right> for navigation. C<r-ctrl> for jumping and C<r-shift> for placing pieces in the puzzle.
+=item C<F>
 
-=head3 Player 2
+Enter or leave full screen mode.
 
-Uses C<w>, C<s>, C<a>, C<d> for navigation. C<l-ctrl> for jumping and C<l-shift> for placing pieces in the puzzle.
+=item C<M>
+
+Toggle the background music.
+
+=item C<ESC>
+
+Abort or exit current game.
+
+=item Keys for player 1
+
+Uses C<UP>, C<DOWN>, C<LEFT>, C<RIGHT> for navigation. C<R-CTRL> for jumping and C<R-SHIFT> for placing pieces in the puzzle.
+
+=item Keys for player 2
+
+Uses C<W>, C<S>, C<A>, C<D> for navigation. C<L-CTRL> for jumping and C<L-SHIFT> for placing pieces in the puzzle.
+
+=back
 
 =head1 FILES
 
