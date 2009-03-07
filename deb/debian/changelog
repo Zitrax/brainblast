@@ -1,4 +1,5 @@
 brainblast (0.2) unstable; urgency=low
+  * Some more sound effects
   * Timebonuses for finishing fast
   * Some highscore table fixes
   * Support for different difficulty levels for the computer
