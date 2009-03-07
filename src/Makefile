@@ -1,12 +1,12 @@
 GCC       = g++
-CFLAGS    = -Weffc++ -Wall -Wextra -pedantic 
+CFLAGS    = -Weffc++ -Wall -Wextra -pedantic
 
 DEBUG_BB  = YES
 
 ifeq ($(DEBUG_BB), YES)
-CFLAGS   += -D_DEBUG -g 
+CFLAGS   += -D_DEBUG -g
 else
-CFLAGS   += -O
+CFLAGS   += -O3 -DNDEBUG
 endif
 
 CFLAGS   += -I../include

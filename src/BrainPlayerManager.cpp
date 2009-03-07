@@ -221,38 +221,42 @@ bool BrainPlayerManager::handleKeyDown(SDLKey key)
 			break;
 
 		case BrainPlayer::WALK_LEFT:
-			if( level->isSelecting() ) 
+			if( level && level->isSelecting() ) 
 				level->navigate(Puzzle::LEFT);
 			break;
 
 		case BrainPlayer::WALK_RIGHT:
-			if( level->isSelecting() )
+			if( level && level->isSelecting() )
 				level->navigate(Puzzle::RIGHT);
 			break;
 
 		case BrainPlayer::JUMP:
 		case BrainPlayer::PICKUP:
- 			if( level->isSelecting() )
+			if( level )
 			{
-				level->navigate(Puzzle::UP);
-				return true;
-			}
-			else if( player->isCarrying() )
-			{
-				BrainSprite* o = player->drop(0);
-				o->setStatic(true);
-				level->startSelection(o);
-				return true;
+				if( level->isSelecting() )
+				{
+					level->navigate(Puzzle::UP);
+					return true;
+				}
+				else if( player->isCarrying() )
+				{
+					BrainSprite* o = player->drop(0);
+					o->setStatic(true);
+					level->startSelection(o);
+					return true;
+				}
 			}
 			break;
 				
 		case BrainPlayer::DROP:
-			if( level->isSelecting() )
+			if( level && level->isSelecting() )
 				level->navigate(Puzzle::DOWN);
 			break;
 
 		case BrainPlayer::SELECT:
-			Brainblast::instance()->select(*level,*player);
+			if( level )
+				Brainblast::instance()->select(*level,*player);
 			break;
 
 		}
@@ -298,12 +302,12 @@ bool BrainPlayerManager::handleKeyHeld(const bool* const keys_held)
 					break;
 
 				case BrainPlayer::WALK_LEFT:
-					if( !level->isSelecting() )
+					if( !level || !level->isSelecting() )
 						player->left();
 					break;
 
 				case BrainPlayer::WALK_RIGHT:
-					if( !level->isSelecting() )
+					if( !level || !level->isSelecting() )
 						player->right();
 					break;
 

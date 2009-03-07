@@ -7,15 +7,12 @@
 #ifndef BRAINBLAST_H
 #define BRAINBLAST_H
 
-#undef NDEBUG
-
 #include <stdlib.h>
 #include <fstream>
 
 #include <wSDL.h>
 #include <wkyra.h>
 
-#include <assert.h>
 #include "bbc.h"
 #include "Puzzle.h"
 #include "Brick.h"
@@ -167,9 +164,9 @@ public:
 
 	vector<BrainSprite*>& getAllSprites() { return m_sprites; }
 
-	unsigned int secondsLeft(time_t& now) const;
+	unsigned int secondsLeft() const;
 
-	void writeScoreAndTime(time_t& now);
+	void writeScoreAndTime();
 
 	/**
 	 * Perform a select for the player at lvl.
@@ -231,6 +228,8 @@ private:
 	 * to the puzzles.
 	 */
 	void clearFloor();
+
+	void deleteLevels();
 
     //! Returns true if created succesfully, false otherwise
     bool makeLevel(int lvl);

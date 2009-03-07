@@ -14,6 +14,7 @@
 #include "SDL_image.h"
 #include "BrainPlayerManager.h"
 
+#include <assert.h>
 #include <sstream>   // ostringstream
 #include <iomanip>   // setfill setw
 #include <algorithm> // for_each
@@ -207,15 +208,23 @@ Brainblast::makeRandomLevel(LevelData& lvl)
 		m_player_manager->getPlayer(i)->setLevel(m_current_levels[i]);
 }
 
+void
+Brainblast::deleteLevels()
+{
+	for(unsigned int i=0; i<m_current_levels.size(); ++i)
+		zap(m_current_levels[i] );
+	m_current_levels.clear();
+	for(unsigned int i=0; i < m_player_manager->playerCount(); ++i)
+		m_player_manager->getPlayer(i)->setLevel(0);
+}
+
 bool
 Brainblast::makeLevel(int lvl)
 {
     if(bbc::debug) cerr << "Brainblast::makeLevel(" << lvl << ")\n";
 	
-	for(unsigned int i=0; i<m_current_levels.size(); ++i)
-		zap(m_current_levels[i] );
-	m_current_levels.clear();
-	
+	deleteLevels();
+
     if( m_level_set == RANDOM ) 
     {
 		if( (m_current_lvl > 1) && !m_level_data.increaseDifficulty() )
@@ -366,6 +375,7 @@ Brainblast::changeLevel(int lvl)
 	clearFloor();
 
 	time(&m_start_time);
+
 	m_gamestate = PLAY_WAIT;
 
 	return true;
@@ -691,8 +701,6 @@ int Brainblast::eventLoop()
 		if ( event.type == SDL_QUIT )
 			break;
         
-		time_t now = time(0);
-
 		switch(event.type)
 		{
         case SDL_KEYDOWN:
@@ -857,7 +865,7 @@ int Brainblast::eventLoop()
 			while(it!=end)
 			{
 				// First check if we should delete this sprite after a timeout
-				if( (*it)->temporary() && (difftime(now,(*it)->creationTime()) > 30) )
+				if( (*it)->temporary() && (difftime(time(0),(*it)->creationTime()) > 30) )
 				{
 					m_engine->Tree()->DeleteNode(*it);
 					// Set it to the next valid element after erasing
@@ -905,7 +913,7 @@ int Brainblast::eventLoop()
 
 			m_engine->Tree()->Walk();
 
-			if( m_start_time && m_gamestate==PLAY_WAIT && (difftime(now,m_start_time) > WAITTIME) )
+			if( m_start_time && m_gamestate==PLAY_WAIT && (difftime(time(0),m_start_time) > WAITTIME) )
 				finishInitialWait();
 			
 			m_engine->Draw();
@@ -928,7 +936,7 @@ int Brainblast::eventLoop()
 		if( m_gamestate != TITLE )
 		{
 			bool was_game_over = m_gamestate == GAME_OVER;
-			writeScoreAndTime(now);
+			writeScoreAndTime();
 			
 			if( m_gamestate==GAME_OVER && !was_game_over )
 				gameOver();
@@ -1081,6 +1089,8 @@ void Brainblast::textInput(SDLKey k)
 			m_center_text_box->SetTextChar(s,4);
 			m_sound->playSample(CLICK);
 		}
+		else
+			playSample(WARNING);
 	}
 }
 
@@ -1111,8 +1121,9 @@ BrainSprite* Brainblast::collisionCheck(BrainPlayer* player)
 	return 0;
 }
 
-unsigned int Brainblast::secondsLeft(time_t& now) const
+unsigned int Brainblast::secondsLeft() const
 {
+	time_t now = time(0);
 	int basetime = m_gamestate==PLAYING ? 60 : static_cast<int>(WAITTIME);
 	int sec = static_cast<int>(basetime - difftime(now,m_start_time));
 	assert(sec <= basetime);
@@ -1120,9 +1131,9 @@ unsigned int Brainblast::secondsLeft(time_t& now) const
 	return (m_gamestate==PLAYING && game_over) ? 0 : sec;
 }
 
-void Brainblast::writeScoreAndTime(time_t& now)
+void Brainblast::writeScoreAndTime()
 {
-	int sec = secondsLeft(now);
+	int sec = secondsLeft();
 	int min = sec/60;
 	sec -= min*60;
 	
@@ -1193,12 +1204,11 @@ void Brainblast::select(Puzzle& lvl, BrainPlayer& player)
 			m_center_text_box->SetTextChar(str.str(),0);
 
 			// Apply time bonus
-			time_t now = time(0);
-			player.addScore(secondsLeft(now)*cscore/10);
-			if(bbc::debug) cerr << "Brainblast::select() TimeBonus (" << secondsLeft(now) << "*" 
-								<< cscore/10 << "): " << secondsLeft(now)*cscore/10 << "\n";
+			int* seconds = new int(secondsLeft());
+			player.addScore(*seconds*cscore/10);
+			if(bbc::debug) cerr << "Brainblast::select() TimeBonus (" << *seconds << "*" 
+								<< cscore/10 << "): " << *seconds*cscore/10 << "\n";
 
-			int* seconds = new int(secondsLeft(now));
 			m_time_bonus_event.type       = SDL_TIME_BONUS_EVENT;
 			m_time_bonus_event.user.data1 = static_cast<void*>(m_player_manager->getPlayer(m_player_manager->getPlayerNumber(player)-1)); // FIXME
 			m_time_bonus_event.user.data2 = static_cast<void*>(seconds);
