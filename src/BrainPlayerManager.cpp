@@ -77,7 +77,7 @@ bool BrainPlayerManager::addPlayers(int human_players, int computer_players)
 		m_players[0]->mapAction(BrainPlayer::JUMP,      SDLK_RCTRL);
 		m_players[0]->mapAction(BrainPlayer::PICKUP,    SDLK_UP);
 		m_players[0]->mapAction(BrainPlayer::DROP,      SDLK_DOWN);
-		m_players[0]->mapAction(BrainPlayer::SELECT,    SDLK_RCTRL);
+		m_players[0]->mapAction(BrainPlayer::SELECT,    SDLK_RSHIFT);
 	}
 
 	if( (m_players.size() > 1) && m_players[1] )
