@@ -12,7 +12,31 @@ The goal of the game is to remember a pattern and then
 rebuild it from pieces that are falling from the sky.
 You can play alone with a friend or against the computer.
 
-http://brainblast.sourceforge.net/
+=head2 Theese are the keys used:
+
+=head3 Player 1
+
+Uses C<up>, C<down>, C<left>, C<right> for navigation. C<r-ctrl> for jumping and C<r-shift> for placing pieces in the puzzle.
+
+=head3 Player 2
+
+Uses C<w>, C<s>, C<a>, C<d> for navigation. C<l-ctrl> for jumping and C<l-shift> for placing pieces in the puzzle.
+
+=head1 FILES
+
+Files created by brainblast. For files accessed, see the installed files.
+
+=over 4
+
+=item F<~/.brainblast_score>
+
+The highscore table
+
+=back
+
+=head1 HOMEPAGE
+
+L<http://brainblast.sourceforge.net/>
 
 =head1 AUTHOR
 

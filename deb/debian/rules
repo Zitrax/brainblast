@@ -14,7 +14,7 @@ binary: clean
 		-d debian/tmp/usr/share/app-install/icons \
 		-d debian/tmp/usr/share/applications \
 		-d debian/tmp/usr/share/doc/$(PACKAGE) \
-		-d debian/tmp/usr/share/man/man1 \
+		-d debian/tmp/usr/share/man/man6 \
 		-d debian/tmp/usr/share/icons/default.kde/16x16/apps \
 		-d debian/tmp/usr/lib
 	@ cp -v ../src/$(PACKAGE) debian/tmp/usr/games
@@ -37,8 +37,8 @@ binary: clean
 	@ cp -v debian/copyright debian/tmp/usr/share/doc/$(PACKAGE)/
 #	@ cp -v ../bassmod/libbassmod.so debian/tmp/usr/lib/
 	@ cp -v ../fmod/api/libfmod-3.75.so debian/tmp/usr/lib/
-	pod2man debian/usr/share/man/$(PACKAGE).pod > debian/tmp/usr/share/man/man1/$(PACKAGE).1
-	gzip -9 debian/tmp/usr/share/man/man1/$(PACKAGE).1
+	pod2man debian/usr/share/man/$(PACKAGE).pod > debian/tmp/usr/share/man/man6/$(PACKAGE).6
+	gzip -9 debian/tmp/usr/share/man/man6/$(PACKAGE).6
 	dpkg-shlibdeps debian/tmp/usr/games/$(PACKAGE)
 	dpkg-gencontrol
 	chown -R root.root debian/tmp
