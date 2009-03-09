@@ -256,18 +256,37 @@ private:
 	 * the solution and the game starts.
 	 */
 	static const double WAITTIME;
-	
-	enum gamestate
+
+	/**
+	 * This class will track the state and statechanges
+	 * such that we can track illegal state changes.
+	 */
+	class BrainState
 	{
-		PLAY_WAIT, // Waiting while showing solution
-		PLAYING,   // Playing the game
-		TITLE,     // Showing the title screen
-		GAME_OVER, // 
-		HIGH_SCORE,
-		TIME_BONUS
+	public:
+		
+		enum gamestate
+		{
+			PLAY_WAIT, // Waiting while showing solution
+			PLAYING,   // Playing the game
+			TITLE,     // Showing the title screen
+			GAME_OVER, // 
+			HIGH_SCORE,
+			TIME_BONUS
+		};
+
+		BrainState(enum gamestate st) : m_gamestate(st) {}
+		
+		/** Used for easier comparisons */
+		operator enum gamestate() const { return m_gamestate; }
+
+		void setState(enum gamestate st);
+
+	private:
+		enum gamestate m_gamestate;
 	};
-	
-	enum gamestate m_gamestate;
+
+	BrainState m_gamestate;
 
 	time_t m_start_time;
 
