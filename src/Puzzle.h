@@ -18,7 +18,13 @@ public:
 	
 	Puzzle(int width, int height, SDL_Rect rect);
 	~Puzzle();
-	
+
+	/** 
+	 * Brainblast will tell the Puzzle when navigation is alllow
+	 * such that the players will not navigate around in other modes
+	 */
+	void allowNavigation(bool allow) { m_allow_navigation = allow; }
+
 	bool checkSolution();
 	int correctBricks() const { return m_correct_bricks; }
 	int totalSolutionBricks() const { return m_total_solution_bricks; }
@@ -39,7 +45,7 @@ public:
 	/// If the selection sprite is removed it must be reset
 	void stopSelection();
 	enum direction { LEFT,RIGHT,UP,DOWN };
-	void navigate(enum direction dir) { m_s_coord.move(dir); updateSelection(); }
+	void navigate(enum direction dir);
 	/**
 	 * Returns true when we are at the correct id.
 	 * The caller has to make sure that the id is indeed
@@ -88,6 +94,8 @@ private:
 
 	int m_correct_bricks;         // TODO: This might also be used in checkSolution.
 	int m_total_solution_bricks;  // TODO: This might also be used in checkSolution.
+
+	bool m_allow_navigation;
 
 	/**
 	 * Handles coordinate selection on the grid.

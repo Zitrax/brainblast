@@ -275,7 +275,7 @@ private:
 			TIME_BONUS
 		};
 
-		BrainState(enum gamestate st) : m_gamestate(st) {}
+		BrainState(Brainblast& bb, enum gamestate st) : m_bb(bb), m_gamestate(st) {}
 		
 		/** Used for easier comparisons */
 		operator enum gamestate() const { return m_gamestate; }
@@ -283,12 +283,16 @@ private:
 		void setState(enum gamestate st);
 
 	private:
+		Brainblast& m_bb;
 		enum gamestate m_gamestate;
 	};
 
 	BrainState m_gamestate;
 
 	time_t m_start_time;
+
+	static void allowNavigation(Puzzle* lvl) { lvl->allowNavigation(true); }
+	static void forbidNavigation(Puzzle* lvl) { lvl->allowNavigation(false); }
 
 	/**
 	 * Handles all the sounds (effects and music)

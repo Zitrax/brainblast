@@ -42,7 +42,7 @@ public:
 	void setName(string name) { m_name = name; }
 
 	virtual Puzzle* getLevel() const      { return m_level;}
-	virtual void setLevel(Puzzle* lvl)    { m_level = lvl; m_level_count++; }
+	virtual void setLevel(Puzzle* lvl)    { m_level = lvl; if(lvl) m_level_count++; }
 	int getLevelCount() const             { return m_level_count; }
 	void resetLevelCount()                { m_level_count = 0; }
 	LEVEL_SET getLevelSet() const         { return m_level_set; }

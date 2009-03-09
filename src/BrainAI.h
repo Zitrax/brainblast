@@ -34,7 +34,8 @@ public:
 	virtual void setLevel(Puzzle* lvl) 
 		{ 
 			m_level = lvl; 
-			m_needed_ids = lvl->getSolutionTypes();
+			if(lvl)
+				m_needed_ids = lvl->getSolutionTypes();
 		}
 
 private:

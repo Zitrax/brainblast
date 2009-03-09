@@ -1,3 +1,6 @@
+* Track state changes, such that we can assert for invalid state changes
+
+* Fix such that you can not speed by holding left+right at once.
 
 X Error sound when placing brick on already correct brick.
 

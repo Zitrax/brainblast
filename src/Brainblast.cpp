@@ -28,7 +28,7 @@ Brainblast* Brainblast::s_instance;
 int TextListener::m_text_id = 0;
 const double Brainblast::WAITTIME = 10.0;
 
-Brainblast::Brainblast() : m_gamestate(BrainState::TITLE),
+Brainblast::Brainblast() : m_gamestate(*this,BrainState::TITLE),
 						   m_start_time(0),
 						   m_sound(new BrainSoundFMOD),
 						   m_level_data(7,8),  // 7x8 is maximum size if you want to avoid overlappings
@@ -827,7 +827,7 @@ int Brainblast::eventLoop()
 		case SDL_TIME_BONUS_EVENT:
 		{
 			int* current = static_cast<int*>(event.user.data2);
-
+ 
 			assert(*current < 1000);
 			if( *current <= 0 )
 			{
@@ -952,6 +952,10 @@ void Brainblast::speedyTimeBonus()
 {
 	// Did not see a better way to change the timer than to delete it and
 	// create a new one.
+	
+	if( !m_time_bonus_timer )
+		return;
+
 	SDL_RemoveTimer(m_time_bonus_timer);
 	m_time_bonus_timer = SDL_AddTimer( 1, TimerCallback, &m_time_bonus_event );	
 }
@@ -1319,7 +1323,58 @@ void Brainblast::LevelData::reset()
 }
 
 void Brainblast::BrainState::setState(enum gamestate st) 
-{ 
+{
+	// We could also have just asserted for the correct
+	// transitions, but this will tell me which error 
+	// case we saw.
+	//
+	// Going to state we are already in is considered safe
+	//
+	switch( m_gamestate )
+	{
+	case PLAY_WAIT:
+		assert(st != HIGH_SCORE); // Should have been in an end state first
+		assert(st != TIME_BONUS); // Can't finish directly from wait state
+		break;
+	case PLAYING:
+		if( st != PLAYING )
+			for_each(m_bb.m_current_levels.begin(),m_bb.m_current_levels.end(),forbidNavigation);
+		assert(st != HIGH_SCORE); // Should have been in an end state first
+		assert(st != PLAY_WAIT);  // Should go through TIME_BONUS
+		break;
+	case TITLE:
+		assert(st != PLAYING);    // Must go through PLAY_WAIT
+		assert(st != GAME_OVER);  // Well, quite obviously :)
+		assert(st != TIME_BONUS); //         --"--
+		break;
+	case GAME_OVER:
+		// Only going to highscore or title is allowed
+		assert(st != PLAY_WAIT);  
+		assert(st != PLAYING);    
+		assert(st != TIME_BONUS); 
+		break;
+	case HIGH_SCORE:
+		// Only going to title is allowed
+		assert(st != PLAY_WAIT);  
+		assert(st != PLAYING);    
+		assert(st != GAME_OVER); 
+		assert(st != TIME_BONUS); 
+		break;
+	case TIME_BONUS:
+		// Only going to PLAYING is allowed
+		assert(st != TITLE);  
+		assert(st != PLAYING);    
+		assert(st != GAME_OVER); 
+		assert(st != HIGH_SCORE); 
+		break;
+	default:
+		assert(!"Should not get here");
+	}
+	
+	if( st == PLAYING )
+		// Tell the levels that we can navigate
+		for_each(m_bb.m_current_levels.begin(),m_bb.m_current_levels.end(),allowNavigation);
+	
 	m_gamestate = st; 
 }
 

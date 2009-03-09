@@ -24,6 +24,7 @@ Puzzle::Puzzle(int width, int height, SDL_Rect rect)
 	m_selection_sprite(0),
 	m_correct_bricks(0),
 	m_total_solution_bricks(0),
+	m_allow_navigation(false),
 	m_s_coord(this)
 {
     if(bbc::debug) std::cerr << "Puzzle::Puzzle(" << m_width << "," << m_height << "," 
@@ -215,8 +216,20 @@ void Puzzle::stopSelection()
 		m_selected_tile->SetVisible(true);
 }
 
+void Puzzle::navigate(enum direction dir)
+{ 
+	if( !m_allow_navigation )
+		return;
+
+	m_s_coord.move(dir); 
+	updateSelection(); 
+}
+
 void Puzzle::startSelection(BrainSprite* bs)
 { 
+	if( !m_allow_navigation )
+		return;
+
 	bs->setTemporary(false);
 	m_selection_sprite=bs; 
 	updateSelection(); 
@@ -224,6 +237,9 @@ void Puzzle::startSelection(BrainSprite* bs)
 
 bool Puzzle::navigateTowards()
 {
+	if( !m_allow_navigation )
+		return false;
+
 	// Find non-filled brick for id
 	int target_id = m_selection_sprite->NodeId();
 	int nav_id = -1;
