@@ -5,6 +5,7 @@
 X Error sound when placing brick on already correct brick.
 
 Version 0.1 was releases at svn version 146.
+From 090311 I switched to git and there is a tag named v0.1
 
 == To fix before first release 0.1 ==
 
