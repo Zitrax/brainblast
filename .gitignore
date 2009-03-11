@@ -1,1 +1,6 @@
 *~
+*.dat
+*.o
+images/bb.h
+images/bb_bg.h
+src/brainblast
