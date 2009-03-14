@@ -1,6 +1,6 @@
 /* -*- Mode: c++; tab-width: 4; indent-tabs-mode: t; c-basic-offset: 4; c-file-style:"stroustrup" -*-
  *
- * @date 2006-2008
+ * @date 2006-2009
  * @author Daniel Bengtsson
  */
 
@@ -1324,9 +1324,9 @@ void Brainblast::LevelData::reset()
 
 void Brainblast::BrainState::setState(enum gamestate st) 
 {
-	// We could also have just asserted for the correct
-	// transitions, but this will tell me which error 
-	// case we saw.
+	// 
+	// Using many asserts to see exactly which 
+	// transition that was triggered.
 	//
 	// Going to state we are already in is considered safe
 	//
