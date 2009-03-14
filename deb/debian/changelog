@@ -1,13 +1,14 @@
 brainblast (0.2) unstable; urgency=low
+  * Updated man page
   * Some more sound effects
   * Timebonuses for finishing fast
   * Some highscore table fixes
   * Support for different difficulty levels for the computer
   * Changed color of second player
   * Many minor fixes
-  * Level difficulty progression for random
+  * Level difficulty progression for random mode
   * End game when reaching last level instead of looping
- -- Daniel Bengtsson <daniel@bengtssons.info>  Sun, 01 Mar 2009 17:04:43 +0100
+ -- Daniel Bengtsson <daniel@bengtssons.info>  Sat, 14 Mar 2009 16:22:28 +0100
 brainblast (0.1) unstable;
   * First public release.
  -- Daniel Bengtsson <daniel@bengtssons.info>  Sun, 06 Jul 2008 20:12:34 +0200

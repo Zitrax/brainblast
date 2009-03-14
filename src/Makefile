@@ -1,7 +1,7 @@
 GCC       = g++
 CFLAGS    = -Weffc++ -Wall -Wextra -pedantic
 
-DEBUG_BB  = YES
+DEBUG_BB  = NO
 
 ifeq ($(DEBUG_BB), YES)
 CFLAGS   += -D_DEBUG -g
