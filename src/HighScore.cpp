@@ -76,14 +76,29 @@ vector<HighScore::Entry> HighScore::getEntries() const
 
 bool HighScore::read(vector<Entry>& entries) const
 {
+	bool backup = false;
 	ifstream in;
 
 	in.open(m_file.c_str());
 	if( !in )
 	{
-		cerr << "WARNING - Could not read highscore (" << m_file.c_str() << ") (" << strerror(errno) << ").\n";
+		cerr << "WARNING - Could not read highscore (" << m_file.c_str() << ") (" << strerror(errno) << ")." << endl;
 		in.close();
-		return false;
+		
+		string bak_file(m_file);
+		bak_file += "~";
+		cerr << "  Trying to read backup file (" << bak_file.c_str() << ")" << endl;
+
+		in.open(bak_file.c_str());
+		if( !in )
+		{
+			cerr << "WARNING - Could not read backup highscore (" << bak_file.c_str() << ") (" << strerror(errno) << ")." << endl;
+			in.close();
+			return false;
+		}
+
+		backup = true;
+		
 	}
 	
 	// Trying to use C++ as much as possible
@@ -95,10 +110,17 @@ bool HighScore::read(vector<Entry>& entries) const
 	//debugOut(entries);
 
 	in.close();
+
+	if( backup )
+	{
+		cerr << "  Backup found, saving it" << endl;
+		write(entries);
+	}
+
 	return true;
 }
 
-bool HighScore::write(vector<Entry>& entries)
+bool HighScore::write(const vector<Entry>& entries) const
 {
 	string new_file(m_file);
 	string bak_file(m_file);

@@ -95,7 +95,7 @@ private:
 	};
 
 	bool read(vector<Entry>& entries) const;
-	bool write(vector<Entry>& entries);
+	bool write(const vector<Entry>& entries) const;
 
 	string m_file;
 	unsigned int m_max_entries;
