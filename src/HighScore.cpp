@@ -100,11 +100,15 @@ bool HighScore::read(vector<Entry>& entries) const
 
 bool HighScore::write(vector<Entry>& entries)
 {
-	ofstream out;
-	out.open(m_file.c_str());
+	string new_file(m_file);
+	string bak_file(m_file);
+	new_file += ".new";
+	bak_file += "~";
+
+	ofstream out(new_file.c_str());
 	if( !out )
 	{
-		cerr << "ERROR - Could open file for writing highscore (" << m_file.c_str() << ") (" << strerror(errno) << ").\n";
+		cerr << "ERROR - Could open file for writing highscore (" << new_file.c_str() << ") (" << strerror(errno) << ").\n";
 		out.close();
 		return false;
 	}
@@ -117,7 +121,23 @@ bool HighScore::write(vector<Entry>& entries)
 		 entries.size()>m_max_entries ? entries.begin()+m_max_entries : entries.end(),
 		 ostream_iterator<Entry>(out,"\n"));
 	
+	// Make sure the file is written to disk
+	// and check that the flushing went alright
+	out.flush();
+	if( !out )
+	{
+		cerr << "ERROR - Could not flush file for writing highscore (" << new_file.c_str() << ") (" << strerror(errno) << ").\n";
+		out.close();
+		return false;
+	}
 	out.close();
+
+	// Make backup and apply the new file
+	// This might be overly pedantic for a simple
+	// highscore table but feels good :)
+	rename(m_file.c_str(),bak_file.c_str());
+	rename(new_file.c_str(),m_file.c_str());
+
 	return true;
 }
 
