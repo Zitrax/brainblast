@@ -19,6 +19,7 @@
 #include "BrainSprite.h"
 #include "BrainSound.h"
 #include "BrainState.h"
+#include "BrainText.h"
 
 class BrainAI;
 class BrainPlayerManager;
@@ -139,8 +140,7 @@ public:
 
     bool initGameKyra();
 
-	void titleScreen();
-	void titleScreenUpdateText();
+	void stopPlay();
 	
 	/**
 	 * Load a font from a bitmap
@@ -159,7 +159,12 @@ public:
 		WARNING
 	};
 	
+	// Make sound interface reachable from the states
 	bool playSample(enum sounds sound) const { return m_sound->playSample(sound); }
+	bool loadMusic(const char* file) { return m_sound->loadMusic(file); }
+	bool playMusic() { return m_sound->playMusic(); }
+
+	BrainText& text() { return m_text; }
 
 	bool changeLevel(int lvl);
 
@@ -320,16 +325,7 @@ private:
 	KrResourceVault* m_bg_vault;
 	KrSprite*        m_bg_sprite;
 
-	// Text
-	KrFontResource* m_font;
-	KrFontResource* m_score_font;
-	KrFontResource* m_title_font;
-
-	KrTextBox*      m_left_score_text_box;
-	KrTextBox*      m_right_score_text_box;
-	KrTextBox*      m_center_text_box;
-	KrTextBox*      m_top_center_text_box;
-	KrTextBox*      m_high_score_text_box;
+	BrainText m_text;
 
 	BrainPlayerManager* m_player_manager;
 

@@ -43,14 +43,7 @@ Brainblast::Brainblast() : m_gamestate(*this,BrainState::TITLE),
 						   m_sprites(0),
 						   m_bg_vault( new KrResourceVault() ),
 						   m_bg_sprite(0),
-						   m_font(0),
-						   m_score_font(0),
-						   m_title_font(0),
-						   m_left_score_text_box(0),
-						   m_right_score_text_box(0),
-						   m_center_text_box(0),
-						   m_top_center_text_box(0),
-						   m_high_score_text_box(0),
+						   m_text(),
 						   m_player_manager(0),
 						   m_human_players(1),
 						   m_computer_players(0),
@@ -163,9 +156,6 @@ Brainblast::cleanup()
 	zap( m_engine );
 	zap( m_bg_vault );
 	zap( m_player_manager );
-	zap( m_font );
-	zap( m_score_font );
-	zap( m_title_font );
 }
 
 void
@@ -417,7 +407,7 @@ Brainblast::startGame()
 
 	// Leave title screen
 	m_gamestate.setState(BrainState::PLAY_WAIT);
-	clearTextBox(m_center_text_box);
+	m_text.clear(BrainText::CENTER);
 
 	if( !m_player_manager->addPlayers(m_human_players,m_computer_players) )
 	{
@@ -502,36 +492,8 @@ Brainblast::initGameKyra()
     m_engine->Draw(); 
 
 	// Set up the font
- 	m_font = KrEncoder::CreateFixedFontResource( "CONSOLE", CONSOLEFONT_DAT, CONSOLEFONT_SIZE );
-	
-	m_score_font = loadFont("/usr/share/games/brainblast/images/bubblemad_8x8.png",83);
-	m_title_font = loadFont("/usr/share/games/brainblast/images/goldfont.png",100);
-
-	if( !m_font || !m_score_font || !m_title_font ) 
-	{
-		printf( "=== Error: Loading font ===\n" );
+	if( m_text.init() )
 		return false;
-	}
-
- 	m_left_score_text_box = new KrTextBox(m_score_font,400,50,1);
-	m_left_score_text_box->SetPos(10,10);
-	m_engine->Tree()->AddNode(0,m_left_score_text_box);
-
- 	m_right_score_text_box = new KrTextBox(m_score_font,400,50,1);
-	m_right_score_text_box->SetPos(VIDEOX-310,10);
-	m_engine->Tree()->AddNode(0,m_right_score_text_box);
-
- 	m_center_text_box = new KrTextBox(m_title_font,600,600,8);
-	m_center_text_box->SetPos(300,280);
-	m_engine->Tree()->AddNode(0,m_center_text_box);
-
- 	m_top_center_text_box = new KrTextBox(m_title_font,200,50,1);
-	m_top_center_text_box->SetPos(350,10);
-	m_engine->Tree()->AddNode(0,m_top_center_text_box);
-
- 	m_high_score_text_box = new KrTextBox(m_title_font,600,600,10);
-	m_high_score_text_box->SetPos((VIDEOX-600)/2,(VIDEOY-600)/2);
-	m_engine->Tree()->AddNode(0,m_high_score_text_box);
 
 	// Load the dat file.
 	// The dat file was carefully created in the sprite
@@ -580,58 +542,12 @@ Brainblast::initGameKyra()
 	return true;
 }
 
-void Brainblast::titleScreen()
+void Brainblast::stopPlay()
 {
-	m_sound->loadMusic("/usr/share/games/brainblast/music/Acidstorm.it");
-	m_sound->playMusic();
-
-	m_gamestate.setState(BrainState::TITLE);
-
-	// Stop all play
 	for(unsigned int i=0; i<m_current_levels.size(); ++i)
 		delete m_current_levels[i];
 	m_current_levels.clear();
 	m_player_manager->removePlayers();
-
-	m_left_score_text_box->SetTextChar("MUSIC BY SAGA MUSIX, HTTP://SAGAMUSIX.DE/",0);
-	m_right_score_text_box->SetTextChar("              CODE: DANIEL BENGTSSON",0);
-
-	titleScreenUpdateText();
-}
-
-void Brainblast::titleScreenUpdateText()
-{
-	clearTextBox(m_center_text_box);
-	clearTextBox(m_high_score_text_box);
-
-	m_center_text_box->SetTextChar("BRAINBLAST 0.2",0);
-	m_center_text_box->SetTextChar("",1);
-
-	ostringstream str;
-
-	str << "F1: Human Players - " << m_human_players;
-	m_center_text_box->SetTextChar(str.str(),2);
-
-	str.str(""); 
-	str << "F2: Computer Players - " << m_computer_players;
-	m_center_text_box->SetTextChar(str.str(),3);
-
-	str.str("");
-	string set = levelSetToString(m_level_set);
-	str << "F3: Level set - " << set;
-	m_center_text_box->SetTextChar(str.str(),4);
-
-	str.str("");
-	string difficulty = m_player_manager->difficultyString();
-	str << "F4: Difficulty - " << difficulty;
-	m_center_text_box->SetTextChar(str.str(),5);
-
-	m_center_text_box->SetTextChar("F5: Highscores",6);
-	m_center_text_box->SetTextChar("",7);
-	m_center_text_box->SetTextChar("SPACE: Start game",8);
-	m_center_text_box->SetTextChar("",9);
-
-	m_top_center_text_box->SetTextChar("",0);
 }
 
 BrainSprite* Brainblast::addSprite()

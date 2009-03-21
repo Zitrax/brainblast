@@ -24,16 +24,26 @@ public:
 
 	virtual void init()			= 0;
 	virtual void cleanup()		= 0;
-	virtual void pause()		= 0;
 	virtual void handleEvents() = 0;
 	virtual void update()		= 0;
 	virtual void draw()			= 0;
 
 	void changeState(BrainState* state);
 
-private:
+protected:
 	BrainStateManager& m_mgr;
+};
 
+/**
+ * Adds reference to the game
+ */
+class BrainBlastState : public BrainState
+{
+public:
+	BrainBlastState(BrainStateManager& mgr, Brainblast& game) : BrainState(mgr), m_game(game) {}
+	virtual ~BrainBlastState(){}
+protected:
+	Brainblast& m_game;
 };
 
 /**
@@ -60,6 +70,30 @@ public:
 private:
 	vector<BrainState*> m_states;
 	bool m_running;
+
+};
+
+class BrainMenu : public BrainBlastState
+{
+public:
+	BrainMenu(BrainStateManager& mgr, Brainblast& game) : BrainBlastState(mgr,game) {}
+	virtual ~BrainMenu(){}
+
+	void init();
+	void cleanup();
+	void handleEvents();
+	void update();
+	void draw();
+
+	void changeState(BrainState*){}
+
+	static BrainMenu& instance() { return s_instance; }
+
+private:
+
+	void titleScreenUpdateText();
+
+	static BrainMenu s_instance;
 
 };
 
