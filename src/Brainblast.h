@@ -18,6 +18,7 @@
 #include "Brick.h"
 #include "BrainSprite.h"
 #include "BrainSound.h"
+#include "BrainState.h"
 
 class BrainAI;
 class BrainPlayerManager;
