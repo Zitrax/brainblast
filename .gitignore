@@ -1,5 +1,8 @@
 *~
+*#
 *.dat
+*.deb
+*.tmp
 *.o
 images/bb.h
 images/bb_bg.h
