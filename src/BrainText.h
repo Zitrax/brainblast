@@ -41,17 +41,17 @@ private:
     BrainText(const BrainText& bb);
     BrainText& operator=(const BrainText& bb);
 
+	KrTextBox* getBox(enum Box box) const;
+
 	KrFontResource* m_font;
 	KrFontResource* m_score_font;
 	KrFontResource* m_title_font;
 
-	KrTextBox*      m_left_score_text_box;
-	KrTextBox*      m_right_score_text_box;
-	KrTextBox*      m_center_text_box;
-	KrTextBox*      m_top_center_text_box;
-	KrTextBox*      m_high_score_text_box;
-
-
+	KrTextBox* m_left_score_text_box;
+	KrTextBox* m_right_score_text_box;
+	KrTextBox* m_center_text_box;
+	KrTextBox* m_top_center_text_box;
+	KrTextBox* m_high_score_text_box;
 };
 
 #endif // BRAINTEXT_H

@@ -60,12 +60,36 @@ BrainText::~BrainText()
 
 void BrainText::write(enum Box box, char* text, int line)
 {
+    getBox(box)->SetTextChar(text,line);
 }
 
 void BrainText::clear(enum Box box)
 {
+    KrTextBox* tb = getBox(box);
+    int lines = tb->NumLines();
+	for(int i=0; i<lines; ++i)
+		tb->SetTextChar("",i);
 }
 
 void BrainText::clearAll()
 {
+    clear(TOP_LEFT);
+    clear(TOP_RIGHT);
+    clear(TOP_CENTER);
+    clear(CENTER);
+    clear(HIGH_SCORE);
+}
+
+KrTextBox* BrainText::getBox(enum Box box) const
+{
+    switch(box)
+    {
+    case TOP_LEFT   : return m_left_score_text_box;
+    case TOP_RIGHT  : return m_right_score_text_box;
+    case TOP_CENTER : return m_top_center_text_box;
+    case CENTER     : return m_center_text_box;
+    case HIGH_SCORE : return m_high_score_text_box;
+    }
+
+    assert(!"Should not get here");
 }

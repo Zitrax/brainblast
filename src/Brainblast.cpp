@@ -400,15 +400,8 @@ Brainblast::checkSolution(Puzzle* puzzle)
 }
 
 bool
-Brainblast::startGame()
+Brainblast::addPlayers()
 {
-	m_sound->loadMusic("/usr/share/games/brainblast/music/enigmatic_path.it");
-	m_sound->playMusic();
-
-	// Leave title screen
-	m_gamestate.setState(BrainState::PLAY_WAIT);
-	m_text.clear(BrainText::CENTER);
-
 	if( !m_player_manager->addPlayers(m_human_players,m_computer_players) )
 	{
 		printf("=== ERROR: Could not create players. ===\n");
@@ -882,17 +875,6 @@ void Brainblast::gameOver()
 	m_center_text_box->SetTextChar("Game Over",0);
 	m_player_manager->gameOver();
 	clearFloor();
-}
-
-void Brainblast::clearTextBox( KrTextBox* tb )
-{
-	if( !tb )
-		return;
-
-	int lines = tb->NumLines();
-
-	for(int i=0; i<lines; ++i)
-		tb->SetTextChar("",i);
 }
 
 void Brainblast::showHighScore()

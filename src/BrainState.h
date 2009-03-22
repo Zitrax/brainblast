@@ -85,8 +85,6 @@ public:
 	void update();
 	void draw();
 
-	void changeState(BrainState*){}
-
 	static BrainMenu& instance() { return s_instance; }
 
 private:
@@ -95,6 +93,25 @@ private:
 
 	static BrainMenu s_instance;
 
+};
+
+class BrainPlayWait : public BrainBlastState
+{
+public:
+	BrainPlayWait(BrainStateManager& mgr, Brainblast& game) : BrainBlastState(mgr,game) {}
+	virtual ~BrainPlayWait(){}
+
+	void init();
+	void cleanup();
+	void handleEvents();
+	void update();
+	void draw();
+
+	static BrainPlayWait& instance() { return s_instance; }
+
+private:
+
+	static BrainPlayWait s_instance;	
 };
 
 #endif // BRAINSTATE_H

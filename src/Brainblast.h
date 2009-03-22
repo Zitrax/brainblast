@@ -214,9 +214,9 @@ private:
 	// Should be called whenever the game ends
 	void gameOver();
 
-	void clearTextBox( KrTextBox* tb );
-
 	void showHighScore();
+
+	BrainPlayerManager& playerManager() const { return *m_player_manager; }
 
 	/** 
 	 * Called when the initial wait where the solution is shown
@@ -224,8 +224,7 @@ private:
 	 **/
 	void finishInitialWait();
 
-    //! Start a new game
-    bool startGame();
+    bool addPlayers();
 
 	bool setupFields(int players);
 	/**

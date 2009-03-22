@@ -24,10 +24,26 @@ void BrainMenu::init()
 
 void BrainMenu::cleanup()
 {
+	m_game.text.clear(CENTER);
 }
 
 void BrainMenu::handleEvents()
 {
+
+	SDL_Event event;
+	
+	if( SDL_PollEvent(&event) )
+	{
+		if( event.state == SDL_KEYDOWN )
+		{
+			if( event.key.keysym.sym == SDLK_SPACE || 
+				event.key.keysym.sym == SDLK_RETURN )
+			{
+				m_mgr.changeState(BrainPlayWait::instance());
+			}
+		}
+		
+	}
 }
 
 void BrainMenu::update()
@@ -71,4 +87,30 @@ void BrainMenu::titleScreenUpdateText()
 	m_game.text.write(CENTER,"",9);
 	
 	m_game.text.write(TOP_CENTER,"",0);
+}
+
+void BrainPlayWait::init()
+{
+	m_game.playerManager().resetScores();
+
+	m_game.loadMusic("/usr/share/games/brainblast/music/enigmatic_path.it");
+	m_game.playMusic();
+	
+	m_game.addPlayers();
+}
+
+void BrainPlayWait::cleanup()
+{
+}
+
+void BrainPlayWait::handleEvents()
+{
+}
+
+void BrainPlayWait::update()
+{
+}
+
+void BrainPlayWait::draw()
+{
 }
