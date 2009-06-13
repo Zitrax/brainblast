@@ -9,9 +9,7 @@
 #include "../images/bb.h"
 #include "../images/bb_bg.h"
 #include "grinliz/glrandom.h"
-#include "consolefont.h"
 #include "BrainSoundFMOD.h"
-#include "SDL_image.h"
 #include "BrainPlayerManager.h"
 
 #include <assert.h>
@@ -409,9 +407,9 @@ Brainblast::addPlayers()
 	}
 
 	// FIXME: Currently only two player support
-	m_player_manager->getPlayer(0)->setScoreBox(m_left_score_text_box);
+	m_player_manager->getPlayer(0)->setScoreBox(BrainText::TOP_LEFT);
 	if( m_player_manager->playerCount() > 1 )
-		m_player_manager->getPlayer(1)->setScoreBox(m_right_score_text_box);
+		m_player_manager->getPlayer(1)->setScoreBox(BrainText::TOP_RIGHT);
 
 	if( !setupFields(m_player_manager->playerCount()) )
 	{
@@ -428,64 +426,18 @@ Brainblast::addPlayers()
 	return true;
 }
 
-KrFontResource* Brainblast::loadFont(const char* file, int glyphs)
-{
-	// Note: Make sure the image file is using indexed colors before 
-	//       using them in this function.
-
-	// Make surface from font file
-	SDL_Surface* raw = IMG_Load(file);
-
-	if(!raw)
-	{
-		printf( "=== Error: Loading font (%s) === \n", IMG_GetError() );
-		return 0;
-	}
-
-	SDL_Surface* s32 = SDL_CreateRGBSurface(SDL_SWSURFACE,
-											raw->w,
-											raw->h,
-											32,
-											0xff << ( KrRGBA::RED * 8 ),
-											0xff << ( KrRGBA::GREEN * 8 ),
-											0xff << ( KrRGBA::BLUE * 8 ),
-											0xff << ( KrRGBA::ALPHA * 8 ) );
-
-	if(!s32)
-	{
-		printf( "=== Error: Loading font (%s) === \n", file );
-		SDL_FreeSurface(raw);
-		return 0;
-	}
-
-	if(SDL_BlitSurface( raw, 0, s32, 0 ))
-	{
-		printf( "=== Error: Blit error - loading font (%s) === \n", file );
-		SDL_FreeSurface(s32);
-		SDL_FreeSurface(raw);
-		return 0;
-	}
-		
-	// FIXME: We might need different names when using many fonts ?
-	KrPaintInfo pi(s32);
-	KrFontResource* fr = new KrFontResource("LOADED_FONT", &pi, 32, 0, KrFontResource::FIXED, glyphs);
-
-	SDL_FreeSurface(s32);
-	SDL_FreeSurface(raw);
-
-	return fr;
-}
-
 bool 
 Brainblast::initGameKyra()
 {
 	srand(time(0));
 
     m_engine = new KrEngine( m_screen );
+	if( !m_engine )
+		return false;
     m_engine->Draw(); 
 
 	// Set up the font
-	if( m_text.init() )
+	if( m_text.init(*m_engine,VIDEOX,VIDEOY) )
 		return false;
 
 	// Load the dat file.
@@ -529,8 +481,8 @@ Brainblast::initGameKyra()
 		  m_sound->addSample("/usr/share/games/brainblast/sounds/bounce.wav",BOUNCE) && 
 		  m_sound->addSample("/usr/share/games/brainblast/sounds/warning.wav",WARNING)) )
 		printf("=== ERROR: Sound/Music error === \n");
-	
-	titleScreen();
+
+	pushState(BrainMenu::instance());
 
 	return true;
 }
@@ -588,8 +540,49 @@ Uint32 TimerCallback(Uint32 interval, void* event)
 	return interval;
 }
 
+void Brainblast::handleEvents()
+{
+	assert(m_engine);
+    SDL_Event event;
+    // Start timing!
+	SDL_Event draw_event; draw_event.type = SDL_DRAW_EVENT;
+	SDL_AddTimer( 35, TimerCallback, &draw_event );	
+	SDL_Event add_sprite_event; add_sprite_event.type = SDL_ADD_SPRITE_EVENT;
+	SDL_AddTimer( 2000, TimerCallback, &add_sprite_event );	
+
+    while( running() && SDL_WaitEvent(&event) )
+	{
+		if ( event.type == SDL_QUIT )
+			break;
+
+		switch(event.type)
+		{
+        case SDL_KEYDOWN:
+			
+			if( bbc::debug )
+				printf( "%s\n", SDL_GetKeyName(event.key.keysym.sym));
+
+			if( !m_text_queue.empty() )
+			{
+				textInput(event.key.keysym.sym);
+			}
+
+			// M = TOGGLE SOUND
+			else if( event.key.keysym.sym == SDLK_m )
+				m_sound->toggleMusic();
+			// F = TOGGLE FULLSCREEN
+			else if( event.key.keysym.sym == SDLK_f )
+				SDL_WM_ToggleFullScreen(m_screen);
+		}
+
+
+		currentState().handleEvent(event);
+	}	
+}
+
 int Brainblast::eventLoop()
 {
+#if 0
 	// There all sort of things that can be
 	// optimized in this loop. But lets get it
 	// working properly first.
@@ -853,6 +846,8 @@ int Brainblast::eventLoop()
 		}
 		
 	}
+
+#endif
     
     return 0;
 }
@@ -871,45 +866,45 @@ void Brainblast::speedyTimeBonus()
 	
 void Brainblast::gameOver()
 {
-	m_gamestate.setState(BrainState::GAME_OVER);
-	m_center_text_box->SetTextChar("Game Over",0);
-	m_player_manager->gameOver();
-	clearFloor();
+// 	m_gamestate.setState(BrainState::GAME_OVER);
+// 	m_center_text_box->SetTextChar("Game Over",0);
+// 	m_player_manager->gameOver();
+// 	clearFloor();
 }
 
 void Brainblast::showHighScore()
 {
-	m_gamestate.setState(BrainState::HIGH_SCORE);
+// 	m_gamestate.setState(BrainState::HIGH_SCORE);
 
-	clearTextBox(m_center_text_box);
+// 	clearTextBox(m_center_text_box);
 
-	unsigned int max = m_player_manager->hs_max_entries();
+// 	unsigned int max = m_player_manager->hs_max_entries();
 
-	vector<HighScore::Entry> entries = m_player_manager->getHighScoreEntries();
+// 	vector<HighScore::Entry> entries = m_player_manager->getHighScoreEntries();
 	
-	int len = (entries.size() > max) ? max : entries.size();
+// 	int len = (entries.size() > max) ? max : entries.size();
 
-	ostringstream str;
+// 	ostringstream str;
 
-	m_high_score_text_box->SetTextChar("Highscores",0);
+// 	m_high_score_text_box->SetTextChar("Highscores",0);
 
-	str << setw(12) << "Name" << setw(8) << "Score" << setw(6) << "Level" << setw(6) << "Mode";
-	m_high_score_text_box->SetTextChar(str.str(),1);
+// 	str << setw(12) << "Name" << setw(8) << "Score" << setw(6) << "Level" << setw(6) << "Mode";
+// 	m_high_score_text_box->SetTextChar(str.str(),1);
 	
-	str.str("");
-	for(int i=0; i<len; ++i)
-	{
-		str << setw(2)  << setfill('0') << i+1 << setfill(' ') 
-			<< setw(10) << entries[i].name
-			<< setw(8)  << entries[i].score
-			<< setw(6)  << entries[i].level << " "
-			<< setw(6)  << levelSetToString(entries[i].level_set);
+// 	str.str("");
+// 	for(int i=0; i<len; ++i)
+// 	{
+// 		str << setw(2)  << setfill('0') << i+1 << setfill(' ') 
+// 			<< setw(10) << entries[i].name
+// 			<< setw(8)  << entries[i].score
+// 			<< setw(6)  << entries[i].level << " "
+// 			<< setw(6)  << levelSetToString(entries[i].level_set);
 			
-		m_high_score_text_box->SetTextChar(str.str(),i+2);
-		str.str("");
-	}
-	for(int i=len; i<=8; i++)
-		m_high_score_text_box->SetTextChar("",i+2);
+// 		m_high_score_text_box->SetTextChar(str.str(),i+2);
+// 		str.str("");
+// 	}
+// 	for(int i=len; i<=8; i++)
+// 		m_high_score_text_box->SetTextChar("",i+2);
 }
 
 void Brainblast::nextTextInput()
@@ -920,8 +915,8 @@ void Brainblast::nextTextInput()
 		return;
 	}
 	
-	m_center_text_box->SetTextChar(m_text_queue.begin()->second,3);	
-	m_center_text_box->SetTextChar("",4);
+	m_text.write(BrainText::CENTER,m_text_queue.begin()->second.c_str(),3);
+	m_text.write(BrainText::CENTER,"",4);
 }
 
 int Brainblast::startTextInput(string label)
@@ -950,11 +945,11 @@ void Brainblast::textInput(SDLKey k)
 		m_text_queue.erase(id);
 		
 		string s;
-		m_center_text_box->GetTextChar(&s,4);
+		m_text.read(BrainText::CENTER,&s,4);
 		if( s.size() )
 		{
 			for_each(m_text_listeners.begin(),m_text_listeners.end(),text_ready(s,id));
-			clearTextBox(m_center_text_box);
+			m_text.clear(BrainText::CENTER);
 			nextTextInput();
 		}
 		else
@@ -969,7 +964,7 @@ void Brainblast::textInput(SDLKey k)
 			 (k >= SDLK_a && k <= SDLK_z) )
 	{
 		string s;
-		m_center_text_box->GetTextChar(&s,4);
+		m_text.read(BrainText::CENTER,&s,4);
 		
 		if( s.size() == 8 ) 
 		{
@@ -978,18 +973,18 @@ void Brainblast::textInput(SDLKey k)
 		}
 
 		s += k;
-		m_center_text_box->SetTextChar(s,4);
+		m_text.write(BrainText::CENTER,s,4);
 		m_sound->playSample(CLICK);
 	}
 
 	else if( k == SDLK_BACKSPACE )
 	{
 		string s;
-		m_center_text_box->GetTextChar(&s,4);
+		m_text.read(BrainText::CENTER,&s,4);
 		if( s.size() )
 		{
 			s.resize(s.size()-1);
-			m_center_text_box->SetTextChar(s,4);
+			m_text.write(BrainText::CENTER,s,4);
 			m_sound->playSample(CLICK);
 		}
 		else
@@ -1007,7 +1002,7 @@ void Brainblast::finishInitialWait()
 		m_current_levels[i]->setVisibleSolution(false);
 
 	m_gamestate.setState(BrainState::PLAYING);
-	m_center_text_box->SetTextChar("",0);
+	m_text.write(BrainText::CENTER,"",0);
 }
 
 BrainSprite* Brainblast::collisionCheck(BrainPlayer* player)
@@ -1049,7 +1044,7 @@ void Brainblast::writeScoreAndTime()
 				  << setw(2) << setfill('0') << min << ":" 
 				  << setw(2) << setfill('0') << sec;
 		
-		m_top_center_text_box->SetTextChar(score_str.str(),0);
+		m_text.write(BrainText::TOP_CENTER,score_str.str(),0);
 		score_str.str("");
 	}
 
@@ -1064,7 +1059,7 @@ void Brainblast::writeScoreAndTime()
 				  << " BRICKS: " << m_current_levels[i]->correctBricks()
 				  << "/" << m_current_levels[i]->totalSolutionBricks();
 		
-		m_player_manager->getPlayer(i)->getScoreBox()->SetTextChar(score_str.str(),0);
+		m_text.write(m_player_manager->getPlayer(i)->getScoreBox(),score_str.str(),0);
 
 		score_str.str("");
 	}
@@ -1099,12 +1094,12 @@ void Brainblast::select(Puzzle& lvl, BrainPlayer& player)
 
 		if( checkSolution(&lvl) )
 		{
-			clearTextBox(m_center_text_box);
+			m_text.clear(BrainText::CENTER);
 			
 			ostringstream str;
 			str << "Player " << m_player_manager->getPlayerNumber(player)
 				<< " wins level " << m_current_lvl;
-			m_center_text_box->SetTextChar(str.str(),0);
+			m_text.write(BrainText::CENTER,str.str(),0);
 
 			// Apply time bonus
 			int* seconds = new int(secondsLeft());

@@ -17,7 +17,8 @@ SDL_FLAGS = $(shell sdl-config --cflags)
 IMAGES    = ../images
 
 OBJECTS = bbc.o consolefont.o Brainblast.o Brick.o Puzzle.o Field.o BrainSprite.o BrainSound.o \
-          BrainPlayer.o BrainAI.o BrainPlayerManager.o main.o BrainSoundFMOD.o HighScore.o #BrainSoundSDL.o BrainSoundBASS.o
+          BrainPlayer.o BrainAI.o BrainPlayerManager.o main.o BrainSoundFMOD.o HighScore.o BrainText.o \
+          BrainState.o #BrainSoundSDL.o BrainSoundBASS.o
 
 VERSION = $(shell perl -wne 'if(/brainblast \((.*)\)/){print "$$1";exit;}' < ../deb/debian/changelog)
 

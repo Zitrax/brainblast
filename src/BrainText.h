@@ -7,6 +7,11 @@
 #ifndef BRAINTEXT_H
 #define BRAINTEXT_H
 
+using namespace std;
+
+#include <string>
+#include <wkyra.h>
+
 /**
  * This class should handle all writing of
  * of text to the screen such as menus and
@@ -20,6 +25,7 @@ public:
 
     enum Box
     {
+		UNKNOWN,
         TOP_LEFT,
         TOP_RIGHT,
         TOP_CENTER,
@@ -30,11 +36,21 @@ public:
 	// Must be called before use
 	// to set up the boxes and load the
 	// needed fonts.
-	bool init();
+	bool init(KrEngine& engine, int width, int height);
 
-    void write(enum Box box, char* text, int line);
+	/**
+	 * Load a font from a bitmap
+	 */
+	KrFontResource* loadFont(const char* file, int glyphs);
+
+    void write(enum Box box, const string& text, int line);
+	void read(enum Box box, string* text, int line);
     void clear(enum Box box);
     void clearAll();
+
+#ifdef _DEBUG
+	KrFontResource* getScoreFont() const { return m_score_font; }
+#endif // _DEBUG
 
 private:
 

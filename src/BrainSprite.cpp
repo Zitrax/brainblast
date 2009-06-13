@@ -124,7 +124,7 @@ int BrainSprite::nextBounce()
 			 */
 			if( !m_b )
 			{
-				m_b = new KrTextBox(Brainblast::instance()->m_score_font,10,10,1);
+				m_b = new KrTextBox(Brainblast::instance()->text().getScoreFont(),10,10,1);
 				m_b->SetTextChar("X",0);
 				Brainblast::instance()->engine()->Tree()->AddNode(0,m_b);
 				m_b->SetZDepth(20);

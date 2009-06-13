@@ -8,6 +8,7 @@
 #define BRAINPLAYER_H
 
 #include "BrainSprite.h"
+#include "BrainText.h"
 #include "Puzzle.h"
 
 using namespace std;
@@ -51,8 +52,8 @@ public:
     virtual void left();
     virtual void right();
 
-	KrTextBox* getScoreBox() const { return m_score_box; }
-	void setScoreBox(KrTextBox* box)  { m_score_box = box; }
+	BrainText::Box getScoreBox() const { return m_score_box; }
+	void setScoreBox(BrainText::Box box)  { m_score_box = box; }
 
 	/**
 	 * Return the action that this player maps 
@@ -88,7 +89,7 @@ private:
 	keymap m_actions;
 	std::vector<SDLKey> m_keys;
 
-	KrTextBox* m_score_box;
+	BrainText::Box m_score_box;
 
 	LEVEL_SET m_level_set;
 };

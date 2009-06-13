@@ -78,7 +78,7 @@ struct text_ready
  * 1. Call initGameKyra()
  * 2. Start the event loop: eventLoop()
  */
-class Brainblast
+class Brainblast : public BrainStateManager
 {
 
 private:
@@ -142,11 +142,6 @@ public:
 
 	void stopPlay();
 	
-	/**
-	 * Load a font from a bitmap
-	 */
-	KrFontResource* loadFont(const char* file, int glyphs);
-
 	BrainSprite* addSprite();
 
 	BrainSprite* reparentSprite(BrainSprite* bs, KrImNode* parent);
@@ -197,6 +192,29 @@ public:
 	 */
 	int startTextInput(string label);
 
+	// < FIXME: Should move into state code >
+
+	/** 
+	 * Called when the initial wait where the solution is shown
+	 * should end.
+	 **/
+	void finishInitialWait();
+    bool addPlayers();
+	BrainPlayerManager& playerManager() const { return *m_player_manager; }
+	int getHumanPlayers() const { return m_human_players; }
+	int getComputerPlayers() const { return m_computer_players; }
+	LEVEL_SET getLevelSet() const { return m_level_set;	}
+	// < / FIXME: Should move into state code >
+
+	//// <BrainStateManager> ////
+
+	void handleEvents();
+	void update(){}
+	void draw(){}
+
+	//// </BrainStateManager> ////
+
+
 private:
 
     Brainblast(const Brainblast& bb);
@@ -215,16 +233,6 @@ private:
 	void gameOver();
 
 	void showHighScore();
-
-	BrainPlayerManager& playerManager() const { return *m_player_manager; }
-
-	/** 
-	 * Called when the initial wait where the solution is shown
-	 * should end.
-	 **/
-	void finishInitialWait();
-
-    bool addPlayers();
 
 	bool setupFields(int players);
 	/**
@@ -261,7 +269,7 @@ private:
 	 * the solution and the game starts.
 	 */
 	static const double WAITTIME;
-
+	
 	/**
 	 * This class will track the state and statechanges
 	 * such that we can track illegal state changes.

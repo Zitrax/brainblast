@@ -23,7 +23,7 @@ int main(int /*argc*/, char* /*argv*/ [])
 		exit(254);
 	}
 
-	bb->eventLoop();
+	bb->handleEvents();
 
 	zap(bb);
 }
