@@ -10,33 +10,35 @@
 #include "BrainPlayerManager.h"
 #include <sstream>   // ostringstream
 
-BrainMenu* BrainMenu::s_instance = 0;
-BrainPlayWait* BrainPlayWait::s_instance = 0;
+BrainStateManager* BrainState::s_mgr = 0;
 
-BrainState::BrainState(BrainStateManager* mgr)
-	: m_mgr(mgr), m_game(dynamic_cast<Brainblast*>(mgr)) {}
+Brainblast* BrainState::game() const
+{ 
+	assert(s_mgr); 
+	return dynamic_cast<Brainblast*>(s_mgr); 
+}
 
 void BrainState::changeState(BrainState& state)
 {
-    m_mgr->changeState(state);
+    s_mgr->changeState(state);
 }
 
 void BrainMenu::init()
 {
-	m_game->loadMusic("/usr/share/games/brainblast/music/Acidstorm.it");
-	m_game->playMusic();
+	game()->loadMusic("/usr/share/games/brainblast/music/Acidstorm.it");
+	game()->playMusic();
 
-	m_game->stopPlay();
+	game()->stopPlay();
 
-	m_game->text().write(BrainText::TOP_LEFT, "MUSIC BY SAGA MUSIX, HTTP://SAGAMUSIX.DE/",0);
-	m_game->text().write(BrainText::TOP_RIGHT,"              CODE: DANIEL BENGTSSON",0);
+	game()->text().write(BrainText::TOP_LEFT, "MUSIC BY SAGA MUSIX, HTTP://SAGAMUSIX.DE/",0);
+	game()->text().write(BrainText::TOP_RIGHT,"              CODE: DANIEL BENGTSSON",0);
 
 	titleScreenUpdateText();
 }
 
 void BrainMenu::cleanup()
 {
-	m_game->text().clear(BrainText::CENTER);
+	game()->text().clear(BrainText::CENTER);
 }
 
 void BrainMenu::handleEvent(SDL_Event& event)
@@ -62,47 +64,47 @@ void BrainMenu::draw()
 
 void BrainMenu::titleScreenUpdateText()
 {
-	m_game->text().clear(BrainText::CENTER);
-	m_game->text().clear(BrainText::HIGH_SCORE); // Should not be needed, that mode should clear it
+	game()->text().clear(BrainText::CENTER);
+	game()->text().clear(BrainText::HIGH_SCORE); // Should not be needed, that mode should clear it
 
-	m_game->text().write(BrainText::CENTER,"BRAINBLAST 0.2",0);
-	m_game->text().write(BrainText::CENTER,"",1);
+	game()->text().write(BrainText::CENTER,"BRAINBLAST 0.2",0);
+	game()->text().write(BrainText::CENTER,"",1);
 
 	ostringstream str;
 
-	str << "F1: Human Players - " << m_game->getHumanPlayers();
-	m_game->text().write(BrainText::CENTER,str.str(),2);
+	str << "F1: Human Players - " << game()->getHumanPlayers();
+	game()->text().write(BrainText::CENTER,str.str(),2);
 
 	str.str(""); 
-	str << "F2: Computer Players - " << m_game->getComputerPlayers();
-	m_game->text().write(BrainText::CENTER,str.str(),3);
+	str << "F2: Computer Players - " << game()->getComputerPlayers();
+	game()->text().write(BrainText::CENTER,str.str(),3);
 
 	str.str("");
-	string set = levelSetToString(m_game->getLevelSet());
+	string set = levelSetToString(game()->getLevelSet());
 	str << "F3: Level set - " << set;
-	m_game->text().write(BrainText::CENTER,str.str(),4);
+	game()->text().write(BrainText::CENTER,str.str(),4);
 
 	str.str("");
-	string difficulty = m_game->playerManager().difficultyString();
+	string difficulty = game()->playerManager().difficultyString();
 	str << "F4: Difficulty - " << difficulty;
-	m_game->text().write(BrainText::CENTER,str.str(),5);
+	game()->text().write(BrainText::CENTER,str.str(),5);
 
-	m_game->text().write(BrainText::CENTER,"F5: Highscores",6);
-	m_game->text().write(BrainText::CENTER,"",7);
-	m_game->text().write(BrainText::CENTER,"SPACE: Start game",8);
-	m_game->text().write(BrainText::CENTER,"",9);
+	game()->text().write(BrainText::CENTER,"F5: Highscores",6);
+	game()->text().write(BrainText::CENTER,"",7);
+	game()->text().write(BrainText::CENTER,"SPACE: Start game",8);
+	game()->text().write(BrainText::CENTER,"",9);
 	
-	m_game->text().write(BrainText::TOP_CENTER,"",0);
+	game()->text().write(BrainText::TOP_CENTER,"",0);
 }
 
 void BrainPlayWait::init()
 {
-	m_game->playerManager().resetScores();
+	game()->playerManager().resetScores();
 
-	m_game->loadMusic("/usr/share/games/brainblast/music/enigmatic_path.it");
-	m_game->playMusic();
+	game()->loadMusic("/usr/share/games/brainblast/music/enigmatic_path.it");
+	game()->playMusic();
 	
-	m_game->addPlayers();
+	game()->addPlayers();
 }
 
 void BrainPlayWait::cleanup()
@@ -117,7 +119,7 @@ void BrainPlayWait::handleEvent(SDL_Event& event)
 		if( event.key.keysym.sym == SDLK_SPACE || 
 			event.key.keysym.sym == SDLK_RETURN )
 		{
-			m_game->finishInitialWait();
+			game()->finishInitialWait();
 		}
 	}
 }

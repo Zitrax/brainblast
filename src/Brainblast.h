@@ -274,7 +274,7 @@ private:
 	 * This class will track the state and statechanges
 	 * such that we can track illegal state changes.
 	 */
-	class BrainState
+	class OldBrainState
 	{
 	public:
 		
@@ -288,7 +288,7 @@ private:
 			TIME_BONUS
 		};
 
-		BrainState(Brainblast& bb, enum gamestate st) : m_bb(bb), m_gamestate(st) {}
+		OldBrainState(Brainblast& bb, enum gamestate st) : m_bb(bb), m_gamestate(st) {}
 		
 		/** Used for easier comparisons */
 		operator enum gamestate() const { return m_gamestate; }
@@ -300,7 +300,7 @@ private:
 		enum gamestate m_gamestate;
 	};
 
-	BrainState m_gamestate;
+	OldBrainState m_gamestate;
 
 	time_t m_start_time;
 

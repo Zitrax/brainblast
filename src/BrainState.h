@@ -25,7 +25,7 @@ class BrainStateManager;
 class BrainState
 {
 public:
-	BrainState(BrainStateManager* mgr);
+	BrainState(){};
 	virtual ~BrainState(){}
 
 	virtual void init()			= 0;
@@ -35,14 +35,19 @@ public:
 	virtual void draw()			= 0;
 
 	void changeState(BrainState& state);
+	
+	/**
+	 * This must be set before using any of the states.
+	 */
+	static void setStateManager(BrainStateManager& mgr) { s_mgr = &mgr; } 
+	Brainblast* game() const;
 
 protected:
 
     BrainState(const BrainState& bb);
     BrainState& operator=(const BrainState& bb);
 
-	BrainStateManager* m_mgr;
-	Brainblast* m_game;
+	static BrainStateManager* s_mgr;
 };
 
 /**
@@ -80,7 +85,6 @@ private:
 class BrainMenu : public BrainState
 {
 public:
-	BrainMenu(BrainStateManager* mgr) : BrainState(mgr) {}
 	virtual ~BrainMenu(){}
 
 	void init();
@@ -89,20 +93,23 @@ public:
 	void update();
 	void draw();
 
-	static BrainMenu& instance() { assert(s_instance); return *s_instance; }
+	static BrainMenu& instance() 
+		{
+			static BrainMenu instance;
+			return instance;
+		}
 
 private:
 
-	void titleScreenUpdateText();
+	BrainMenu(){assert(s_mgr);};
 
-	static BrainMenu* s_instance;
+	void titleScreenUpdateText();
 
 };
 
 class BrainPlayWait : public BrainState
 {
 public:
-	BrainPlayWait(BrainStateManager* mgr) : BrainState(mgr) {}
 	virtual ~BrainPlayWait(){}
 
 	void init();
@@ -111,11 +118,15 @@ public:
 	void update();
 	void draw();
 
-	static BrainPlayWait& instance() { assert(s_instance); return *s_instance; }
+	static BrainPlayWait& instance() 
+		{
+			static BrainPlayWait instance;
+			return instance;
+		}
 
 private:
 
-	static BrainPlayWait* s_instance;	
+	BrainPlayWait(){assert(s_mgr);}
 };
 
 #endif // BRAINSTATE_H

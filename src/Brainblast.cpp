@@ -26,7 +26,7 @@ Brainblast* Brainblast::s_instance;
 int TextListener::m_text_id = 0;
 const double Brainblast::WAITTIME = 10.0;
 
-Brainblast::Brainblast() : m_gamestate(*this,BrainState::TITLE),
+Brainblast::Brainblast() : m_gamestate(*this,OldBrainState::TITLE),
 						   m_start_time(0),
 						   m_sound(new BrainSoundFMOD),
 						   m_level_data(7,8),  // 7x8 is maximum size if you want to avoid overlappings
@@ -364,7 +364,7 @@ Brainblast::changeLevel(int lvl)
 
 	time(&m_start_time);
 
-	m_gamestate.setState(BrainState::PLAY_WAIT);
+	m_gamestate.setState(OldBrainState::PLAY_WAIT);
 
 	return true;
 }
@@ -437,7 +437,7 @@ Brainblast::initGameKyra()
     m_engine->Draw(); 
 
 	// Set up the font
-	if( m_text.init(*m_engine,VIDEOX,VIDEOY) )
+	if( !m_text.init(*m_engine,VIDEOX,VIDEOY) )
 		return false;
 
 	// Load the dat file.
@@ -482,6 +482,9 @@ Brainblast::initGameKyra()
 		  m_sound->addSample("/usr/share/games/brainblast/sounds/warning.wav",WARNING)) )
 		printf("=== ERROR: Sound/Music error === \n");
 
+	// Init states
+	BrainState::setStateManager(*this);
+
 	pushState(BrainMenu::instance());
 
 	return true;
@@ -497,8 +500,8 @@ void Brainblast::stopPlay()
 
 BrainSprite* Brainblast::addSprite()
 {
-	if( m_gamestate != BrainState::PLAYING && 
-		!(m_gamestate == BrainState::TITLE || m_gamestate == BrainState::HIGH_SCORE) )
+	if( m_gamestate != OldBrainState::PLAYING && 
+		!(m_gamestate == OldBrainState::TITLE || m_gamestate == OldBrainState::HIGH_SCORE) )
 		return 0;
 
 	KrSpriteResource* spriteRes = 0;
@@ -627,7 +630,7 @@ int Brainblast::eventLoop()
 			{
 				switch(m_gamestate)
 				{
-				case BrainState::TITLE:
+				case OldBrainState::TITLE:
 					m_player_manager->resetScores();
 					if( !startGame() )
 					{
@@ -635,14 +638,14 @@ int Brainblast::eventLoop()
 						done = true; // Just abort if we could not start the game
 					}
 					break;
-				case BrainState::GAME_OVER: 
-				case BrainState::HIGH_SCORE:
+				case OldBrainState::GAME_OVER: 
+				case OldBrainState::HIGH_SCORE:
 					titleScreen(); break;
-				case BrainState::PLAY_WAIT:
+				case OldBrainState::PLAY_WAIT:
 					finishInitialWait(); break;
-				case BrainState::TIME_BONUS:
+				case OldBrainState::TIME_BONUS:
 					speedyTimeBonus(); break;
-				case BrainState::PLAYING:
+				case OldBrainState::PLAYING:
 					break;
 				}
 			}
@@ -650,25 +653,25 @@ int Brainblast::eventLoop()
 			{
 				switch(m_gamestate)
 				{
-				case BrainState::TITLE:
+				case OldBrainState::TITLE:
 					done = true; break;
-				case BrainState::PLAY_WAIT:
-				case BrainState::PLAYING:
+				case OldBrainState::PLAY_WAIT:
+				case OldBrainState::PLAYING:
 				{
 					// If no one had any points, go directly to title screen
 					m_player_manager->allScoresNull() ? titleScreen() : gameOver();
 					clearFloor();
 				}
 				break;
-				case BrainState::GAME_OVER: 
-				case BrainState::HIGH_SCORE:
+				case OldBrainState::GAME_OVER: 
+				case OldBrainState::HIGH_SCORE:
 					titleScreen();
 					break;
-				case BrainState::TIME_BONUS:
+				case OldBrainState::TIME_BONUS:
 					break;
 				}
 			}
-			else if( m_gamestate==BrainState::TITLE && event.key.keysym.sym == SDLK_F1 )
+			else if( m_gamestate==OldBrainState::TITLE && event.key.keysym.sym == SDLK_F1 )
 			{
 				m_sound->playSample(CLICK);
 				m_human_players++;
@@ -678,7 +681,7 @@ int Brainblast::eventLoop()
 					m_computer_players--;
 				titleScreenUpdateText();
 			}
-			else if( m_gamestate==BrainState::TITLE && event.key.keysym.sym == SDLK_F2 )
+			else if( m_gamestate==OldBrainState::TITLE && event.key.keysym.sym == SDLK_F2 )
 			{
 				m_sound->playSample(CLICK);
 				m_computer_players++;
@@ -688,7 +691,7 @@ int Brainblast::eventLoop()
 					m_human_players--;
 				titleScreenUpdateText();
 			}
-			else if( m_gamestate==BrainState::TITLE && event.key.keysym.sym == SDLK_F3 )
+			else if( m_gamestate==OldBrainState::TITLE && event.key.keysym.sym == SDLK_F3 )
 			{
 				m_sound->playSample(CLICK);
 				switch( m_level_set )
@@ -702,12 +705,12 @@ int Brainblast::eventLoop()
 				}
 				titleScreenUpdateText();
 			}
-			else if( m_gamestate==BrainState::TITLE && event.key.keysym.sym == SDLK_F4 )
+			else if( m_gamestate==OldBrainState::TITLE && event.key.keysym.sym == SDLK_F4 )
 			{
 				m_player_manager->toggleDifficulty();
 				titleScreenUpdateText();
 			}
-			else if( m_gamestate==BrainState::TITLE && event.key.keysym.sym == SDLK_F5 )
+			else if( m_gamestate==OldBrainState::TITLE && event.key.keysym.sym == SDLK_F5 )
 			{
 				showHighScore();
 			}
@@ -722,7 +725,7 @@ int Brainblast::eventLoop()
 			break;
 
 		case SDL_ADD_SPRITE_EVENT:
-			if( m_gamestate != BrainState::GAME_OVER )
+			if( m_gamestate != OldBrainState::GAME_OVER )
 				addSprite();
 			break;
 			
@@ -816,7 +819,7 @@ int Brainblast::eventLoop()
 
 			m_engine->Tree()->Walk();
 
-			if( m_start_time && m_gamestate==BrainState::PLAY_WAIT && (difftime(time(0),m_start_time) > WAITTIME) )
+			if( m_start_time && m_gamestate==OldBrainState::PLAY_WAIT && (difftime(time(0),m_start_time) > WAITTIME) )
 				finishInitialWait();
 			
 			m_engine->Draw();
@@ -836,12 +839,12 @@ int Brainblast::eventLoop()
 		else
 			m_player_manager->handleKeyHeld(keysHeld);
 
-		if( m_gamestate != BrainState::TITLE )
+		if( m_gamestate != OldBrainState::TITLE )
 		{
-			bool was_game_over = m_gamestate == BrainState::GAME_OVER;
+			bool was_game_over = m_gamestate == OldBrainState::GAME_OVER;
 			writeScoreAndTime();
 			
-			if( m_gamestate==BrainState::GAME_OVER && !was_game_over )
+			if( m_gamestate==OldBrainState::GAME_OVER && !was_game_over )
 				gameOver();
 		}
 		
@@ -866,7 +869,7 @@ void Brainblast::speedyTimeBonus()
 	
 void Brainblast::gameOver()
 {
-// 	m_gamestate.setState(BrainState::GAME_OVER);
+// 	m_gamestate.setState(OldBrainState::GAME_OVER);
 // 	m_center_text_box->SetTextChar("Game Over",0);
 // 	m_player_manager->gameOver();
 // 	clearFloor();
@@ -874,7 +877,7 @@ void Brainblast::gameOver()
 
 void Brainblast::showHighScore()
 {
-// 	m_gamestate.setState(BrainState::HIGH_SCORE);
+// 	m_gamestate.setState(OldBrainState::HIGH_SCORE);
 
 // 	clearTextBox(m_center_text_box);
 
@@ -994,14 +997,14 @@ void Brainblast::textInput(SDLKey k)
 
 void Brainblast::finishInitialWait()
 {
-	if( m_gamestate == BrainState::GAME_OVER ||
-		m_gamestate == BrainState::TITLE )
+	if( m_gamestate == OldBrainState::GAME_OVER ||
+		m_gamestate == OldBrainState::TITLE )
 		return;
 
 	for(unsigned int i=0; i<m_current_levels.size(); ++i)
 		m_current_levels[i]->setVisibleSolution(false);
 
-	m_gamestate.setState(BrainState::PLAYING);
+	m_gamestate.setState(OldBrainState::PLAYING);
 	m_text.write(BrainText::CENTER,"",0);
 }
 
@@ -1022,11 +1025,11 @@ BrainSprite* Brainblast::collisionCheck(BrainPlayer* player)
 unsigned int Brainblast::secondsLeft() const
 {
 	time_t now = time(0);
-	int basetime = m_gamestate==BrainState::PLAYING ? 60 : static_cast<int>(WAITTIME);
+	int basetime = m_gamestate==OldBrainState::PLAYING ? 60 : static_cast<int>(WAITTIME);
 	int sec = static_cast<int>(basetime - difftime(now,m_start_time));
 	assert(sec <= basetime);
 	bool game_over = sec <= 0;
-	return (m_gamestate==BrainState::PLAYING && game_over) ? 0 : sec;
+	return (m_gamestate==OldBrainState::PLAYING && game_over) ? 0 : sec;
 }
 
 void Brainblast::writeScoreAndTime()
@@ -1037,8 +1040,8 @@ void Brainblast::writeScoreAndTime()
 	
 	ostringstream score_str;
 
-	if( m_gamestate == BrainState::PLAYING ||
-		m_gamestate == BrainState::PLAY_WAIT )
+	if( m_gamestate == OldBrainState::PLAYING ||
+		m_gamestate == OldBrainState::PLAY_WAIT )
 	{
 		score_str << "       "
 				  << setw(2) << setfill('0') << min << ":" 
@@ -1064,18 +1067,18 @@ void Brainblast::writeScoreAndTime()
 		score_str.str("");
 	}
 	
-	if( (m_gamestate == BrainState::PLAYING) && !sec && !min )
-		m_gamestate.setState(BrainState::GAME_OVER);
+	if( (m_gamestate == OldBrainState::PLAYING) && !sec && !min )
+		m_gamestate.setState(OldBrainState::GAME_OVER);
 }
 
 void Brainblast::select(Puzzle& lvl, BrainPlayer& player)
 {
-	if( m_gamestate == BrainState::TIME_BONUS )
+	if( m_gamestate == OldBrainState::TIME_BONUS )
 	{
 		speedyTimeBonus();
 		return;
 	}
-	else if( m_gamestate == BrainState::PLAY_WAIT )
+	else if( m_gamestate == OldBrainState::PLAY_WAIT )
 	{
 		finishInitialWait();
 		return;
@@ -1111,7 +1114,7 @@ void Brainblast::select(Puzzle& lvl, BrainPlayer& player)
 			m_time_bonus_event.user.data1 = static_cast<void*>(m_player_manager->getPlayer(m_player_manager->getPlayerNumber(player)-1)); // FIXME
 			m_time_bonus_event.user.data2 = static_cast<void*>(seconds);
 			m_time_bonus_timer = SDL_AddTimer( 100, TimerCallback, &m_time_bonus_event );	
-			m_gamestate.setState(BrainState::TIME_BONUS);
+			m_gamestate.setState(OldBrainState::TIME_BONUS);
 			clearFloor();
 
 			// Level is changed when counting the bonus is finished
@@ -1215,7 +1218,7 @@ void Brainblast::LevelData::reset()
 	m_types	 = 1;
 }
 
-void Brainblast::BrainState::setState(enum gamestate st) 
+void Brainblast::OldBrainState::setState(enum gamestate st) 
 {
 	// 
 	// Using many asserts to see exactly which 
