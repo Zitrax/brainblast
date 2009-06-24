@@ -192,6 +192,16 @@ public:
 	 */
 	int startTextInput(string label);
 
+	/**
+	 * Will add a human player and roll around if there is one too many
+	 */
+	void addHumanPlayer();
+
+	/**
+	 * Will add a computer player and roll around if there is one too many
+	 */
+	void addComputerPlayer();
+
 	// < FIXME: Should move into state code >
 
 	/** 
@@ -204,6 +214,7 @@ public:
 	int getHumanPlayers() const { return m_human_players; }
 	int getComputerPlayers() const { return m_computer_players; }
 	LEVEL_SET getLevelSet() const { return m_level_set;	}
+	void setLevelSet(LEVEL_SET s) { m_level_set = s; }
 	// < / FIXME: Should move into state code >
 
 	//// <BrainStateManager> ////

@@ -560,6 +560,7 @@ void Brainblast::handleEvents()
 
 		switch(event.type)
 		{
+			
         case SDL_KEYDOWN:
 			
 			if( bbc::debug )
@@ -576,8 +577,41 @@ void Brainblast::handleEvents()
 			// F = TOGGLE FULLSCREEN
 			else if( event.key.keysym.sym == SDLK_f )
 				SDL_WM_ToggleFullScreen(m_screen);
-		}
 
+        case SDL_DRAW_EVENT:
+        {
+			vector<BrainSprite*>::iterator it  = m_sprites.begin();
+			vector<BrainSprite*>::iterator end = m_sprites.end();
+			while(it!=end)
+			{
+				// First check if we should delete this sprite after a timeout
+				if( (*it)->temporary() && (difftime(time(0),(*it)->creationTime()) > 30) )
+				{
+					m_engine->Tree()->DeleteNode(*it);
+					// Set it to the next valid element after erasing
+					it = m_sprites.erase(it);
+					end = m_sprites.end(); // Only recalculate this when we might be invalidated
+				}
+				else
+				{
+					(*it)->move();
+					++it;
+				}
+			}
+
+			m_player_manager->move();
+
+			m_engine->Tree()->Walk();
+
+			if( m_start_time && m_gamestate==OldBrainState::PLAY_WAIT && (difftime(time(0),m_start_time) > WAITTIME) )
+				finishInitialWait();
+			
+			m_engine->Draw();
+
+        }
+        break;
+
+		}
 
 		currentState().handleEvent(event);
 	}	
@@ -671,49 +705,49 @@ int Brainblast::eventLoop()
 					break;
 				}
 			}
-			else if( m_gamestate==OldBrainState::TITLE && event.key.keysym.sym == SDLK_F1 )
-			{
-				m_sound->playSample(CLICK);
-				m_human_players++;
-				if( m_human_players > 2 )
-					m_human_players = 1;
-				if( (m_human_players + m_computer_players) > 2 )
-					m_computer_players--;
-				titleScreenUpdateText();
-			}
-			else if( m_gamestate==OldBrainState::TITLE && event.key.keysym.sym == SDLK_F2 )
-			{
-				m_sound->playSample(CLICK);
-				m_computer_players++;
-				if( m_computer_players > 2 )
-					m_computer_players = 1;
-				if( (m_human_players + m_computer_players) > 2 )
-					m_human_players--;
-				titleScreenUpdateText();
-			}
-			else if( m_gamestate==OldBrainState::TITLE && event.key.keysym.sym == SDLK_F3 )
-			{
-				m_sound->playSample(CLICK);
-				switch( m_level_set )
-				{
-				case NORMAL:
-					m_level_set = RANDOM; break;
-				case RANDOM:
-					m_level_set = NORMAL; break;
-				default:
-					m_level_set = NORMAL; break;
-				}
-				titleScreenUpdateText();
-			}
-			else if( m_gamestate==OldBrainState::TITLE && event.key.keysym.sym == SDLK_F4 )
-			{
-				m_player_manager->toggleDifficulty();
-				titleScreenUpdateText();
-			}
-			else if( m_gamestate==OldBrainState::TITLE && event.key.keysym.sym == SDLK_F5 )
-			{
-				showHighScore();
-			}
+// 			else if( m_gamestate==OldBrainState::TITLE && event.key.keysym.sym == SDLK_F1 )
+// 			{
+// 				m_sound->playSample(CLICK);
+// 				m_human_players++;
+// 				if( m_human_players > 2 )
+// 					m_human_players = 1;
+// 				if( (m_human_players + m_computer_players) > 2 )
+// 					m_computer_players--;
+// 				titleScreenUpdateText();
+// 			}
+// 			else if( m_gamestate==OldBrainState::TITLE && event.key.keysym.sym == SDLK_F2 )
+// 			{
+// 				m_sound->playSample(CLICK);
+// 				m_computer_players++;
+// 				if( m_computer_players > 2 )
+// 					m_computer_players = 1;
+// 				if( (m_human_players + m_computer_players) > 2 )
+// 					m_human_players--;
+// 				titleScreenUpdateText();
+// 			}
+// 			else if( m_gamestate==OldBrainState::TITLE && event.key.keysym.sym == SDLK_F3 )
+// 			{
+// 				m_sound->playSample(CLICK);
+// 				switch( m_level_set )
+// 				{
+// 				case NORMAL:
+// 					m_level_set = RANDOM; break;
+// 				case RANDOM:
+// 					m_level_set = NORMAL; break;
+// 				default:
+// 					m_level_set = NORMAL; break;
+// 				}
+// 				titleScreenUpdateText();
+// 			}
+// 			else if( m_gamestate==OldBrainState::TITLE && event.key.keysym.sym == SDLK_F4 )
+// 			{
+// 				m_player_manager->toggleDifficulty();
+// 				titleScreenUpdateText();
+// 			}
+// 			else if( m_gamestate==OldBrainState::TITLE && event.key.keysym.sym == SDLK_F5 )
+// 			{
+// 				showHighScore();
+// 			}
 			else
 				if( !m_player_manager->handleKeyDown(event.key.keysym.sym) )
 					keysHeld[event.key.keysym.sym] = true;
@@ -936,6 +970,24 @@ int Brainblast::startTextInput(string label)
 		nextTextInput();
 
 	return id;
+}
+
+void Brainblast::addHumanPlayer()
+{
+	m_human_players++;
+	if( m_human_players > 2 )
+		m_human_players = 1;
+	if( (m_human_players + m_computer_players) > 2 )
+		m_computer_players--;
+}
+
+void Brainblast::addComputerPlayer()
+{
+	m_computer_players++;
+	if( m_computer_players > 2 )
+		m_computer_players = 1;
+	if( (m_human_players + m_computer_players) > 2 )
+		m_human_players--;
 }
 
 void Brainblast::textInput(SDLKey k)

@@ -10,6 +10,7 @@
 #include <wSDL.h>
 #include <vector>
 #include <assert.h>
+#include <string>
 
 class Brainblast;
 
@@ -28,11 +29,12 @@ public:
 	BrainState(){};
 	virtual ~BrainState(){}
 
-	virtual void init()			= 0;
-	virtual void cleanup()		= 0;
-	virtual void handleEvent(SDL_Event& event) = 0;
-	virtual void update()		= 0;
-	virtual void draw()			= 0;
+	virtual void    init()								= 0;
+	virtual void    cleanup()							= 0;
+	virtual void    handleEvent(SDL_Event& event)		= 0;
+	virtual void    update()							= 0;
+	virtual void    draw()								= 0;
+	virtual string  name() const						= 0;
 
 	void changeState(BrainState& state);
 	
@@ -56,7 +58,7 @@ protected:
 class BrainStateManager
 {
 public:
-	BrainStateManager() : m_states(),m_running(false) {}
+	BrainStateManager() : m_states(),m_running(true) {}
 	virtual ~BrainStateManager() {}
 
 	// Is this needed, can we go with just pushState instead ?
@@ -69,7 +71,7 @@ public:
 	virtual void update() = 0;
 	virtual void draw() = 0;
 
-	void pushState(BrainState& state) { m_states.push_back(&state); }
+	void pushState(BrainState& state);
 	void popState() { m_states.pop_back(); }
 	BrainState& currentState() const { assert(m_states.back()); return *m_states.back(); }
 
@@ -92,6 +94,7 @@ public:
 	void handleEvent(SDL_Event& event);
 	void update();
 	void draw();
+	string name() const { return "BrainMenu"; }
 
 	static BrainMenu& instance() 
 		{
@@ -117,6 +120,7 @@ public:
 	void handleEvent(SDL_Event& event);
 	void update();
 	void draw();
+	string name() const { return "BrainPlayWait"; }
 
 	static BrainPlayWait& instance() 
 		{

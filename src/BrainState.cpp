@@ -23,6 +23,13 @@ void BrainState::changeState(BrainState& state)
     s_mgr->changeState(state);
 }
 
+void BrainStateManager::pushState(BrainState& state)
+{ 
+	if(bbc::debug) cerr << "BrainStateManager::pushState(" << state.name() << ")" << endl;
+	m_states.push_back(&state); 
+	state.init(); 
+}
+
 void BrainMenu::init()
 {
 	game()->loadMusic("/usr/share/games/brainblast/music/Acidstorm.it");
@@ -46,10 +53,54 @@ void BrainMenu::handleEvent(SDL_Event& event)
 	switch( event.type )
 	{
 	case SDL_KEYDOWN:
-		if( event.key.keysym.sym == SDLK_SPACE || 
-			event.key.keysym.sym == SDLK_RETURN )
+
+		switch(event.key.keysym.sym)
 		{
+			
+		case SDLK_SPACE:
+		case SDLK_RETURN:
 			changeState(BrainPlayWait::instance());
+			break;
+
+		case SDLK_F1:
+			game()->playSample(Brainblast::CLICK);
+			game()->addHumanPlayer();
+			titleScreenUpdateText();
+			break;
+
+		case SDLK_F2:
+			game()->playSample(Brainblast::CLICK);
+			game()->addComputerPlayer();
+			titleScreenUpdateText();
+			break;
+			
+		case SDLK_F3:
+			game()->playSample(Brainblast::CLICK);
+			switch( game()->getLevelSet() )
+			{
+			case NORMAL:
+				game()->setLevelSet(RANDOM); break;
+			case RANDOM:
+				game()->setLevelSet(NORMAL); break;
+			default:
+				game()->setLevelSet(NORMAL); break;
+			}
+			titleScreenUpdateText();
+			break;
+			
+		case SDLK_F4:
+			game()->playerManager().toggleDifficulty();
+			titleScreenUpdateText();
+			break;
+
+		case SDLK_F5:
+			assert(!"Not implemented");
+			//showHighScore();
+			break;
+
+		default:
+			// Just skip other keys
+			break;
 		}
 	}
 }
