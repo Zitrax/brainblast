@@ -1,0 +1,1 @@
+..\..\encoder\release\krencoder -w square.dat square.xml

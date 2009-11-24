@@ -1,0 +1,94 @@
+# In general, the build is control by shell variables:
+#     MAKE_KYRA=RELEASE/DEBUG/PROFILE
+#     KYRA_OPENGL=[undefined]/YES
+#
+
+# DEBUG can be set to YES to include debugging info, or NO otherwise
+DEBUG          := NO
+
+# PROFILE can be set to YES to include profiling info, or NO otherwise
+PROFILE        := NO
+
+#****************************************************************************
+ifeq (RELEASE, ${MAKE_KYRA})
+	DEBUG   := NO
+	PROFILE := NO
+endif
+
+ifeq (DEBUG, ${MAKE_KYRA})
+	DEBUG   := YES
+	PROFILE := NO
+endif
+
+ifeq (PROFILE, ${MAKE_KYRA})
+	DEBUG   := NO
+	PROFILE := YES
+endif
+
+CC     := gcc
+CXX    := g++
+LD     := g++
+AR     := ar rc
+RANLIB := ranlib
+
+DEBUG_CFLAGS     := -Wall -Wno-unknown-pragmas -Wno-format -g -DDEBUG
+RELEASE_CFLAGS   := -Wall -Wno-unknown-pragmas -Wno-format -O3
+
+LIBS		 :=  $(shell sdl-config --libs)
+
+DEBUG_CXXFLAGS   := ${DEBUG_CFLAGS}
+RELEASE_CXXFLAGS := ${RELEASE_CFLAGS}
+
+DEBUG_LDFLAGS    := -g
+RELEASE_LDFLAGS  :=
+
+ifeq (YES, ${DEBUG})
+   CFLAGS       := ${DEBUG_CFLAGS}
+   CXXFLAGS     := ${DEBUG_CXXFLAGS}
+   LDFLAGS      := ${DEBUG_LDFLAGS}
+else
+   CFLAGS       := ${RELEASE_CFLAGS}
+   CXXFLAGS     := ${RELEASE_CXXFLAGS}
+   LDFLAGS      := ${RELEASE_LDFLAGS}
+endif
+
+ifeq (YES, ${PROFILE})
+   CFLAGS   := ${CFLAGS} -pg
+   CXXFLAGS := ${CXXFLAGS} -pg
+   LDFLAGS  := ${LDFLAGS} -pg
+endif
+
+ifeq (YES, ${KYRA_OPENGL})
+	ifeq (MINGW32, ${MSYSTEM})
+		LIBS := ${LIBS} -lopengl32
+	else
+		LIBS := ${LIBS} -lGL
+	endif
+endif
+
+#****************************************************************************
+# Preprocessor directives
+#****************************************************************************
+
+ifeq (YES, ${PROFILE})
+  DEFS :=
+else
+  DEFS :=
+endif
+
+ifeq (YES, ${KYRA_OPENGL})
+	DEFS := ${DEFS} -DKYRA_SUPPORT_OPENGL
+endif
+
+#****************************************************************************
+# Include paths
+#****************************************************************************
+
+INCS := $(shell sdl-config --cflags)
+
+#****************************************************************************
+# Makefile code common to all platforms
+#****************************************************************************
+
+CFLAGS   := ${CFLAGS}   ${DEFS}
+CXXFLAGS := ${CXXFLAGS} ${DEFS}

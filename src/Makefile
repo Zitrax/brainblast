@@ -9,9 +9,9 @@ else
 CFLAGS   += -O3 -DNDEBUG
 endif
 
-CFLAGS   += -I../include
+CFLAGS   += -I../include -I../kyra2_1_3
 
-LIBS      = /usr/local/lib/libengine.a /usr/local/lib/libkyra.a  -L../fmod/api -lfmod-3.75 -lrt
+LIBS      = ../kyra2_1_3/Kyra/engine/.libs/libengine.a ../kyra2_1_3/Kyra/.libs/libkyra.a -L../fmod/api -lfmod-3.75 -lrt
 SDL_LIBS  = $(shell sdl-config --static-libs) -lSDL_image #-lSDL_mixer
 SDL_FLAGS = $(shell sdl-config --cflags)
 IMAGES    = ../images
@@ -22,15 +22,17 @@ OBJECTS = bbc.o consolefont.o Brainblast.o Brick.o Puzzle.o Field.o BrainSprite.
 
 VERSION = $(shell perl -wne 'if(/brainblast \((.*)\)/){print "$$1";exit;}' < ../deb/debian/changelog)
 
+KRENCODER = ../kyra2_1_3/Kyra/encoder/krencoder
+
 all: brainblast
 
 $(IMAGES)/bb.h: ../images/bricks.xml 
 	cd $(IMAGES) && \
-	krencoder -pBB_ bb.h bricks.xml
+	$(KRENCODER) -pBB_ bb.h bricks.xml
 
 $(IMAGES)/bb_bg.h: ../images/bg.xml
 	cd $(IMAGES) && \
-	krencoder -pBB_BG_ bb_bg.h bg.xml
+	$(KRENCODER) -pBB_BG_ bb_bg.h bg.xml
 
 # How to avoid hardcoding the static libraries ? Using -l just makes it find the .so it seems
   #/usr/local/lib/libengine.a /usr/local/lib/libkyra.a

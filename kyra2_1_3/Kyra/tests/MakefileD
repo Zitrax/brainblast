@@ -1,0 +1,1220 @@
+#****************************************************************************
+#
+# Makefile for Kyra.
+# Lee Thomason and David Leimbach
+# www.grinninglizard.com
+# www.sourceforge.net/projects/kyra
+#
+# This is a GNU make (gmake) makefile
+#****************************************************************************
+
+DEBUG := YES
+
+CC     := gcc
+CXX    := g++
+LD     := g++
+AR     := ar rc
+RANLIB := ranlib
+
+DEBUG_CFLAGS     := -Wall -Wno-unknown-pragmas -Wno-format -g -DDEBUG
+RELEASE_CFLAGS   := -Wall -Wno-unknown-pragmas -Wno-format
+
+LIBS		 :=   $(shell sdl-config --libs) -lSDL_image -lGL
+
+DEBUG_CXXFLAGS   := ${DEBUG_CFLAGS}
+RELEASE_CXXFLAGS := ${RELEASE_CFLAGS}
+
+DEBUG_LDFLAGS    := -g
+RELEASE_LDFLAGS  :=
+
+ifeq (YES, ${DEBUG})
+   CFLAGS       := ${DEBUG_CFLAGS}
+   CXXFLAGS     := ${DEBUG_CXXFLAGS}
+   LDFLAGS      := ${DEBUG_LDFLAGS}
+else
+   CFLAGS       := ${RELEASE_CFLAGS}
+   CXXFLAGS     := ${RELEASE_CXXFLAGS}
+   LDFLAGS      := ${RELEASE_LDFLAGS}
+endif
+
+
+#****************************************************************************
+# Preprocessor directives
+#****************************************************************************
+
+ifeq (YES, ${PROFILE})
+  DEFS := KYRA_SUPPORT_OPENGL
+else
+  DEFS := -DKYRA_SUPPORT_OPENGL
+endif
+
+#****************************************************************************
+# Include paths
+#****************************************************************************
+
+INCS := $(shell sdl-config --cflags)
+
+
+#****************************************************************************
+# Makefile code common to all platforms
+#****************************************************************************
+
+CFLAGS   := ${CFLAGS}   ${DEFS}
+CXXFLAGS := ${CXXFLAGS} ${DEFS}
+
+#****************************************************************************
+# Targets of the build
+#****************************************************************************
+
+OUTPUT := krdemo
+
+all: ${OUTPUT}
+
+
+#****************************************************************************
+# Source files
+#****************************************************************************
+
+SRCS :=	bemgame.cpp \
+		blttest.cpp \
+		demos.cpp \
+		space.cpp \
+		spritetest.cpp \
+		tiletest.cpp \
+		gamefactory.cpp \
+        scale.cpp \
+        sinwave.cpp \
+		text.cpp \
+		title.cpp \
+		shooter.cpp
+
+   SRCS   := ${SRCS} \
+   		../engine/dataresource.cpp \
+		../engine/action.cpp \
+		../engine/box.cpp \
+		../engine/boxresource.cpp \
+		../engine/canvas.cpp \
+		../engine/canvasresource.cpp \
+		../engine/color.cpp \
+		../util/gldebug.cpp \
+		../engine/dirtyrectangle.cpp \
+		../engine/encoder.cpp \
+		../engine/engine.cpp \
+		../engine/fontresource.cpp \
+		../engine/image.cpp \
+		../engine/imagetree.cpp \
+		../engine/imnode.cpp \
+		../engine/kyraresource.cpp \
+		../engine/ogltexture.cpp \
+		../engine/painter.cpp \
+		../engine/parser.cpp \
+		../engine/pixelblock.cpp \
+		../engine/rle.cpp \
+		../engine/sdlutil.cpp \
+		../engine/sprite.cpp \
+		../engine/spriteresource.cpp \
+		../engine/textbox.cpp \
+		../engine/tile.cpp \
+		../engine/tileresource.cpp \
+		../engine/vault.cpp \
+        ../engine/namefield.cpp \
+		../engine/krmath.cpp \
+		../util/glrandom.cpp \
+		../util/glmap.cpp \
+        ../util/glisomath.cpp \
+		../util/glstring.cpp \
+        ../util/glmemorypool.cpp \
+		../util/glprime.cpp \
+		../util/glperformance.cpp \
+		../tinyxml/tinyxml.cpp \
+		../tinyxml/tinyxmlparser.cpp \
+		../tinyxml/tinyxmlerror.cpp \
+		../gui/console.cpp \
+		../gui/widget.cpp
+
+
+# Add on the sources for libraries
+SRCS := ${SRCS}
+
+OBJS := $(addsuffix .o,$(basename ${SRCS}))
+
+#****************************************************************************
+# Output
+#****************************************************************************
+
+${OUTPUT}: ${OBJS}
+	${LD} -o $@ ${LDFLAGS} ${OBJS} ${LIBS} ${EXTRA_LIBS}
+
+#****************************************************************************
+# common rules
+#****************************************************************************
+
+# Rules for compiling source files to object files
+%.o : %.cpp
+	${CXX} -c ${CXXFLAGS} ${INCS} $< -o $@
+
+%.o : %.c
+	${CC} -c ${CFLAGS} ${INCS} $< -o $@
+
+clean:
+	-rm -f core ${OBJS} ${OUTPUT}
+
+depend:
+	makedepend -fMakefileD ${SRCS}
+
+# DO NOT DELETE
+
+bemgame.o: demos.h ../util/gldebug.h ../util/glrandom.h ../util/gltypes.h
+bemgame.o: /usr/include/stdlib.h /usr/include/features.h
+bemgame.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+bemgame.o: /usr/include/sys/types.h /usr/include/bits/types.h
+bemgame.o: /usr/include/bits/pthreadtypes.h /usr/include/bits/sched.h
+bemgame.o: /usr/include/time.h /usr/include/endian.h
+bemgame.o: /usr/include/bits/endian.h /usr/include/sys/select.h
+bemgame.o: /usr/include/bits/select.h /usr/include/bits/sigset.h
+bemgame.o: /usr/include/bits/time.h /usr/include/sys/sysmacros.h
+bemgame.o: /usr/include/alloca.h ../engine/krmath.h ../util/glutil.h
+bemgame.o: ../util/gltypes.h ../util/glfixed.h /usr/include/limits.h
+bemgame.o: /usr/include/bits/wordsize.h /usr/include/bits/posix1_lim.h
+bemgame.o: /usr/include/bits/local_lim.h /usr/include/linux/limits.h
+bemgame.o: /usr/include/bits/posix2_lim.h ../util/gldebug.h ../engine/color.h
+bemgame.o: ../engine/engine.h ../engine/vault.h ../util/gllist.h
+bemgame.o: ../util/gldynarray.h ../util/glutil.h ../util/glstring.h
+bemgame.o: ../util/gldynarray.h ../engine/rle.h ../util/glmemorypool.h
+bemgame.o: ../engine/painter.h ../engine/color.h ../engine/kyrabuild.h
+bemgame.o: ../engine/kyraresource.h ../engine/imagetree.h ../util/glmap.h
+bemgame.o: ../util/glprime.h ../engine/sprite.h ../engine/image.h
+bemgame.o: ../engine/imnode.h ../util/glinsidelist.h ../engine/krmath.h
+bemgame.o: ../engine/kyrabuild.h ../engine/spriteresource.h
+bemgame.o: ../engine/action.h ../engine/dirtyrectangle.h
+bemgame.o: ../util/glcirclelist.h bem.h ../engine/tileresource.h
+bemgame.o: ../engine/pixelblock.h ../engine/ogltexture.h ../engine/tile.h
+bemgame.o: ../engine/tileresource.h ../engine/canvasresource.h
+bemgame.o: ../engine/canvas.h ../engine/canvasresource.h /usr/include/math.h
+bemgame.o: /usr/include/bits/huge_val.h /usr/include/bits/mathdef.h
+bemgame.o: /usr/include/bits/mathcalls.h ../util/glisomath.h
+bemgame.o: ../util/glfixed.h ../engine/box.h ../engine/boxresource.h
+bemgame.o: ../engine/boxresource.h
+blttest.o: /usr/include/stdlib.h /usr/include/features.h
+blttest.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+blttest.o: /usr/include/sys/types.h /usr/include/bits/types.h
+blttest.o: /usr/include/bits/pthreadtypes.h /usr/include/bits/sched.h
+blttest.o: /usr/include/time.h /usr/include/endian.h
+blttest.o: /usr/include/bits/endian.h /usr/include/sys/select.h
+blttest.o: /usr/include/bits/select.h /usr/include/bits/sigset.h
+blttest.o: /usr/include/bits/time.h /usr/include/sys/sysmacros.h
+blttest.o: /usr/include/alloca.h /usr/include/stdio.h /usr/include/libio.h
+blttest.o: /usr/include/_G_config.h /usr/include/wchar.h
+blttest.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+blttest.o: /usr/include/bits/stdio_lim.h ../engine/spriteresource.h
+blttest.o: ../util/glstring.h ../util/gltypes.h ../util/gldynarray.h
+blttest.o: ../util/glmap.h ../util/glutil.h ../util/gldebug.h
+blttest.o: ../util/glprime.h ../engine/kyraresource.h ../util/gltypes.h
+blttest.o: ../util/glutil.h ../util/glfixed.h /usr/include/limits.h
+blttest.o: /usr/include/bits/wordsize.h /usr/include/bits/posix1_lim.h
+blttest.o: /usr/include/bits/local_lim.h /usr/include/linux/limits.h
+blttest.o: /usr/include/bits/posix2_lim.h ../engine/krmath.h
+blttest.o: ../engine/action.h ../engine/rle.h ../util/gldebug.h
+blttest.o: ../util/glmemorypool.h ../engine/painter.h ../engine/color.h
+blttest.o: ../engine/kyrabuild.h ../util/gldynarray.h ../engine/sprite.h
+blttest.o: ../engine/image.h ../engine/imnode.h ../util/glinsidelist.h
+blttest.o: ../engine/krmath.h ../engine/kyrabuild.h
+blttest.o: ../engine/spriteresource.h ../engine/engine.h ../engine/vault.h
+blttest.o: ../util/gllist.h ../engine/imagetree.h ../engine/sprite.h
+blttest.o: ../engine/dirtyrectangle.h
+demos.o: demos.h ../util/gldebug.h ../util/glrandom.h ../util/gltypes.h
+demos.o: /usr/include/stdlib.h /usr/include/features.h
+demos.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+demos.o: /usr/include/sys/types.h /usr/include/bits/types.h
+demos.o: /usr/include/bits/pthreadtypes.h /usr/include/bits/sched.h
+demos.o: /usr/include/time.h /usr/include/endian.h /usr/include/bits/endian.h
+demos.o: /usr/include/sys/select.h /usr/include/bits/select.h
+demos.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+demos.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
+demos.o: ../engine/krmath.h ../util/glutil.h ../util/gltypes.h
+demos.o: ../util/glfixed.h /usr/include/limits.h /usr/include/bits/wordsize.h
+demos.o: /usr/include/bits/posix1_lim.h /usr/include/bits/local_lim.h
+demos.o: /usr/include/linux/limits.h /usr/include/bits/posix2_lim.h
+demos.o: ../util/gldebug.h ../engine/color.h ../engine/engine.h
+demos.o: ../engine/vault.h ../util/gllist.h ../util/gldynarray.h
+demos.o: ../util/glutil.h ../util/glstring.h ../util/gldynarray.h
+demos.o: ../engine/rle.h ../util/glmemorypool.h ../engine/painter.h
+demos.o: ../engine/color.h ../engine/kyrabuild.h ../engine/kyraresource.h
+demos.o: ../engine/imagetree.h ../util/glmap.h ../util/glprime.h
+demos.o: ../engine/sprite.h ../engine/image.h ../engine/imnode.h
+demos.o: ../util/glinsidelist.h ../engine/krmath.h ../engine/kyrabuild.h
+demos.o: ../engine/spriteresource.h ../engine/action.h
+demos.o: ../engine/dirtyrectangle.h ../util/glcirclelist.h ../engine/vault.h
+demos.o: /usr/include/string.h ../util/glperformance.h ../util/glmap.h
+space.o: demos.h ../util/gldebug.h ../util/glrandom.h ../util/gltypes.h
+space.o: /usr/include/stdlib.h /usr/include/features.h
+space.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+space.o: /usr/include/sys/types.h /usr/include/bits/types.h
+space.o: /usr/include/bits/pthreadtypes.h /usr/include/bits/sched.h
+space.o: /usr/include/time.h /usr/include/endian.h /usr/include/bits/endian.h
+space.o: /usr/include/sys/select.h /usr/include/bits/select.h
+space.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+space.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
+space.o: ../engine/krmath.h ../util/glutil.h ../util/gltypes.h
+space.o: ../util/glfixed.h /usr/include/limits.h /usr/include/bits/wordsize.h
+space.o: /usr/include/bits/posix1_lim.h /usr/include/bits/local_lim.h
+space.o: /usr/include/linux/limits.h /usr/include/bits/posix2_lim.h
+space.o: ../util/gldebug.h ../engine/color.h ../engine/engine.h
+space.o: ../engine/vault.h ../util/gllist.h ../util/gldynarray.h
+space.o: ../util/glutil.h ../util/glstring.h ../util/gldynarray.h
+space.o: ../engine/rle.h ../util/glmemorypool.h ../engine/painter.h
+space.o: ../engine/color.h ../engine/kyrabuild.h ../engine/kyraresource.h
+space.o: ../engine/imagetree.h ../util/glmap.h ../util/glprime.h
+space.o: ../engine/sprite.h ../engine/image.h ../engine/imnode.h
+space.o: ../util/glinsidelist.h ../engine/krmath.h ../engine/kyrabuild.h
+space.o: ../engine/spriteresource.h ../engine/action.h
+space.o: ../engine/dirtyrectangle.h ../util/glcirclelist.h space.h
+space.o: ../engine/tileresource.h ../engine/pixelblock.h
+space.o: ../engine/ogltexture.h ../engine/tile.h ../engine/tileresource.h
+space.o: ../engine/canvasresource.h ../engine/canvas.h
+space.o: ../engine/canvasresource.h /usr/include/math.h
+space.o: /usr/include/bits/huge_val.h /usr/include/bits/mathdef.h
+space.o: /usr/include/bits/mathcalls.h
+spritetest.o: /usr/include/stdlib.h /usr/include/features.h
+spritetest.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+spritetest.o: /usr/include/sys/types.h /usr/include/bits/types.h
+spritetest.o: /usr/include/bits/pthreadtypes.h /usr/include/bits/sched.h
+spritetest.o: /usr/include/time.h /usr/include/endian.h
+spritetest.o: /usr/include/bits/endian.h /usr/include/sys/select.h
+spritetest.o: /usr/include/bits/select.h /usr/include/bits/sigset.h
+spritetest.o: /usr/include/bits/time.h /usr/include/sys/sysmacros.h
+spritetest.o: /usr/include/alloca.h /usr/include/stdio.h /usr/include/libio.h
+spritetest.o: /usr/include/_G_config.h /usr/include/wchar.h
+spritetest.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+spritetest.o: /usr/include/bits/stdio_lim.h ../engine/spriteresource.h
+spritetest.o: ../util/glstring.h ../util/gltypes.h ../util/gldynarray.h
+spritetest.o: ../util/glmap.h ../util/glutil.h ../util/gldebug.h
+spritetest.o: ../util/glprime.h ../engine/kyraresource.h ../util/gltypes.h
+spritetest.o: ../util/glutil.h ../util/glfixed.h /usr/include/limits.h
+spritetest.o: /usr/include/bits/wordsize.h /usr/include/bits/posix1_lim.h
+spritetest.o: /usr/include/bits/local_lim.h /usr/include/linux/limits.h
+spritetest.o: /usr/include/bits/posix2_lim.h ../engine/krmath.h
+spritetest.o: ../engine/action.h ../engine/rle.h ../util/gldebug.h
+spritetest.o: ../util/glmemorypool.h ../engine/painter.h ../engine/color.h
+spritetest.o: ../engine/kyrabuild.h ../util/gldynarray.h ../engine/sprite.h
+spritetest.o: ../engine/image.h ../engine/imnode.h ../util/glinsidelist.h
+spritetest.o: ../engine/krmath.h ../engine/kyrabuild.h
+spritetest.o: ../engine/spriteresource.h ../engine/engine.h ../engine/vault.h
+spritetest.o: ../util/gllist.h ../engine/imagetree.h ../engine/sprite.h
+spritetest.o: ../engine/dirtyrectangle.h ../engine/textbox.h
+spritetest.o: ../engine/fontresource.h demos.h ../util/glrandom.h
+spritetest.o: ../engine/color.h ../util/glcirclelist.h
+tiletest.o: /usr/include/stdlib.h /usr/include/features.h
+tiletest.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+tiletest.o: /usr/include/sys/types.h /usr/include/bits/types.h
+tiletest.o: /usr/include/bits/pthreadtypes.h /usr/include/bits/sched.h
+tiletest.o: /usr/include/time.h /usr/include/endian.h
+tiletest.o: /usr/include/bits/endian.h /usr/include/sys/select.h
+tiletest.o: /usr/include/bits/select.h /usr/include/bits/sigset.h
+tiletest.o: /usr/include/bits/time.h /usr/include/sys/sysmacros.h
+tiletest.o: /usr/include/alloca.h /usr/include/stdio.h /usr/include/libio.h
+tiletest.o: /usr/include/_G_config.h /usr/include/wchar.h
+tiletest.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+tiletest.o: /usr/include/bits/stdio_lim.h ../engine/spriteresource.h
+tiletest.o: ../util/glstring.h ../util/gltypes.h ../util/gldynarray.h
+tiletest.o: ../util/glmap.h ../util/glutil.h ../util/gldebug.h
+tiletest.o: ../util/glprime.h ../engine/kyraresource.h ../util/gltypes.h
+tiletest.o: ../util/glutil.h ../util/glfixed.h /usr/include/limits.h
+tiletest.o: /usr/include/bits/wordsize.h /usr/include/bits/posix1_lim.h
+tiletest.o: /usr/include/bits/local_lim.h /usr/include/linux/limits.h
+tiletest.o: /usr/include/bits/posix2_lim.h ../engine/krmath.h
+tiletest.o: ../engine/action.h ../engine/rle.h ../util/gldebug.h
+tiletest.o: ../util/glmemorypool.h ../engine/painter.h ../engine/color.h
+tiletest.o: ../engine/kyrabuild.h ../util/gldynarray.h ../engine/sprite.h
+tiletest.o: ../engine/image.h ../engine/imnode.h ../util/glinsidelist.h
+tiletest.o: ../engine/krmath.h ../engine/kyrabuild.h
+tiletest.o: ../engine/spriteresource.h ../engine/tile.h
+tiletest.o: ../engine/tileresource.h ../engine/engine.h ../engine/vault.h
+tiletest.o: ../util/gllist.h ../engine/imagetree.h ../engine/sprite.h
+tiletest.o: ../engine/dirtyrectangle.h ../engine/canvas.h
+tiletest.o: ../engine/canvasresource.h demos.h ../util/glrandom.h
+tiletest.o: ../engine/color.h ../util/glcirclelist.h
+gamefactory.o: demos.h ../util/gldebug.h ../util/glrandom.h ../util/gltypes.h
+gamefactory.o: /usr/include/stdlib.h /usr/include/features.h
+gamefactory.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+gamefactory.o: /usr/include/sys/types.h /usr/include/bits/types.h
+gamefactory.o: /usr/include/bits/pthreadtypes.h /usr/include/bits/sched.h
+gamefactory.o: /usr/include/time.h /usr/include/endian.h
+gamefactory.o: /usr/include/bits/endian.h /usr/include/sys/select.h
+gamefactory.o: /usr/include/bits/select.h /usr/include/bits/sigset.h
+gamefactory.o: /usr/include/bits/time.h /usr/include/sys/sysmacros.h
+gamefactory.o: /usr/include/alloca.h ../engine/krmath.h ../util/glutil.h
+gamefactory.o: ../util/gltypes.h ../util/glfixed.h /usr/include/limits.h
+gamefactory.o: /usr/include/bits/wordsize.h /usr/include/bits/posix1_lim.h
+gamefactory.o: /usr/include/bits/local_lim.h /usr/include/linux/limits.h
+gamefactory.o: /usr/include/bits/posix2_lim.h ../util/gldebug.h
+gamefactory.o: ../engine/color.h ../engine/engine.h ../engine/vault.h
+gamefactory.o: ../util/gllist.h ../util/gldynarray.h ../util/glutil.h
+gamefactory.o: ../util/glstring.h ../util/gldynarray.h ../engine/rle.h
+gamefactory.o: ../util/glmemorypool.h ../engine/painter.h ../engine/color.h
+gamefactory.o: ../engine/kyrabuild.h ../engine/kyraresource.h
+gamefactory.o: ../engine/imagetree.h ../util/glmap.h ../util/glprime.h
+gamefactory.o: ../engine/sprite.h ../engine/image.h ../engine/imnode.h
+gamefactory.o: ../util/glinsidelist.h ../engine/krmath.h
+gamefactory.o: ../engine/kyrabuild.h ../engine/spriteresource.h
+gamefactory.o: ../engine/action.h ../engine/dirtyrectangle.h
+gamefactory.o: ../util/glcirclelist.h /usr/include/string.h
+gamefactory.o: /usr/include/stdio.h /usr/include/libio.h
+gamefactory.o: /usr/include/_G_config.h /usr/include/wchar.h
+gamefactory.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+gamefactory.o: /usr/include/bits/stdio_lim.h
+scale.o: /usr/include/math.h /usr/include/features.h /usr/include/sys/cdefs.h
+scale.o: /usr/include/gnu/stubs.h /usr/include/bits/huge_val.h
+scale.o: /usr/include/bits/mathdef.h /usr/include/bits/mathcalls.h demos.h
+scale.o: ../util/gldebug.h ../util/glrandom.h ../util/gltypes.h
+scale.o: /usr/include/stdlib.h /usr/include/sys/types.h
+scale.o: /usr/include/bits/types.h /usr/include/bits/pthreadtypes.h
+scale.o: /usr/include/bits/sched.h /usr/include/time.h /usr/include/endian.h
+scale.o: /usr/include/bits/endian.h /usr/include/sys/select.h
+scale.o: /usr/include/bits/select.h /usr/include/bits/sigset.h
+scale.o: /usr/include/bits/time.h /usr/include/sys/sysmacros.h
+scale.o: /usr/include/alloca.h ../engine/krmath.h ../util/glutil.h
+scale.o: ../util/gltypes.h ../util/glfixed.h /usr/include/limits.h
+scale.o: /usr/include/bits/wordsize.h /usr/include/bits/posix1_lim.h
+scale.o: /usr/include/bits/local_lim.h /usr/include/linux/limits.h
+scale.o: /usr/include/bits/posix2_lim.h ../util/gldebug.h ../engine/color.h
+scale.o: ../engine/engine.h ../engine/vault.h ../util/gllist.h
+scale.o: ../util/gldynarray.h ../util/glutil.h ../util/glstring.h
+scale.o: ../util/gldynarray.h ../engine/rle.h ../util/glmemorypool.h
+scale.o: ../engine/painter.h ../engine/color.h ../engine/kyrabuild.h
+scale.o: ../engine/kyraresource.h ../engine/imagetree.h ../util/glmap.h
+scale.o: ../util/glprime.h ../engine/sprite.h ../engine/image.h
+scale.o: ../engine/imnode.h ../util/glinsidelist.h ../engine/krmath.h
+scale.o: ../engine/kyrabuild.h ../engine/spriteresource.h ../engine/action.h
+scale.o: ../engine/dirtyrectangle.h ../util/glcirclelist.h ../engine/kyra.h
+scale.o: ../util/glisomath.h ../util/glfixed.h ../util/glperformance.h
+scale.o: ../util/glmap.h ../util/glgraph.h ../util/gllist.h
+scale.o: ../util/glinsidelist.h ../util/glcirclelist.h ../engine/box.h
+scale.o: ../engine/boxresource.h ../engine/canvas.h
+scale.o: ../engine/canvasresource.h ../engine/engine.h
+scale.o: ../engine/fontresource.h ../engine/pixelblock.h
+scale.o: ../engine/ogltexture.h ../engine/sdlutil.h ../engine/textbox.h
+scale.o: ../engine/tile.h ../engine/tileresource.h
+sinwave.o: demos.h ../util/gldebug.h ../util/glrandom.h ../util/gltypes.h
+sinwave.o: /usr/include/stdlib.h /usr/include/features.h
+sinwave.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+sinwave.o: /usr/include/sys/types.h /usr/include/bits/types.h
+sinwave.o: /usr/include/bits/pthreadtypes.h /usr/include/bits/sched.h
+sinwave.o: /usr/include/time.h /usr/include/endian.h
+sinwave.o: /usr/include/bits/endian.h /usr/include/sys/select.h
+sinwave.o: /usr/include/bits/select.h /usr/include/bits/sigset.h
+sinwave.o: /usr/include/bits/time.h /usr/include/sys/sysmacros.h
+sinwave.o: /usr/include/alloca.h ../engine/krmath.h ../util/glutil.h
+sinwave.o: ../util/gltypes.h ../util/glfixed.h /usr/include/limits.h
+sinwave.o: /usr/include/bits/wordsize.h /usr/include/bits/posix1_lim.h
+sinwave.o: /usr/include/bits/local_lim.h /usr/include/linux/limits.h
+sinwave.o: /usr/include/bits/posix2_lim.h ../util/gldebug.h ../engine/color.h
+sinwave.o: ../engine/engine.h ../engine/vault.h ../util/gllist.h
+sinwave.o: ../util/gldynarray.h ../util/glutil.h ../util/glstring.h
+sinwave.o: ../util/gldynarray.h ../engine/rle.h ../util/glmemorypool.h
+sinwave.o: ../engine/painter.h ../engine/color.h ../engine/kyrabuild.h
+sinwave.o: ../engine/kyraresource.h ../engine/imagetree.h ../util/glmap.h
+sinwave.o: ../util/glprime.h ../engine/sprite.h ../engine/image.h
+sinwave.o: ../engine/imnode.h ../util/glinsidelist.h ../engine/krmath.h
+sinwave.o: ../engine/kyrabuild.h ../engine/spriteresource.h
+sinwave.o: ../engine/action.h ../engine/dirtyrectangle.h
+sinwave.o: ../util/glcirclelist.h ../engine/kyra.h ../util/glisomath.h
+sinwave.o: ../util/glfixed.h ../util/glperformance.h ../util/glmap.h
+sinwave.o: ../util/glgraph.h ../util/gllist.h ../util/glinsidelist.h
+sinwave.o: ../util/glcirclelist.h ../engine/box.h ../engine/boxresource.h
+sinwave.o: ../engine/canvas.h ../engine/canvasresource.h ../engine/engine.h
+sinwave.o: ../engine/fontresource.h ../engine/pixelblock.h
+sinwave.o: ../engine/ogltexture.h ../engine/sdlutil.h ../engine/textbox.h
+sinwave.o: ../engine/tile.h ../engine/tileresource.h /usr/include/math.h
+sinwave.o: /usr/include/bits/huge_val.h /usr/include/bits/mathdef.h
+sinwave.o: /usr/include/bits/mathcalls.h
+text.o: /usr/include/stdlib.h /usr/include/features.h
+text.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+text.o: /usr/include/sys/types.h /usr/include/bits/types.h
+text.o: /usr/include/bits/pthreadtypes.h /usr/include/bits/sched.h
+text.o: /usr/include/time.h /usr/include/endian.h /usr/include/bits/endian.h
+text.o: /usr/include/sys/select.h /usr/include/bits/select.h
+text.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+text.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
+text.o: /usr/include/stdio.h /usr/include/libio.h /usr/include/_G_config.h
+text.o: /usr/include/wchar.h /usr/include/bits/wchar.h /usr/include/gconv.h
+text.o: /usr/include/bits/stdio_lim.h ../engine/spriteresource.h
+text.o: ../util/glstring.h ../util/gltypes.h ../util/gldynarray.h
+text.o: ../util/glmap.h ../util/glutil.h ../util/gldebug.h ../util/glprime.h
+text.o: ../engine/kyraresource.h ../util/gltypes.h ../util/glutil.h
+text.o: ../util/glfixed.h /usr/include/limits.h /usr/include/bits/wordsize.h
+text.o: /usr/include/bits/posix1_lim.h /usr/include/bits/local_lim.h
+text.o: /usr/include/linux/limits.h /usr/include/bits/posix2_lim.h
+text.o: ../engine/krmath.h ../engine/action.h ../engine/rle.h
+text.o: ../util/gldebug.h ../util/glmemorypool.h ../engine/painter.h
+text.o: ../engine/color.h ../engine/kyrabuild.h ../util/gldynarray.h
+text.o: ../engine/sprite.h ../engine/image.h ../engine/imnode.h
+text.o: ../util/glinsidelist.h ../engine/krmath.h ../engine/kyrabuild.h
+text.o: ../engine/spriteresource.h ../engine/tile.h ../engine/tileresource.h
+text.o: ../engine/engine.h ../engine/vault.h ../util/gllist.h
+text.o: ../engine/imagetree.h ../engine/sprite.h ../engine/dirtyrectangle.h
+text.o: ../engine/canvas.h ../engine/canvasresource.h ../engine/textbox.h
+text.o: ../engine/fontresource.h ../engine/boxresource.h
+text.o: ../engine/dataresource.h ../engine/box.h ../engine/boxresource.h
+text.o: ../util/glcirclelist.h demos.h ../util/glrandom.h ../engine/color.h
+title.o: demos.h ../util/gldebug.h ../util/glrandom.h ../util/gltypes.h
+title.o: /usr/include/stdlib.h /usr/include/features.h
+title.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+title.o: /usr/include/sys/types.h /usr/include/bits/types.h
+title.o: /usr/include/bits/pthreadtypes.h /usr/include/bits/sched.h
+title.o: /usr/include/time.h /usr/include/endian.h /usr/include/bits/endian.h
+title.o: /usr/include/sys/select.h /usr/include/bits/select.h
+title.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+title.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
+title.o: ../engine/krmath.h ../util/glutil.h ../util/gltypes.h
+title.o: ../util/glfixed.h /usr/include/limits.h /usr/include/bits/wordsize.h
+title.o: /usr/include/bits/posix1_lim.h /usr/include/bits/local_lim.h
+title.o: /usr/include/linux/limits.h /usr/include/bits/posix2_lim.h
+title.o: ../util/gldebug.h ../engine/color.h ../engine/engine.h
+title.o: ../engine/vault.h ../util/gllist.h ../util/gldynarray.h
+title.o: ../util/glutil.h ../util/glstring.h ../util/gldynarray.h
+title.o: ../engine/rle.h ../util/glmemorypool.h ../engine/painter.h
+title.o: ../engine/color.h ../engine/kyrabuild.h ../engine/kyraresource.h
+title.o: ../engine/imagetree.h ../util/glmap.h ../util/glprime.h
+title.o: ../engine/sprite.h ../engine/image.h ../engine/imnode.h
+title.o: ../util/glinsidelist.h ../engine/krmath.h ../engine/kyrabuild.h
+title.o: ../engine/spriteresource.h ../engine/action.h
+title.o: ../engine/dirtyrectangle.h ../util/glcirclelist.h ../engine/kyra.h
+title.o: ../util/glisomath.h ../util/glfixed.h ../util/glperformance.h
+title.o: ../util/glmap.h ../util/glgraph.h ../util/gllist.h
+title.o: ../util/glinsidelist.h ../util/glcirclelist.h ../engine/box.h
+title.o: ../engine/boxresource.h ../engine/canvas.h
+title.o: ../engine/canvasresource.h ../engine/engine.h
+title.o: ../engine/fontresource.h ../engine/pixelblock.h
+title.o: ../engine/ogltexture.h ../engine/sdlutil.h ../engine/textbox.h
+title.o: ../engine/tile.h ../engine/tileresource.h
+shooter.o: demos.h ../util/gldebug.h ../util/glrandom.h ../util/gltypes.h
+shooter.o: /usr/include/stdlib.h /usr/include/features.h
+shooter.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+shooter.o: /usr/include/sys/types.h /usr/include/bits/types.h
+shooter.o: /usr/include/bits/pthreadtypes.h /usr/include/bits/sched.h
+shooter.o: /usr/include/time.h /usr/include/endian.h
+shooter.o: /usr/include/bits/endian.h /usr/include/sys/select.h
+shooter.o: /usr/include/bits/select.h /usr/include/bits/sigset.h
+shooter.o: /usr/include/bits/time.h /usr/include/sys/sysmacros.h
+shooter.o: /usr/include/alloca.h ../engine/krmath.h ../util/glutil.h
+shooter.o: ../util/gltypes.h ../util/glfixed.h /usr/include/limits.h
+shooter.o: /usr/include/bits/wordsize.h /usr/include/bits/posix1_lim.h
+shooter.o: /usr/include/bits/local_lim.h /usr/include/linux/limits.h
+shooter.o: /usr/include/bits/posix2_lim.h ../util/gldebug.h ../engine/color.h
+shooter.o: ../engine/engine.h ../engine/vault.h ../util/gllist.h
+shooter.o: ../util/gldynarray.h ../util/glutil.h ../util/glstring.h
+shooter.o: ../util/gldynarray.h ../engine/rle.h ../util/glmemorypool.h
+shooter.o: ../engine/painter.h ../engine/color.h ../engine/kyrabuild.h
+shooter.o: ../engine/kyraresource.h ../engine/imagetree.h ../util/glmap.h
+shooter.o: ../util/glprime.h ../engine/sprite.h ../engine/image.h
+shooter.o: ../engine/imnode.h ../util/glinsidelist.h ../engine/krmath.h
+shooter.o: ../engine/kyrabuild.h ../engine/spriteresource.h
+shooter.o: ../engine/action.h ../engine/dirtyrectangle.h
+shooter.o: ../util/glcirclelist.h space.h ../engine/kyra.h
+shooter.o: ../util/glisomath.h ../util/glfixed.h ../util/glperformance.h
+shooter.o: ../util/glmap.h ../util/glgraph.h ../util/gllist.h
+shooter.o: ../util/glinsidelist.h ../util/glcirclelist.h ../engine/box.h
+shooter.o: ../engine/boxresource.h ../engine/canvas.h
+shooter.o: ../engine/canvasresource.h ../engine/engine.h
+shooter.o: ../engine/fontresource.h ../engine/pixelblock.h
+shooter.o: ../engine/ogltexture.h ../engine/sdlutil.h ../engine/textbox.h
+shooter.o: ../engine/tile.h ../engine/tileresource.h
+../engine/dataresource.o: ../engine/dataresource.h ../engine/kyraresource.h
+../engine/dataresource.o: ../util/glstring.h ../util/gltypes.h
+../engine/dataresource.o: ../util/gldynarray.h ../util/gltypes.h
+../engine/dataresource.o: ../util/glutil.h ../util/glfixed.h
+../engine/dataresource.o: /usr/include/limits.h /usr/include/features.h
+../engine/dataresource.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+../engine/dataresource.o: /usr/include/bits/wordsize.h
+../engine/dataresource.o: /usr/include/bits/posix1_lim.h
+../engine/dataresource.o: /usr/include/bits/local_lim.h
+../engine/dataresource.o: /usr/include/linux/limits.h
+../engine/dataresource.o: /usr/include/bits/posix2_lim.h ../util/gldebug.h
+../engine/dataresource.o: ../engine/sdlutil.h ../util/gllist.h
+../engine/dataresource.o: ../engine/encoder.h ../tinyxml/tinyxml.h
+../engine/dataresource.o: /usr/include/stdio.h /usr/include/bits/types.h
+../engine/dataresource.o: /usr/include/bits/pthreadtypes.h
+../engine/dataresource.o: /usr/include/bits/sched.h /usr/include/libio.h
+../engine/dataresource.o: /usr/include/_G_config.h /usr/include/wchar.h
+../engine/dataresource.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+../engine/dataresource.o: /usr/include/bits/stdio_lim.h /usr/include/assert.h
+../engine/dataresource.o: ../engine/color.h ../engine/namefield.h
+../engine/dataresource.o: ../engine/vault.h ../util/gldynarray.h
+../engine/dataresource.o: ../util/glutil.h ../engine/rle.h
+../engine/dataresource.o: /usr/include/stdlib.h /usr/include/sys/types.h
+../engine/dataresource.o: /usr/include/time.h /usr/include/endian.h
+../engine/dataresource.o: /usr/include/bits/endian.h
+../engine/dataresource.o: /usr/include/sys/select.h
+../engine/dataresource.o: /usr/include/bits/select.h
+../engine/dataresource.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+../engine/dataresource.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
+../engine/dataresource.o: ../util/gldebug.h ../engine/krmath.h
+../engine/dataresource.o: ../util/glmemorypool.h ../engine/painter.h
+../engine/dataresource.o: ../engine/color.h ../engine/kyrabuild.h
+../engine/action.o: ../engine/action.h ../engine/rle.h /usr/include/stdlib.h
+../engine/action.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../engine/action.o: /usr/include/gnu/stubs.h /usr/include/sys/types.h
+../engine/action.o: /usr/include/bits/types.h
+../engine/action.o: /usr/include/bits/pthreadtypes.h
+../engine/action.o: /usr/include/bits/sched.h /usr/include/time.h
+../engine/action.o: /usr/include/endian.h /usr/include/bits/endian.h
+../engine/action.o: /usr/include/sys/select.h /usr/include/bits/select.h
+../engine/action.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+../engine/action.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
+../engine/action.o: ../util/gltypes.h ../util/gldebug.h ../engine/krmath.h
+../engine/action.o: ../util/glutil.h ../util/gltypes.h ../util/glfixed.h
+../engine/action.o: /usr/include/limits.h /usr/include/bits/wordsize.h
+../engine/action.o: /usr/include/bits/posix1_lim.h
+../engine/action.o: /usr/include/bits/local_lim.h /usr/include/linux/limits.h
+../engine/action.o: /usr/include/bits/posix2_lim.h ../util/gldebug.h
+../engine/action.o: ../util/glmemorypool.h ../engine/painter.h
+../engine/action.o: ../engine/color.h ../engine/kyrabuild.h
+../engine/action.o: ../util/gldynarray.h ../util/glutil.h ../engine/sdlutil.h
+../engine/action.o: ../util/glstring.h ../util/gldynarray.h ../util/gllist.h
+../engine/action.o: ../engine/canvasresource.h ../engine/kyrabuild.h
+../engine/action.o: ../engine/encoder.h ../tinyxml/tinyxml.h
+../engine/action.o: /usr/include/stdio.h /usr/include/libio.h
+../engine/action.o: /usr/include/_G_config.h /usr/include/wchar.h
+../engine/action.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+../engine/action.o: /usr/include/bits/stdio_lim.h /usr/include/assert.h
+../engine/action.o: ../engine/color.h ../engine/kyraresource.h
+../engine/action.o: ../engine/namefield.h ../engine/vault.h
+../engine/box.o: ../engine/box.h ../engine/image.h ../engine/imnode.h
+../engine/box.o: ../util/glinsidelist.h ../util/gldebug.h
+../engine/box.o: ../util/gldynarray.h /usr/include/limits.h
+../engine/box.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../engine/box.o: /usr/include/gnu/stubs.h /usr/include/bits/wordsize.h
+../engine/box.o: /usr/include/bits/posix1_lim.h /usr/include/bits/local_lim.h
+../engine/box.o: /usr/include/linux/limits.h /usr/include/bits/posix2_lim.h
+../engine/box.o: ../util/glutil.h ../util/gldebug.h ../engine/krmath.h
+../engine/box.o: ../engine/color.h ../engine/kyrabuild.h
+../engine/box.o: ../engine/boxresource.h ../engine/kyraresource.h
+../engine/box.o: ../util/glstring.h ../util/gltypes.h ../util/gldynarray.h
+../engine/box.o: ../util/gltypes.h ../util/glutil.h ../util/glfixed.h
+../engine/box.o: ../engine/krmath.h ../util/glcirclelist.h ../engine/engine.h
+../engine/boxresource.o: ../engine/boxresource.h ../engine/kyraresource.h
+../engine/boxresource.o: ../util/glstring.h ../util/gltypes.h
+../engine/boxresource.o: ../util/gldynarray.h ../util/gltypes.h
+../engine/boxresource.o: ../util/glutil.h ../util/glfixed.h
+../engine/boxresource.o: /usr/include/limits.h /usr/include/features.h
+../engine/boxresource.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+../engine/boxresource.o: /usr/include/bits/wordsize.h
+../engine/boxresource.o: /usr/include/bits/posix1_lim.h
+../engine/boxresource.o: /usr/include/bits/local_lim.h
+../engine/boxresource.o: /usr/include/linux/limits.h
+../engine/boxresource.o: /usr/include/bits/posix2_lim.h ../util/gldebug.h
+../engine/boxresource.o: ../engine/krmath.h ../util/glcirclelist.h
+../engine/boxresource.o: ../util/gldebug.h ../engine/color.h ../engine/box.h
+../engine/boxresource.o: ../engine/image.h ../engine/imnode.h
+../engine/boxresource.o: ../util/glinsidelist.h ../util/gldynarray.h
+../engine/boxresource.o: ../util/glutil.h ../engine/krmath.h
+../engine/boxresource.o: ../engine/kyrabuild.h ../engine/painter.h
+../engine/boxresource.o: ../engine/kyrabuild.h ../engine/imagetree.h
+../engine/boxresource.o: ../util/gllist.h ../util/glmap.h ../util/glprime.h
+../engine/boxresource.o: ../engine/sprite.h ../engine/spriteresource.h
+../engine/boxresource.o: ../engine/action.h ../engine/rle.h
+../engine/boxresource.o: /usr/include/stdlib.h /usr/include/sys/types.h
+../engine/boxresource.o: /usr/include/bits/types.h
+../engine/boxresource.o: /usr/include/bits/pthreadtypes.h
+../engine/boxresource.o: /usr/include/bits/sched.h /usr/include/time.h
+../engine/boxresource.o: /usr/include/endian.h /usr/include/bits/endian.h
+../engine/boxresource.o: /usr/include/sys/select.h /usr/include/bits/select.h
+../engine/boxresource.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+../engine/boxresource.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
+../engine/boxresource.o: ../util/glmemorypool.h
+../engine/canvas.o: ../engine/canvas.h ../engine/image.h ../engine/imnode.h
+../engine/canvas.o: ../util/glinsidelist.h ../util/gldebug.h
+../engine/canvas.o: ../util/gldynarray.h /usr/include/limits.h
+../engine/canvas.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../engine/canvas.o: /usr/include/gnu/stubs.h /usr/include/bits/wordsize.h
+../engine/canvas.o: /usr/include/bits/posix1_lim.h
+../engine/canvas.o: /usr/include/bits/local_lim.h /usr/include/linux/limits.h
+../engine/canvas.o: /usr/include/bits/posix2_lim.h ../util/glutil.h
+../engine/canvas.o: ../util/gldebug.h ../engine/krmath.h ../engine/color.h
+../engine/canvas.o: ../engine/kyrabuild.h ../engine/canvasresource.h
+../engine/canvas.o: ../engine/engine.h
+../engine/canvasresource.o: ../engine/canvasresource.h ../engine/canvas.h
+../engine/canvasresource.o: ../engine/image.h ../engine/imnode.h
+../engine/canvasresource.o: ../util/glinsidelist.h ../util/gldebug.h
+../engine/canvasresource.o: ../util/gldynarray.h /usr/include/limits.h
+../engine/canvasresource.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../engine/canvasresource.o: /usr/include/gnu/stubs.h
+../engine/canvasresource.o: /usr/include/bits/wordsize.h
+../engine/canvasresource.o: /usr/include/bits/posix1_lim.h
+../engine/canvasresource.o: /usr/include/bits/local_lim.h
+../engine/canvasresource.o: /usr/include/linux/limits.h
+../engine/canvasresource.o: /usr/include/bits/posix2_lim.h ../util/glutil.h
+../engine/canvasresource.o: ../util/gldebug.h ../engine/krmath.h
+../engine/canvasresource.o: ../engine/color.h ../engine/kyrabuild.h
+../engine/canvasresource.o: ../engine/engine.h
+../engine/color.o: ../engine/color.h ../util/gldebug.h ../util/glutil.h
+../engine/color.o: ../util/gltypes.h ../engine/kyrabuild.h
+../engine/color.o: /usr/include/stdlib.h /usr/include/features.h
+../engine/color.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+../engine/color.o: /usr/include/sys/types.h /usr/include/bits/types.h
+../engine/color.o: /usr/include/bits/pthreadtypes.h /usr/include/bits/sched.h
+../engine/color.o: /usr/include/time.h /usr/include/endian.h
+../engine/color.o: /usr/include/bits/endian.h /usr/include/sys/select.h
+../engine/color.o: /usr/include/bits/select.h /usr/include/bits/sigset.h
+../engine/color.o: /usr/include/bits/time.h /usr/include/sys/sysmacros.h
+../engine/color.o: /usr/include/alloca.h
+../util/gldebug.o: ../util/gldebug.h
+../engine/dirtyrectangle.o: ../engine/dirtyrectangle.h ../engine/krmath.h
+../engine/dirtyrectangle.o: ../util/glutil.h ../util/gltypes.h
+../engine/dirtyrectangle.o: ../util/gltypes.h ../util/glfixed.h
+../engine/dirtyrectangle.o: /usr/include/limits.h /usr/include/features.h
+../engine/dirtyrectangle.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+../engine/dirtyrectangle.o: /usr/include/bits/wordsize.h
+../engine/dirtyrectangle.o: /usr/include/bits/posix1_lim.h
+../engine/dirtyrectangle.o: /usr/include/bits/local_lim.h
+../engine/dirtyrectangle.o: /usr/include/linux/limits.h
+../engine/dirtyrectangle.o: /usr/include/bits/posix2_lim.h ../util/gldebug.h
+../engine/dirtyrectangle.o: ../util/gllist.h ../engine/painter.h
+../engine/dirtyrectangle.o: ../engine/color.h ../engine/kyrabuild.h
+../engine/encoder.o: ../engine/encoder.h ../tinyxml/tinyxml.h
+../engine/encoder.o: /usr/include/stdio.h /usr/include/features.h
+../engine/encoder.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+../engine/encoder.o: /usr/include/bits/types.h
+../engine/encoder.o: /usr/include/bits/pthreadtypes.h
+../engine/encoder.o: /usr/include/bits/sched.h /usr/include/libio.h
+../engine/encoder.o: /usr/include/_G_config.h /usr/include/wchar.h
+../engine/encoder.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+../engine/encoder.o: /usr/include/bits/stdio_lim.h /usr/include/assert.h
+../engine/encoder.o: ../util/gltypes.h ../engine/color.h ../util/gllist.h
+../engine/encoder.o: ../util/gldebug.h ../engine/kyraresource.h
+../engine/encoder.o: ../util/glstring.h ../util/gltypes.h
+../engine/encoder.o: ../util/gldynarray.h ../util/glutil.h ../util/glfixed.h
+../engine/encoder.o: /usr/include/limits.h /usr/include/bits/wordsize.h
+../engine/encoder.o: /usr/include/bits/posix1_lim.h
+../engine/encoder.o: /usr/include/bits/local_lim.h
+../engine/encoder.o: /usr/include/linux/limits.h
+../engine/encoder.o: /usr/include/bits/posix2_lim.h ../engine/namefield.h
+../engine/encoder.o: ../engine/vault.h ../util/gldynarray.h ../util/glutil.h
+../engine/encoder.o: ../engine/rle.h /usr/include/stdlib.h
+../engine/encoder.o: /usr/include/sys/types.h /usr/include/time.h
+../engine/encoder.o: /usr/include/endian.h /usr/include/bits/endian.h
+../engine/encoder.o: /usr/include/sys/select.h /usr/include/bits/select.h
+../engine/encoder.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+../engine/encoder.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
+../engine/encoder.o: ../util/gldebug.h ../engine/krmath.h
+../engine/encoder.o: ../util/glmemorypool.h ../engine/painter.h
+../engine/encoder.o: ../engine/color.h ../engine/kyrabuild.h
+../engine/encoder.o: ../engine/painter.h ../engine/parser.h ../engine/rle.h
+../engine/encoder.o: ../engine/sdlutil.h ../engine/pixelblock.h
+../engine/encoder.o: ../engine/ogltexture.h ../engine/krmath.h
+../engine/encoder.o: ../engine/canvasresource.h ../util/glcirclelist.h
+../engine/encoder.o: ../engine/pixelblock.h ../engine/fontresource.h
+../engine/encoder.o: ../engine/spriteresource.h ../util/glmap.h
+../engine/encoder.o: ../util/glprime.h ../engine/action.h
+../engine/encoder.o: ../engine/tileresource.h ../engine/dataresource.h
+../engine/encoder.o: ../engine/engine.h ../engine/imagetree.h
+../engine/encoder.o: ../engine/sprite.h ../engine/image.h ../engine/imnode.h
+../engine/encoder.o: ../util/glinsidelist.h ../engine/kyrabuild.h
+../engine/encoder.o: ../engine/dirtyrectangle.h ../gui/console.h
+../engine/encoder.o: ../gui/widget.h
+../engine/engine.o: ../engine/engine.h ../util/glperformance.h
+../engine/engine.o: ../util/gltypes.h ../util/glmap.h
+../engine/fontresource.o: ../engine/fontresource.h ../engine/spriteresource.h
+../engine/fontresource.o: ../util/glstring.h ../util/gltypes.h
+../engine/fontresource.o: ../util/gldynarray.h ../util/glmap.h
+../engine/fontresource.o: ../util/glutil.h ../util/gldebug.h
+../engine/fontresource.o: ../util/glprime.h ../engine/kyraresource.h
+../engine/fontresource.o: ../util/gltypes.h ../util/glutil.h
+../engine/fontresource.o: ../util/glfixed.h /usr/include/limits.h
+../engine/fontresource.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../engine/fontresource.o: /usr/include/gnu/stubs.h
+../engine/fontresource.o: /usr/include/bits/wordsize.h
+../engine/fontresource.o: /usr/include/bits/posix1_lim.h
+../engine/fontresource.o: /usr/include/bits/local_lim.h
+../engine/fontresource.o: /usr/include/linux/limits.h
+../engine/fontresource.o: /usr/include/bits/posix2_lim.h ../engine/krmath.h
+../engine/fontresource.o: ../engine/action.h ../engine/rle.h
+../engine/fontresource.o: /usr/include/stdlib.h /usr/include/sys/types.h
+../engine/fontresource.o: /usr/include/bits/types.h
+../engine/fontresource.o: /usr/include/bits/pthreadtypes.h
+../engine/fontresource.o: /usr/include/bits/sched.h /usr/include/time.h
+../engine/fontresource.o: /usr/include/endian.h /usr/include/bits/endian.h
+../engine/fontresource.o: /usr/include/sys/select.h
+../engine/fontresource.o: /usr/include/bits/select.h
+../engine/fontresource.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+../engine/fontresource.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
+../engine/fontresource.o: ../util/gldebug.h ../util/glmemorypool.h
+../engine/fontresource.o: ../engine/painter.h ../engine/color.h
+../engine/fontresource.o: ../engine/kyrabuild.h ../util/gldynarray.h
+../engine/fontresource.o: ../engine/engine.h ../engine/encoder.h
+../engine/fontresource.o: ../tinyxml/tinyxml.h /usr/include/stdio.h
+../engine/fontresource.o: /usr/include/libio.h /usr/include/_G_config.h
+../engine/fontresource.o: /usr/include/wchar.h /usr/include/bits/wchar.h
+../engine/fontresource.o: /usr/include/gconv.h /usr/include/bits/stdio_lim.h
+../engine/fontresource.o: /usr/include/assert.h ../engine/color.h
+../engine/fontresource.o: ../util/gllist.h ../engine/namefield.h
+../engine/fontresource.o: ../engine/vault.h ../engine/sdlutil.h
+../engine/image.o: ../engine/image.h ../engine/imnode.h
+../engine/image.o: ../util/glinsidelist.h ../util/gldebug.h
+../engine/image.o: ../util/gldynarray.h /usr/include/limits.h
+../engine/image.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../engine/image.o: /usr/include/gnu/stubs.h /usr/include/bits/wordsize.h
+../engine/image.o: /usr/include/bits/posix1_lim.h
+../engine/image.o: /usr/include/bits/local_lim.h /usr/include/linux/limits.h
+../engine/image.o: /usr/include/bits/posix2_lim.h ../util/glutil.h
+../engine/image.o: ../util/gldebug.h ../engine/krmath.h ../engine/color.h
+../engine/image.o: ../engine/kyrabuild.h ../engine/engine.h
+../engine/imagetree.o: ../engine/imagetree.h ../util/gllist.h
+../engine/imagetree.o: ../util/gldebug.h ../engine/krmath.h ../util/glutil.h
+../engine/imagetree.o: ../util/gltypes.h ../util/gltypes.h ../util/glfixed.h
+../engine/imagetree.o: /usr/include/limits.h /usr/include/features.h
+../engine/imagetree.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+../engine/imagetree.o: /usr/include/bits/wordsize.h
+../engine/imagetree.o: /usr/include/bits/posix1_lim.h
+../engine/imagetree.o: /usr/include/bits/local_lim.h
+../engine/imagetree.o: /usr/include/linux/limits.h
+../engine/imagetree.o: /usr/include/bits/posix2_lim.h ../util/glmap.h
+../engine/imagetree.o: ../util/glutil.h ../util/glprime.h ../engine/sprite.h
+../engine/imagetree.o: ../engine/image.h ../engine/imnode.h
+../engine/imagetree.o: ../util/glinsidelist.h ../util/gldebug.h
+../engine/imagetree.o: ../util/gldynarray.h ../engine/krmath.h
+../engine/imagetree.o: ../engine/color.h ../engine/kyrabuild.h
+../engine/imagetree.o: ../engine/spriteresource.h ../util/glstring.h
+../engine/imagetree.o: ../util/gldynarray.h ../engine/kyraresource.h
+../engine/imagetree.o: ../engine/action.h ../engine/rle.h
+../engine/imagetree.o: /usr/include/stdlib.h /usr/include/sys/types.h
+../engine/imagetree.o: /usr/include/bits/types.h
+../engine/imagetree.o: /usr/include/bits/pthreadtypes.h
+../engine/imagetree.o: /usr/include/bits/sched.h /usr/include/time.h
+../engine/imagetree.o: /usr/include/endian.h /usr/include/bits/endian.h
+../engine/imagetree.o: /usr/include/sys/select.h /usr/include/bits/select.h
+../engine/imagetree.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+../engine/imagetree.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
+../engine/imagetree.o: ../util/glmemorypool.h ../engine/painter.h
+../engine/imagetree.o: ../engine/kyrabuild.h ../engine/engine.h
+../engine/imagetree.o: ../util/glperformance.h ../util/glmap.h
+../engine/imnode.o: ../engine/imnode.h ../util/glinsidelist.h
+../engine/imnode.o: ../util/gldebug.h ../util/gldynarray.h
+../engine/imnode.o: /usr/include/limits.h /usr/include/features.h
+../engine/imnode.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+../engine/imnode.o: /usr/include/bits/wordsize.h
+../engine/imnode.o: /usr/include/bits/posix1_lim.h
+../engine/imnode.o: /usr/include/bits/local_lim.h /usr/include/linux/limits.h
+../engine/imnode.o: /usr/include/bits/posix2_lim.h ../util/glutil.h
+../engine/imnode.o: ../util/gldebug.h ../engine/krmath.h ../engine/color.h
+../engine/imnode.o: ../engine/kyrabuild.h ../engine/engine.h
+../engine/imnode.o: ../util/glperformance.h ../util/gltypes.h ../util/glmap.h
+../engine/kyraresource.o: ../engine/kyraresource.h ../util/glstring.h
+../engine/kyraresource.o: ../util/gltypes.h ../util/gldynarray.h
+../engine/kyraresource.o: ../util/gltypes.h ../util/glutil.h
+../engine/kyraresource.o: ../util/glfixed.h /usr/include/limits.h
+../engine/kyraresource.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../engine/kyraresource.o: /usr/include/gnu/stubs.h
+../engine/kyraresource.o: /usr/include/bits/wordsize.h
+../engine/kyraresource.o: /usr/include/bits/posix1_lim.h
+../engine/kyraresource.o: /usr/include/bits/local_lim.h
+../engine/kyraresource.o: /usr/include/linux/limits.h
+../engine/kyraresource.o: /usr/include/bits/posix2_lim.h ../util/gldebug.h
+../engine/kyraresource.o: ../engine/spriteresource.h ../util/glmap.h
+../engine/kyraresource.o: ../util/glutil.h ../util/glprime.h
+../engine/kyraresource.o: ../engine/krmath.h ../engine/action.h
+../engine/kyraresource.o: ../engine/rle.h /usr/include/stdlib.h
+../engine/kyraresource.o: /usr/include/sys/types.h /usr/include/bits/types.h
+../engine/kyraresource.o: /usr/include/bits/pthreadtypes.h
+../engine/kyraresource.o: /usr/include/bits/sched.h /usr/include/time.h
+../engine/kyraresource.o: /usr/include/endian.h /usr/include/bits/endian.h
+../engine/kyraresource.o: /usr/include/sys/select.h
+../engine/kyraresource.o: /usr/include/bits/select.h
+../engine/kyraresource.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+../engine/kyraresource.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
+../engine/kyraresource.o: ../util/gldebug.h ../util/glmemorypool.h
+../engine/kyraresource.o: ../engine/painter.h ../engine/color.h
+../engine/kyraresource.o: ../engine/kyrabuild.h ../util/gldynarray.h
+../engine/kyraresource.o: ../engine/tileresource.h ../engine/fontresource.h
+../engine/kyraresource.o: ../engine/dataresource.h
+../engine/ogltexture.o: /usr/include/math.h /usr/include/features.h
+../engine/ogltexture.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+../engine/ogltexture.o: /usr/include/bits/huge_val.h
+../engine/ogltexture.o: /usr/include/bits/mathdef.h
+../engine/ogltexture.o: /usr/include/bits/mathcalls.h ../engine/ogltexture.h
+../engine/ogltexture.o: ../engine/krmath.h ../engine/color.h
+../engine/ogltexture.o: ../util/gldynarray.h /usr/include/limits.h
+../engine/ogltexture.o: /usr/include/bits/wordsize.h
+../engine/ogltexture.o: /usr/include/bits/posix1_lim.h
+../engine/ogltexture.o: /usr/include/bits/local_lim.h
+../engine/ogltexture.o: /usr/include/linux/limits.h
+../engine/ogltexture.o: /usr/include/bits/posix2_lim.h ../util/glutil.h
+../engine/ogltexture.o: ../util/gldebug.h ../engine/kyrabuild.h
+../engine/ogltexture.o: ../engine/canvasresource.h ../engine/engine.h
+../engine/painter.o: ../engine/painter.h ../util/gltypes.h ../engine/color.h
+../engine/painter.o: ../engine/krmath.h ../util/glutil.h ../util/gltypes.h
+../engine/painter.o: ../util/glfixed.h /usr/include/limits.h
+../engine/painter.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../engine/painter.o: /usr/include/gnu/stubs.h /usr/include/bits/wordsize.h
+../engine/painter.o: /usr/include/bits/posix1_lim.h
+../engine/painter.o: /usr/include/bits/local_lim.h
+../engine/painter.o: /usr/include/linux/limits.h
+../engine/painter.o: /usr/include/bits/posix2_lim.h ../util/gldebug.h
+../engine/painter.o: ../engine/kyrabuild.h ../util/gldebug.h
+../engine/painter.o: ../util/glperformance.h ../util/glmap.h
+../engine/painter.o: ../engine/ogltexture.h ../engine/krmath.h
+../engine/painter.o: ../util/gldynarray.h ../util/glutil.h
+../engine/parser.o: ../tinyxml/tinyxml.h /usr/include/stdio.h
+../engine/parser.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../engine/parser.o: /usr/include/gnu/stubs.h /usr/include/bits/types.h
+../engine/parser.o: /usr/include/bits/pthreadtypes.h
+../engine/parser.o: /usr/include/bits/sched.h /usr/include/libio.h
+../engine/parser.o: /usr/include/_G_config.h /usr/include/wchar.h
+../engine/parser.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+../engine/parser.o: /usr/include/bits/stdio_lim.h /usr/include/assert.h
+../engine/parser.o: ../engine/parser.h ../util/gllist.h ../util/gldebug.h
+../engine/parser.o: ../util/gldynarray.h /usr/include/limits.h
+../engine/parser.o: /usr/include/bits/wordsize.h
+../engine/parser.o: /usr/include/bits/posix1_lim.h
+../engine/parser.o: /usr/include/bits/local_lim.h /usr/include/linux/limits.h
+../engine/parser.o: /usr/include/bits/posix2_lim.h ../util/glutil.h
+../engine/pixelblock.o: ../engine/pixelblock.h ../util/gltypes.h
+../engine/pixelblock.o: ../util/gldebug.h ../engine/krmath.h ../util/glutil.h
+../engine/pixelblock.o: ../util/gltypes.h ../util/glfixed.h
+../engine/pixelblock.o: /usr/include/limits.h /usr/include/features.h
+../engine/pixelblock.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+../engine/pixelblock.o: /usr/include/bits/wordsize.h
+../engine/pixelblock.o: /usr/include/bits/posix1_lim.h
+../engine/pixelblock.o: /usr/include/bits/local_lim.h
+../engine/pixelblock.o: /usr/include/linux/limits.h
+../engine/pixelblock.o: /usr/include/bits/posix2_lim.h ../util/gldebug.h
+../engine/pixelblock.o: ../engine/painter.h ../engine/color.h
+../engine/pixelblock.o: ../engine/kyrabuild.h ../engine/ogltexture.h
+../engine/pixelblock.o: ../engine/krmath.h ../util/gldynarray.h
+../engine/pixelblock.o: ../util/glutil.h ../util/glmemorypool.h
+../engine/pixelblock.o: ../engine/engine.h
+../engine/rle.o: ../engine/rle.h /usr/include/stdlib.h
+../engine/rle.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../engine/rle.o: /usr/include/gnu/stubs.h /usr/include/sys/types.h
+../engine/rle.o: /usr/include/bits/types.h /usr/include/bits/pthreadtypes.h
+../engine/rle.o: /usr/include/bits/sched.h /usr/include/time.h
+../engine/rle.o: /usr/include/endian.h /usr/include/bits/endian.h
+../engine/rle.o: /usr/include/sys/select.h /usr/include/bits/select.h
+../engine/rle.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+../engine/rle.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
+../engine/rle.o: ../util/gltypes.h ../util/gldebug.h ../engine/krmath.h
+../engine/rle.o: ../util/glutil.h ../util/gltypes.h ../util/glfixed.h
+../engine/rle.o: /usr/include/limits.h /usr/include/bits/wordsize.h
+../engine/rle.o: /usr/include/bits/posix1_lim.h /usr/include/bits/local_lim.h
+../engine/rle.o: /usr/include/linux/limits.h /usr/include/bits/posix2_lim.h
+../engine/rle.o: ../util/gldebug.h ../util/glmemorypool.h ../engine/painter.h
+../engine/rle.o: ../engine/color.h ../engine/kyrabuild.h
+../engine/rle.o: /usr/include/string.h ../engine/sdlutil.h ../util/glstring.h
+../engine/rle.o: ../util/gldynarray.h ../util/gllist.h ../engine/kyrabuild.h
+../engine/rle.o: ../engine/canvasresource.h ../engine/engine.h
+../engine/rle.o: ../engine/ogltexture.h ../engine/krmath.h
+../engine/rle.o: ../util/gldynarray.h ../util/glutil.h
+../engine/sdlutil.o: ../engine/sdlutil.h ../util/glstring.h ../util/gltypes.h
+../engine/sdlutil.o: ../util/gldynarray.h ../util/gllist.h ../util/gldebug.h
+../engine/sprite.o: ../engine/sprite.h ../engine/image.h ../engine/imnode.h
+../engine/sprite.o: ../util/glinsidelist.h ../util/gldebug.h
+../engine/sprite.o: ../util/gldynarray.h /usr/include/limits.h
+../engine/sprite.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../engine/sprite.o: /usr/include/gnu/stubs.h /usr/include/bits/wordsize.h
+../engine/sprite.o: /usr/include/bits/posix1_lim.h
+../engine/sprite.o: /usr/include/bits/local_lim.h /usr/include/linux/limits.h
+../engine/sprite.o: /usr/include/bits/posix2_lim.h ../util/glutil.h
+../engine/sprite.o: ../util/gldebug.h ../engine/krmath.h ../engine/color.h
+../engine/sprite.o: ../engine/kyrabuild.h ../engine/spriteresource.h
+../engine/sprite.o: ../util/glstring.h ../util/gltypes.h ../util/gldynarray.h
+../engine/sprite.o: ../util/glmap.h ../util/glprime.h
+../engine/sprite.o: ../engine/kyraresource.h ../util/gltypes.h
+../engine/sprite.o: ../util/glutil.h ../util/glfixed.h ../engine/krmath.h
+../engine/sprite.o: ../engine/action.h ../engine/rle.h /usr/include/stdlib.h
+../engine/sprite.o: /usr/include/sys/types.h /usr/include/bits/types.h
+../engine/sprite.o: /usr/include/bits/pthreadtypes.h
+../engine/sprite.o: /usr/include/bits/sched.h /usr/include/time.h
+../engine/sprite.o: /usr/include/endian.h /usr/include/bits/endian.h
+../engine/sprite.o: /usr/include/sys/select.h /usr/include/bits/select.h
+../engine/sprite.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+../engine/sprite.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
+../engine/sprite.o: ../util/glmemorypool.h ../engine/painter.h
+../engine/sprite.o: ../engine/kyrabuild.h ../engine/engine.h
+../engine/spriteresource.o: ../engine/rle.h /usr/include/stdlib.h
+../engine/spriteresource.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../engine/spriteresource.o: /usr/include/gnu/stubs.h /usr/include/sys/types.h
+../engine/spriteresource.o: /usr/include/bits/types.h
+../engine/spriteresource.o: /usr/include/bits/pthreadtypes.h
+../engine/spriteresource.o: /usr/include/bits/sched.h /usr/include/time.h
+../engine/spriteresource.o: /usr/include/endian.h /usr/include/bits/endian.h
+../engine/spriteresource.o: /usr/include/sys/select.h
+../engine/spriteresource.o: /usr/include/bits/select.h
+../engine/spriteresource.o: /usr/include/bits/sigset.h
+../engine/spriteresource.o: /usr/include/bits/time.h
+../engine/spriteresource.o: /usr/include/sys/sysmacros.h
+../engine/spriteresource.o: /usr/include/alloca.h ../util/gltypes.h
+../engine/spriteresource.o: ../util/gldebug.h ../engine/krmath.h
+../engine/spriteresource.o: ../util/glutil.h ../util/gltypes.h
+../engine/spriteresource.o: ../util/glfixed.h /usr/include/limits.h
+../engine/spriteresource.o: /usr/include/bits/wordsize.h
+../engine/spriteresource.o: /usr/include/bits/posix1_lim.h
+../engine/spriteresource.o: /usr/include/bits/local_lim.h
+../engine/spriteresource.o: /usr/include/linux/limits.h
+../engine/spriteresource.o: /usr/include/bits/posix2_lim.h ../util/gldebug.h
+../engine/spriteresource.o: ../util/glmemorypool.h ../engine/painter.h
+../engine/spriteresource.o: ../engine/color.h ../engine/kyrabuild.h
+../engine/spriteresource.o: ../engine/spriteresource.h ../util/glstring.h
+../engine/spriteresource.o: ../util/gldynarray.h ../util/glmap.h
+../engine/spriteresource.o: ../util/glutil.h ../util/glprime.h
+../engine/spriteresource.o: ../engine/kyraresource.h ../engine/action.h
+../engine/spriteresource.o: ../util/gldynarray.h ../engine/sdlutil.h
+../engine/spriteresource.o: ../util/gllist.h ../engine/canvasresource.h
+../engine/spriteresource.o: ../engine/encoder.h ../tinyxml/tinyxml.h
+../engine/spriteresource.o: /usr/include/stdio.h /usr/include/libio.h
+../engine/spriteresource.o: /usr/include/_G_config.h /usr/include/wchar.h
+../engine/spriteresource.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+../engine/spriteresource.o: /usr/include/bits/stdio_lim.h
+../engine/spriteresource.o: /usr/include/assert.h ../engine/color.h
+../engine/spriteresource.o: ../engine/namefield.h ../engine/vault.h
+../engine/spriteresource.o: ../engine/image.h ../engine/imnode.h
+../engine/spriteresource.o: ../util/glinsidelist.h ../engine/krmath.h
+../engine/spriteresource.o: ../engine/kyrabuild.h ../engine/sprite.h
+../engine/textbox.o: ../engine/textbox.h ../engine/image.h ../engine/imnode.h
+../engine/textbox.o: ../util/glinsidelist.h ../util/gldebug.h
+../engine/textbox.o: ../util/gldynarray.h /usr/include/limits.h
+../engine/textbox.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../engine/textbox.o: /usr/include/gnu/stubs.h /usr/include/bits/wordsize.h
+../engine/textbox.o: /usr/include/bits/posix1_lim.h
+../engine/textbox.o: /usr/include/bits/local_lim.h
+../engine/textbox.o: /usr/include/linux/limits.h
+../engine/textbox.o: /usr/include/bits/posix2_lim.h ../util/glutil.h
+../engine/textbox.o: ../util/gldebug.h ../engine/krmath.h ../engine/color.h
+../engine/textbox.o: ../engine/kyrabuild.h ../engine/fontresource.h
+../engine/textbox.o: ../engine/spriteresource.h ../util/glstring.h
+../engine/textbox.o: ../util/gltypes.h ../util/gldynarray.h ../util/glmap.h
+../engine/textbox.o: ../util/glprime.h ../engine/kyraresource.h
+../engine/textbox.o: ../util/gltypes.h ../util/glutil.h ../util/glfixed.h
+../engine/textbox.o: ../engine/krmath.h ../engine/action.h ../engine/rle.h
+../engine/textbox.o: /usr/include/stdlib.h /usr/include/sys/types.h
+../engine/textbox.o: /usr/include/bits/types.h
+../engine/textbox.o: /usr/include/bits/pthreadtypes.h
+../engine/textbox.o: /usr/include/bits/sched.h /usr/include/time.h
+../engine/textbox.o: /usr/include/endian.h /usr/include/bits/endian.h
+../engine/textbox.o: /usr/include/sys/select.h /usr/include/bits/select.h
+../engine/textbox.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+../engine/textbox.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
+../engine/textbox.o: ../util/glmemorypool.h ../engine/painter.h
+../engine/textbox.o: ../engine/kyrabuild.h ../engine/sprite.h
+../engine/textbox.o: ../engine/engine.h
+../engine/tile.o: ../engine/tile.h ../engine/image.h ../engine/imnode.h
+../engine/tile.o: ../util/glinsidelist.h ../util/gldebug.h
+../engine/tile.o: ../util/gldynarray.h /usr/include/limits.h
+../engine/tile.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../engine/tile.o: /usr/include/gnu/stubs.h /usr/include/bits/wordsize.h
+../engine/tile.o: /usr/include/bits/posix1_lim.h
+../engine/tile.o: /usr/include/bits/local_lim.h /usr/include/linux/limits.h
+../engine/tile.o: /usr/include/bits/posix2_lim.h ../util/glutil.h
+../engine/tile.o: ../util/gldebug.h ../engine/krmath.h ../engine/color.h
+../engine/tile.o: ../engine/kyrabuild.h ../engine/tileresource.h
+../engine/tile.o: ../engine/engine.h
+../engine/tileresource.o: ../engine/tileresource.h ../engine/sdlutil.h
+../engine/tileresource.o: ../util/glstring.h ../util/gltypes.h
+../engine/tileresource.o: ../util/gldynarray.h ../util/gllist.h
+../engine/tileresource.o: ../util/gldebug.h ../engine/engine.h
+../engine/tileresource.o: ../engine/canvasresource.h ../engine/encoder.h
+../engine/tileresource.o: ../tinyxml/tinyxml.h /usr/include/stdio.h
+../engine/tileresource.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../engine/tileresource.o: /usr/include/gnu/stubs.h /usr/include/bits/types.h
+../engine/tileresource.o: /usr/include/bits/pthreadtypes.h
+../engine/tileresource.o: /usr/include/bits/sched.h /usr/include/libio.h
+../engine/tileresource.o: /usr/include/_G_config.h /usr/include/wchar.h
+../engine/tileresource.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+../engine/tileresource.o: /usr/include/bits/stdio_lim.h /usr/include/assert.h
+../engine/tileresource.o: ../util/gltypes.h ../engine/color.h
+../engine/tileresource.o: ../engine/kyraresource.h ../util/glutil.h
+../engine/tileresource.o: ../util/glfixed.h /usr/include/limits.h
+../engine/tileresource.o: /usr/include/bits/wordsize.h
+../engine/tileresource.o: /usr/include/bits/posix1_lim.h
+../engine/tileresource.o: /usr/include/bits/local_lim.h
+../engine/tileresource.o: /usr/include/linux/limits.h
+../engine/tileresource.o: /usr/include/bits/posix2_lim.h
+../engine/tileresource.o: ../engine/namefield.h ../engine/vault.h
+../engine/tileresource.o: ../util/gldynarray.h ../util/glutil.h
+../engine/tileresource.o: ../engine/rle.h /usr/include/stdlib.h
+../engine/tileresource.o: /usr/include/sys/types.h /usr/include/time.h
+../engine/tileresource.o: /usr/include/endian.h /usr/include/bits/endian.h
+../engine/tileresource.o: /usr/include/sys/select.h
+../engine/tileresource.o: /usr/include/bits/select.h
+../engine/tileresource.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+../engine/tileresource.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
+../engine/tileresource.o: ../util/gldebug.h ../engine/krmath.h
+../engine/tileresource.o: ../util/glmemorypool.h ../engine/painter.h
+../engine/tileresource.o: ../engine/color.h ../engine/kyrabuild.h
+../engine/vault.o: /usr/include/time.h /usr/include/bits/types.h
+../engine/vault.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../engine/vault.o: /usr/include/gnu/stubs.h /usr/include/bits/pthreadtypes.h
+../engine/vault.o: /usr/include/bits/sched.h ../engine/vault.h
+../engine/vault.o: ../util/glutil.h ../util/gltypes.h ../util/gllist.h
+../engine/vault.o: ../util/gldebug.h ../util/gldynarray.h
+../engine/vault.o: /usr/include/limits.h /usr/include/bits/wordsize.h
+../engine/vault.o: /usr/include/bits/posix1_lim.h
+../engine/vault.o: /usr/include/bits/local_lim.h /usr/include/linux/limits.h
+../engine/vault.o: /usr/include/bits/posix2_lim.h ../util/glutil.h
+../engine/vault.o: ../util/glstring.h ../util/gldynarray.h ../engine/rle.h
+../engine/vault.o: /usr/include/stdlib.h /usr/include/sys/types.h
+../engine/vault.o: /usr/include/endian.h /usr/include/bits/endian.h
+../engine/vault.o: /usr/include/sys/select.h /usr/include/bits/select.h
+../engine/vault.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+../engine/vault.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
+../engine/vault.o: ../util/gltypes.h ../util/gldebug.h ../engine/krmath.h
+../engine/vault.o: ../util/glfixed.h ../util/glmemorypool.h
+../engine/vault.o: ../engine/painter.h ../engine/color.h
+../engine/vault.o: ../engine/kyrabuild.h ../engine/kyraresource.h
+../engine/vault.o: ../engine/sdlutil.h ../engine/pixelblock.h
+../engine/vault.o: ../engine/ogltexture.h ../engine/krmath.h
+../engine/namefield.o: ../engine/namefield.h ../util/gltypes.h
+../engine/namefield.o: ../util/gllist.h ../util/gldebug.h
+../engine/namefield.o: ../util/gldynarray.h /usr/include/limits.h
+../engine/namefield.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../engine/namefield.o: /usr/include/gnu/stubs.h /usr/include/bits/wordsize.h
+../engine/namefield.o: /usr/include/bits/posix1_lim.h
+../engine/namefield.o: /usr/include/bits/local_lim.h
+../engine/namefield.o: /usr/include/linux/limits.h
+../engine/namefield.o: /usr/include/bits/posix2_lim.h ../util/glutil.h
+../engine/namefield.o: ../util/glstring.h ../util/gltypes.h
+../engine/namefield.o: ../util/gldynarray.h
+../engine/krmath.o: ../engine/krmath.h ../util/glutil.h ../util/gltypes.h
+../engine/krmath.o: /usr/include/math.h /usr/include/features.h
+../engine/krmath.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+../engine/krmath.o: /usr/include/bits/huge_val.h /usr/include/bits/mathdef.h
+../engine/krmath.o: /usr/include/bits/mathcalls.h
+../util/glrandom.o: ../util/glrandom.h ../util/gltypes.h
+../util/glrandom.o: /usr/include/stdlib.h /usr/include/features.h
+../util/glrandom.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+../util/glrandom.o: /usr/include/sys/types.h /usr/include/bits/types.h
+../util/glrandom.o: /usr/include/bits/pthreadtypes.h
+../util/glrandom.o: /usr/include/bits/sched.h /usr/include/time.h
+../util/glrandom.o: /usr/include/endian.h /usr/include/bits/endian.h
+../util/glrandom.o: /usr/include/sys/select.h /usr/include/bits/select.h
+../util/glrandom.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+../util/glrandom.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
+../util/glrandom.o: ../util/glutil.h
+../util/glisomath.o: ../util/glisomath.h ../util/gldebug.h ../util/gltypes.h
+../util/glisomath.o: ../util/glfixed.h /usr/include/math.h
+../util/glisomath.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../util/glisomath.o: /usr/include/gnu/stubs.h /usr/include/bits/huge_val.h
+../util/glisomath.o: /usr/include/bits/mathdef.h
+../util/glisomath.o: /usr/include/bits/mathcalls.h
+../util/glstring.o: ../util/glstring.h ../util/gltypes.h ../util/gldynarray.h
+../util/glstring.o: /usr/include/stdlib.h /usr/include/features.h
+../util/glstring.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+../util/glstring.o: /usr/include/sys/types.h /usr/include/bits/types.h
+../util/glstring.o: /usr/include/bits/pthreadtypes.h
+../util/glstring.o: /usr/include/bits/sched.h /usr/include/time.h
+../util/glstring.o: /usr/include/endian.h /usr/include/bits/endian.h
+../util/glstring.o: /usr/include/sys/select.h /usr/include/bits/select.h
+../util/glstring.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+../util/glstring.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
+../util/glstring.o: /usr/include/ctype.h /usr/include/string.h
+../util/glstring.o: /usr/include/stdio.h /usr/include/libio.h
+../util/glstring.o: /usr/include/_G_config.h /usr/include/wchar.h
+../util/glstring.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+../util/glstring.o: /usr/include/bits/stdio_lim.h
+../util/glmemorypool.o: ../util/glmemorypool.h ../util/gldebug.h
+../util/glmemorypool.o: /usr/include/stdlib.h /usr/include/features.h
+../util/glmemorypool.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+../util/glmemorypool.o: /usr/include/sys/types.h /usr/include/bits/types.h
+../util/glmemorypool.o: /usr/include/bits/pthreadtypes.h
+../util/glmemorypool.o: /usr/include/bits/sched.h /usr/include/time.h
+../util/glmemorypool.o: /usr/include/endian.h /usr/include/bits/endian.h
+../util/glmemorypool.o: /usr/include/sys/select.h /usr/include/bits/select.h
+../util/glmemorypool.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+../util/glmemorypool.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
+../util/glmemorypool.o: /usr/include/memory.h /usr/include/string.h
+../util/glprime.o: ../util/gldebug.h
+../util/glperformance.o: /usr/include/stdio.h /usr/include/features.h
+../util/glperformance.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+../util/glperformance.o: /usr/include/bits/types.h
+../util/glperformance.o: /usr/include/bits/pthreadtypes.h
+../util/glperformance.o: /usr/include/bits/sched.h /usr/include/libio.h
+../util/glperformance.o: /usr/include/_G_config.h /usr/include/wchar.h
+../util/glperformance.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+../util/glperformance.o: /usr/include/bits/stdio_lim.h ../util/gldebug.h
+../util/glperformance.o: ../util/glperformance.h ../util/gltypes.h
+../util/glperformance.o: ../util/glmap.h
+../tinyxml/tinyxml.o: ../tinyxml/tinyxml.h /usr/include/stdio.h
+../tinyxml/tinyxml.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../tinyxml/tinyxml.o: /usr/include/gnu/stubs.h /usr/include/bits/types.h
+../tinyxml/tinyxml.o: /usr/include/bits/pthreadtypes.h
+../tinyxml/tinyxml.o: /usr/include/bits/sched.h /usr/include/libio.h
+../tinyxml/tinyxml.o: /usr/include/_G_config.h /usr/include/wchar.h
+../tinyxml/tinyxml.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+../tinyxml/tinyxml.o: /usr/include/bits/stdio_lim.h /usr/include/assert.h
+../tinyxml/tinyxmlparser.o: ../tinyxml/tinyxml.h /usr/include/stdio.h
+../tinyxml/tinyxmlparser.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../tinyxml/tinyxmlparser.o: /usr/include/gnu/stubs.h
+../tinyxml/tinyxmlparser.o: /usr/include/bits/types.h
+../tinyxml/tinyxmlparser.o: /usr/include/bits/pthreadtypes.h
+../tinyxml/tinyxmlparser.o: /usr/include/bits/sched.h /usr/include/libio.h
+../tinyxml/tinyxmlparser.o: /usr/include/_G_config.h /usr/include/wchar.h
+../tinyxml/tinyxmlparser.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+../tinyxml/tinyxmlparser.o: /usr/include/bits/stdio_lim.h
+../tinyxml/tinyxmlparser.o: /usr/include/assert.h /usr/include/ctype.h
+../tinyxml/tinyxmlparser.o: /usr/include/endian.h /usr/include/bits/endian.h
+../tinyxml/tinyxmlerror.o: ../tinyxml/tinyxml.h /usr/include/stdio.h
+../tinyxml/tinyxmlerror.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../tinyxml/tinyxmlerror.o: /usr/include/gnu/stubs.h /usr/include/bits/types.h
+../tinyxml/tinyxmlerror.o: /usr/include/bits/pthreadtypes.h
+../tinyxml/tinyxmlerror.o: /usr/include/bits/sched.h /usr/include/libio.h
+../tinyxml/tinyxmlerror.o: /usr/include/_G_config.h /usr/include/wchar.h
+../tinyxml/tinyxmlerror.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+../tinyxml/tinyxmlerror.o: /usr/include/bits/stdio_lim.h
+../tinyxml/tinyxmlerror.o: /usr/include/assert.h
+../gui/console.o: /usr/include/stdio.h /usr/include/features.h
+../gui/console.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+../gui/console.o: /usr/include/bits/types.h /usr/include/bits/pthreadtypes.h
+../gui/console.o: /usr/include/bits/sched.h /usr/include/libio.h
+../gui/console.o: /usr/include/_G_config.h /usr/include/wchar.h
+../gui/console.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+../gui/console.o: /usr/include/bits/stdio_lim.h /usr/include/stdlib.h
+../gui/console.o: /usr/include/sys/types.h /usr/include/time.h
+../gui/console.o: /usr/include/endian.h /usr/include/bits/endian.h
+../gui/console.o: /usr/include/sys/select.h /usr/include/bits/select.h
+../gui/console.o: /usr/include/bits/sigset.h /usr/include/bits/time.h
+../gui/console.o: /usr/include/sys/sysmacros.h /usr/include/alloca.h
+../gui/console.o: ../gui/console.h ../gui/widget.h ../util/gllist.h
+../gui/console.o: ../util/gldebug.h ../engine/engine.h ../engine/vault.h
+../gui/console.o: ../util/glutil.h ../util/gltypes.h ../util/gldynarray.h
+../gui/console.o: /usr/include/limits.h /usr/include/bits/wordsize.h
+../gui/console.o: /usr/include/bits/posix1_lim.h
+../gui/console.o: /usr/include/bits/local_lim.h /usr/include/linux/limits.h
+../gui/console.o: /usr/include/bits/posix2_lim.h ../util/glutil.h
+../gui/console.o: ../util/glstring.h ../util/gldynarray.h ../engine/rle.h
+../gui/console.o: ../util/gltypes.h ../util/gldebug.h ../engine/krmath.h
+../gui/console.o: ../util/glfixed.h ../util/glmemorypool.h
+../gui/console.o: ../engine/painter.h ../engine/color.h ../engine/kyrabuild.h
+../gui/console.o: ../engine/kyraresource.h ../engine/imagetree.h
+../gui/console.o: ../util/glmap.h ../util/glprime.h ../engine/sprite.h
+../gui/console.o: ../engine/image.h ../engine/imnode.h ../util/glinsidelist.h
+../gui/console.o: ../engine/krmath.h ../engine/kyrabuild.h
+../gui/console.o: ../engine/spriteresource.h ../engine/action.h
+../gui/console.o: ../engine/dirtyrectangle.h ../util/glcirclelist.h
+../gui/console.o: ../engine/textbox.h ../engine/fontresource.h
+../gui/console.o: ../engine/canvas.h ../engine/canvasresource.h
+../gui/console.o: ../engine/imagetree.h ../engine/boxresource.h
+../gui/console.o: ../engine/box.h ../engine/boxresource.h
+../gui/widget.o: ../gui/widget.h ../util/gllist.h ../util/gldebug.h
+../gui/widget.o: ../engine/engine.h ../engine/vault.h ../util/glutil.h
+../gui/widget.o: ../util/gltypes.h ../util/gldynarray.h /usr/include/limits.h
+../gui/widget.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../gui/widget.o: /usr/include/gnu/stubs.h /usr/include/bits/wordsize.h
+../gui/widget.o: /usr/include/bits/posix1_lim.h /usr/include/bits/local_lim.h
+../gui/widget.o: /usr/include/linux/limits.h /usr/include/bits/posix2_lim.h
+../gui/widget.o: ../util/glutil.h ../util/glstring.h ../util/gldynarray.h
+../gui/widget.o: ../engine/rle.h /usr/include/stdlib.h
+../gui/widget.o: /usr/include/sys/types.h /usr/include/bits/types.h
+../gui/widget.o: /usr/include/bits/pthreadtypes.h /usr/include/bits/sched.h
+../gui/widget.o: /usr/include/time.h /usr/include/endian.h
+../gui/widget.o: /usr/include/bits/endian.h /usr/include/sys/select.h
+../gui/widget.o: /usr/include/bits/select.h /usr/include/bits/sigset.h
+../gui/widget.o: /usr/include/bits/time.h /usr/include/sys/sysmacros.h
+../gui/widget.o: /usr/include/alloca.h ../util/gltypes.h ../util/gldebug.h
+../gui/widget.o: ../engine/krmath.h ../util/glfixed.h ../util/glmemorypool.h
+../gui/widget.o: ../engine/painter.h ../engine/color.h ../engine/kyrabuild.h
+../gui/widget.o: ../engine/kyraresource.h ../engine/imagetree.h
+../gui/widget.o: ../util/glmap.h ../util/glprime.h ../engine/sprite.h
+../gui/widget.o: ../engine/image.h ../engine/imnode.h ../util/glinsidelist.h
+../gui/widget.o: ../engine/krmath.h ../engine/kyrabuild.h
+../gui/widget.o: ../engine/spriteresource.h ../engine/action.h
+../gui/widget.o: ../engine/dirtyrectangle.h

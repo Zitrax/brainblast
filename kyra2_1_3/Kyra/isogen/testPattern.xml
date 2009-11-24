@@ -1,0 +1,3 @@
+<Isogen sprite="testPattern" width="1024" height="768">
+	<Set drawAll="true" drawDouble="true" floor="testPatternA.bmp" wall="testPatternG.bmp" />
+</Isogen>

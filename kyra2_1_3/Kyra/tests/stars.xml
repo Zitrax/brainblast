@@ -1,0 +1,7 @@
+<Direct>
+
+	<File filename="spaceBackground.bmp">
+		<Image		tile="STARS" />
+	</File>
+
+</Direct>

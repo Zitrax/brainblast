@@ -1,0 +1,7 @@
+<Definition filename="bigship.pcx" Transparent0="#000000">
+    <Sprite name="BIG">
+        <Action name="NONE">
+            <Frame x="13" y="23" width="360" height="378" hotspotx="252" hotspoty="211" deltax="0" deltay="0" />
+        </Action>
+    </Sprite>
+</Definition>

@@ -1,0 +1,1 @@
+zip -R kyrasrc.zip *.cpp *.c *.h *.dsp Makefile

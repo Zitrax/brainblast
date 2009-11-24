@@ -1,0 +1,3 @@
+glprime.lo: ../../grinliz/glprime.cpp ../../grinliz/gldebug.h
+
+../../grinliz/gldebug.h:

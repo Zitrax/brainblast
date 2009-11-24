@@ -1,0 +1,12 @@
+<Direct>
+
+	<File filename="tileset.gif" >
+
+		<ColorKey	tile="GROUND"							color="#ffff00"	frameCount="1" />
+		<ColorKey	tile="FLOWER"							color="#ffff00"	frameCount="1" />
+		<ColorKey	sprite="GROUND"		action="LIGHT"		color="#ffff00"	frameCount="1" />
+		<ColorKey	sprite="GROUND"		action="DARK"		color="#ffff00"	frameCount="1" />
+
+	</File>
+
+</Direct>

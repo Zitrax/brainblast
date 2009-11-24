@@ -1,0 +1,208 @@
+#****************************************************************************
+#
+# Makefile for Kyra.
+# Lee Thomason
+# www.grinninglizard.com
+#
+# This is a GNU make (gmake) makefile
+#****************************************************************************
+
+# DEBUG can be set to YES to include debugging info, or NO otherwise
+DEBUG          := NO
+
+# PROFILE can be set to YES to include profiling info, or NO otherwise
+PROFILE        := NO
+
+#****************************************************************************
+ifeq (RELEASE, ${MAKE_KYRA})
+	DEBUG   := NO
+	PROFILE := NO
+endif
+
+ifeq (DEBUG, ${MAKE_KYRA})
+	DEBUG   := YES
+	PROFILE := NO
+endif
+
+ifeq (PROFILE, ${MAKE_KYRA})
+	DEBUG   := NO
+	PROFILE := YES
+endif
+
+CC     := gcc
+CXX    := g++
+LD     := g++
+AR     := ar rc
+RANLIB := ranlib
+
+DEBUG_CFLAGS     := -Wall -Wno-unknown-pragmas -Wno-format -g -DDEBUG
+RELEASE_CFLAGS   := -Wall -Wno-unknown-pragmas -Wno-format -O3
+
+LIBS		 :=  $(shell sdl-config --libs) -lSDL_image ../engine/krengine.a
+
+DEBUG_CXXFLAGS   := ${DEBUG_CFLAGS}
+RELEASE_CXXFLAGS := ${RELEASE_CFLAGS}
+
+DEBUG_LDFLAGS    := -g
+RELEASE_LDFLAGS  :=
+
+ifeq (YES, ${DEBUG})
+   CFLAGS       := ${DEBUG_CFLAGS}
+   CXXFLAGS     := ${DEBUG_CXXFLAGS}
+   LDFLAGS      := ${DEBUG_LDFLAGS}
+else
+   CFLAGS       := ${RELEASE_CFLAGS}
+   CXXFLAGS     := ${RELEASE_CXXFLAGS}
+   LDFLAGS      := ${RELEASE_LDFLAGS}
+endif
+
+ifeq (YES, ${PROFILE})
+   CFLAGS   := ${CFLAGS} -pg
+   CXXFLAGS := ${CXXFLAGS} -pg
+   LDFLAGS  := ${LDFLAGS} -pg
+endif
+
+#****************************************************************************
+# Preprocessor directives
+#****************************************************************************
+
+ifeq (YES, ${PROFILE})
+  DEFS :=
+else
+  DEFS :=
+endif
+
+#****************************************************************************
+# Include paths
+#****************************************************************************
+
+INCS := $(shell sdl-config --cflags)
+
+
+#****************************************************************************
+# Makefile code common to all platforms
+#****************************************************************************
+
+CFLAGS   := ${CFLAGS}   ${DEFS}
+CXXFLAGS := ${CXXFLAGS} ${DEFS}
+
+#****************************************************************************
+# Targets of the build
+#****************************************************************************
+
+OUTPUT := krencoder
+
+all: ${OUTPUT}
+
+
+#****************************************************************************
+# Source files
+#****************************************************************************
+
+SRCS :=	main.cpp \
+		../tinyxml/tinyxml.cpp \
+		../tinyxml/tinyxmlerror.cpp \
+		../tinyxml/tinyxmlparser.cpp
+						
+# Add on the sources for libraries
+SRCS := ${SRCS}
+
+OBJS := $(addsuffix .o,$(basename ${SRCS}))
+
+
+# Files for building the release directories:		
+ADD_SRC := 	main.cpp \
+			Makefile \
+			encoder.dsp
+
+
+#****************************************************************************
+# Output
+#****************************************************************************
+
+${OUTPUT}: ${OBJS} ../engine/krengine.a
+	${LD} -o $@ ${LDFLAGS} ${OBJS} ${LIBS} ${EXTRA_LIBS}
+
+#****************************************************************************
+# common rules
+#****************************************************************************
+
+# Rules for compiling source files to object files
+%.o : %.cpp
+	${CXX} -c ${CXXFLAGS} ${INCS} $< -o $@
+
+%.o : %.c
+	${CC} -c ${CFLAGS} ${INCS} $< -o $@
+
+clean:
+	-rm -f core ${OBJS} ${OUTPUT}
+
+depend:
+	makedepend ${INCS} ${SRCS}
+	
+srcrelease:
+	makedepend; cp ${ADD_SRC} ~/Releases/KyraSrc/encoder
+
+# DO NOT DELETE
+
+main.o: ../tinyxml/tinyxml.h /usr/include/stdio.h /usr/include/features.h
+main.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+main.o: /usr/include/bits/types.h /usr/include/bits/pthreadtypes.h
+main.o: /usr/include/bits/sched.h /usr/include/libio.h
+main.o: /usr/include/_G_config.h /usr/include/wchar.h
+main.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+main.o: /usr/include/bits/stdio_lim.h /usr/include/assert.h
+main.o: ../engine/encoder.h /usr/local/include/SDL/SDL.h
+main.o: /usr/local/include/SDL/SDL_main.h /usr/local/include/SDL/SDL_types.h
+main.o: /usr/local/include/SDL/SDL_getenv.h
+main.o: /usr/local/include/SDL/SDL_error.h
+main.o: /usr/local/include/SDL/begin_code.h
+main.o: /usr/local/include/SDL/close_code.h
+main.o: /usr/local/include/SDL/SDL_rwops.h /usr/local/include/SDL/SDL_timer.h
+main.o: /usr/local/include/SDL/SDL_audio.h
+main.o: /usr/local/include/SDL/SDL_byteorder.h
+main.o: /usr/local/include/SDL/SDL_cdrom.h
+main.o: /usr/local/include/SDL/SDL_joystick.h
+main.o: /usr/local/include/SDL/SDL_events.h
+main.o: /usr/local/include/SDL/SDL_active.h
+main.o: /usr/local/include/SDL/SDL_keyboard.h
+main.o: /usr/local/include/SDL/SDL_keysym.h
+main.o: /usr/local/include/SDL/SDL_mouse.h /usr/local/include/SDL/SDL_video.h
+main.o: /usr/local/include/SDL/SDL_mutex.h /usr/local/include/SDL/SDL_quit.h
+main.o: /usr/local/include/SDL/SDL_version.h ../util/gltypes.h
+main.o: ../engine/color.h ../util/gllist.h ../util/gldebug.h
+main.o: ../engine/kyraresource.h ../util/glstring.h ../util/gltypes.h
+main.o: ../util/gldynarray.h /usr/include/limits.h
+main.o: /usr/include/bits/wordsize.h /usr/include/bits/posix1_lim.h
+main.o: /usr/include/bits/local_lim.h /usr/include/linux/limits.h
+main.o: /usr/include/bits/posix2_lim.h ../util/glutil.h ../util/glutil.h
+main.o: ../util/glfixed.h ../engine/namefield.h
+main.o: /usr/local/include/SDL/SDL_endian.h ../util/gldebug.h
+../tinyxml/tinyxml.o: ../tinyxml/tinyxml.h /usr/include/stdio.h
+../tinyxml/tinyxml.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../tinyxml/tinyxml.o: /usr/include/gnu/stubs.h /usr/include/bits/types.h
+../tinyxml/tinyxml.o: /usr/include/bits/pthreadtypes.h
+../tinyxml/tinyxml.o: /usr/include/bits/sched.h /usr/include/libio.h
+../tinyxml/tinyxml.o: /usr/include/_G_config.h /usr/include/wchar.h
+../tinyxml/tinyxml.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+../tinyxml/tinyxml.o: /usr/include/bits/stdio_lim.h /usr/include/assert.h
+../tinyxml/tinyxmlerror.o: ../tinyxml/tinyxml.h /usr/include/stdio.h
+../tinyxml/tinyxmlerror.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../tinyxml/tinyxmlerror.o: /usr/include/gnu/stubs.h /usr/include/bits/types.h
+../tinyxml/tinyxmlerror.o: /usr/include/bits/pthreadtypes.h
+../tinyxml/tinyxmlerror.o: /usr/include/bits/sched.h /usr/include/libio.h
+../tinyxml/tinyxmlerror.o: /usr/include/_G_config.h /usr/include/wchar.h
+../tinyxml/tinyxmlerror.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+../tinyxml/tinyxmlerror.o: /usr/include/bits/stdio_lim.h
+../tinyxml/tinyxmlerror.o: /usr/include/assert.h
+../tinyxml/tinyxmlparser.o: ../tinyxml/tinyxml.h /usr/include/stdio.h
+../tinyxml/tinyxmlparser.o: /usr/include/features.h /usr/include/sys/cdefs.h
+../tinyxml/tinyxmlparser.o: /usr/include/gnu/stubs.h
+../tinyxml/tinyxmlparser.o: /usr/include/bits/types.h
+../tinyxml/tinyxmlparser.o: /usr/include/bits/pthreadtypes.h
+../tinyxml/tinyxmlparser.o: /usr/include/bits/sched.h /usr/include/libio.h
+../tinyxml/tinyxmlparser.o: /usr/include/_G_config.h /usr/include/wchar.h
+../tinyxml/tinyxmlparser.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+../tinyxml/tinyxmlparser.o: /usr/include/bits/stdio_lim.h
+../tinyxml/tinyxmlparser.o: /usr/include/assert.h /usr/include/ctype.h
+../tinyxml/tinyxmlparser.o: /usr/include/endian.h /usr/include/bits/endian.h

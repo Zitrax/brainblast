@@ -1,0 +1,651 @@
+Kyra test data.
+
+1. Basic engine, all tests in.
+
+Tested at 16bbp fullscreen=0
+Game[2] time=5833 frames=300 fps=51.4
+Game[3] time=3391 frames=150 fps=44.2
+Game[4] time=3715 frames=150 fps=40.4
+
+Tested at 16bbp fullscreen=1
+Game[2] time=5423 frames=300 fps=55.3
+Game[3] time=3199 frames=150 fps=46.9
+Game[4] time=3689 frames=150 fps=40.7
+
+2. Initial dirty rectangle clipping code. (Doesn't
+do banding -- simply clips the easy cases.)
+
+Tested at 16bbp fullscreen=0
+Game[2] time=4950 frames=300 fps=60.6
+Game[3] time=3069 frames=150 fps=48.9
+Game[4] time=3563 frames=150 fps=42.1
+
+Tested at 16bbp fullscreen=1
+Game[2] time=4945 frames=300 fps=60.7
+Game[3] time=2851 frames=150 fps=52.6
+Game[4] time=3750 frames=150 fps=40.0
+
+3. Full DR clipping
+
+Tested at 16bbp fullscreen=0
+Game[2] time=5075 frames=300 fps=59.1
+Game[3] time=2859 frames=150 fps=52.5
+Game[4] time=4188 frames=150 fps=35.8
+
+4. Seperating Blit Rects from Dirty Rects
+
+Tested at 16bbp fullscreen=0
+Game[2] time=4924 frames=300 fps=60.9
+Game[3] time=2805 frames=150 fps=53.5
+Game[4] time=3805 frames=150 fps=39.4
+
+Tested at 16bbp fullscreen=1
+Game[2] time=4882 frames=300 fps=61.5
+Game[3] time=2980 frames=150 fps=50.3
+Game[4] time=3606 frames=150 fps=41.6
+
+5. Drop back and punt. Too much complexity. Removed blit
+rectangles and complex clipping.
+
+Tested at 16bbp fullscreen=0
+Game[2] time=4971 frames=300 fps=60.4
+Game[3] time=2967 frames=150 fps=50.6
+Game[4] time=3524 frames=150 fps=42.6
+
+Tested at 16bbp fullscreen=1
+Game[2] time=5028 frames=300 fps=59.7
+Game[3] time=2965 frames=150 fps=50.6
+Game[4] time=3517 frames=150 fps=42.6
+
+
+Windows vs. Linux:
+(Windows times)
+
+Tested at 32bbp fullscreen=0
+Game[2] time=5863 frames=300 fps=51.2
+Game[3] time=4140 frames=150 fps=36.2
+Game[4] time=5610 frames=150 fps=26.7
+
+Why is this different? This is after the SDL 1.2
+rev. We may be seeing the effects of hardware
+acceleration?
+
+Tested at 32bbp fullscreen=0 Win32
+Game[2] time=4578 frames=300 fps=65.5
+Game[3] time=3393 frames=150 fps=44.2
+Game[4] time=3971 frames=150 fps=37.8
+
+Text is in, tests are in an intermediate state. Taking an
+optimization run.
+
+Baseline:
+Game[2]                BEM: time=4533 frames=300 fps=66.2
+Game[3]      Space : Fixed: time=3378 frames=150 fps=44.4
+Game[4]   Space : Tracking: time=3928 frames=150 fps=38.2
+Game[5]               Text: time=9794 frames=250 fps=25.5
+
+Inlining the min/max/swap utils:
+No-op. *sigh*
+
+Switching to Linux. Baseline:
+Tested at 16bbp fullscreen=0 Linux
+Game[2]                BEM: time=5053 frames=300 fps=59.4
+Game[3]      Space : Fixed: time=3478 frames=150 fps=43.1
+Game[4]   Space : Tracking: time=3756 frames=150 fps=39.9
+Game[5]               Text: time=9030 frames=250 fps=27.7
+
+Added better line width to text box.
+Optimized the inner loop of KrTextBox::Draw.
+Worked some with the KrRle::Draw loop.
+
+Little changes with the next test, some improvement on the
+text speed.
+
+Tested at 16bbp fullscreen=0 Linux
+Game[2]                BEM: time=5070 frames=300 fps=59.2
+Game[3]      Space : Fixed: time=3488 frames=150 fps=43.0
+Game[4]   Space : Tracking: time=3766 frames=150 fps=39.8
+Game[5]               Text: time=8494 frames=250 fps=29.4
+
+Testing out splitting up the RleLine:
+Tested at 32bbp fullscreen=0 Win32
+Game[2]                BEM: time=4426 frames=300 fps=67.8
+Game[3]      Space : Fixed: time=3363 frames=150 fps=44.6
+Game[4]   Space : Tracking: time=3912 frames=150 fps=38.3
+Game[5]               Text: time=4241 frames=250 fps=58.9
+
+Checking with color flip and optimized 32B blitter.
+	On:
+	Tested at 32bbp fullscreen=0 Win32
+	Game[2]                BEM: time=4113 frames=300 fps=72.9
+	Game[3]      Space : Fixed: time=2542 frames=150 fps=59.0
+	Game[4]   Space : Tracking: time=3171 frames=150 fps=47.3
+	Game[5]               Text: time=3760 frames=250 fps=66.5
+
+	Off:
+	Tested at 32bbp fullscreen=0 Win32
+	Game[2]                BEM: time=4426 frames=300 fps=67.8
+	Game[3]      Space : Fixed: time=2770 frames=150 fps=54.2
+	Game[4]   Space : Tracking: time=3394 frames=150 fps=44.2
+	Game[5]               Text: time=3866 frames=250 fps=64.7
+
+Comparing 16 to 32 bits, on windows.
+	Tested at 32bbp fullscreen=1 Win32
+	Game[2]                BEM: time=4027 frames=300 fps=74.5
+	Game[3]      Space : Fixed: time=2519 frames=150 fps=59.5
+	Game[4]   Space : Tracking: time=3139 frames=150 fps=47.8
+	Game[5]               Text: time=3623 frames=250 fps=69.0
+
+	Tested at 16bbp fullscreen=1 Win32
+	Game[2]                BEM: time=6458 frames=300 fps=46.5
+	Game[3]      Space : Fixed: time=4263 frames=150 fps=35.2
+	Game[4]   Space : Tracking: time=5064 frames=150 fps=29.6
+	Game[5]               Text: time=2990 frames=250 fps=83.6
+
+Getting ready to change the Draw loop.
+Baseline:
+	Tested at 32bbp fullscreen=0 Win32
+	Game[2]                BEM: time=4125 frames=300 fps=72.7
+	Game[3]      Space : Fixed: time=3089 frames=150 fps=48.6
+	Game[4]   Space : Tracking: time=3972 frames=150 fps=37.8
+	Game[5]               Text: time=6233 frames=250 fps=40.1
+	Game[6]        WaveScaling: time=2861 frames=250 fps=87.4
+	Game[7]            Scaling: time=2009 frames=250 fps=124.4
+
+With new DR stuff:
+	Tested at 32bbp fullscreen=0 Win32
+	Game[2]                BEM: time=4464 frames=300 fps=67.2
+	Game[3]      Space : Fixed: time=3555 frames=150 fps=42.2
+	Game[4]   Space : Tracking: time=4398 frames=150 fps=34.1
+	Game[5]               Text: time=5530 frames=250 fps=45.2
+	Game[6]        WaveScaling: time=4061 frames=250 fps=61.6
+	Game[7]            Scaling: time=2083 frames=250 fps=120.0
+
+Ouch! Off to linux to profile...nothing substantial has changed.
+Upping the DR count to 128:
+
+	Tested at 32bbp fullscreen=0 Win32
+	Game[2]                BEM: time=4188 frames=300 fps=71.6
+	Game[3]      Space : Fixed: time=3296 frames=150 fps=45.5
+	Game[4]   Space : Tracking: time=4524 frames=150 fps=33.2
+	Game[5]               Text: time=5405 frames=250 fps=46.3
+	Game[6]        WaveScaling: time=2760 frames=250 fps=90.6
+	Game[7]            Scaling: time=1980 frames=250 fps=126.3
+
+There we go.
+
+Optimization:
+Text baseline:
+	Tested at 32bbp fullscreen=0 Win32
+	Game[5]               Text: time=5322 frames=250 fps=47.0
+
+Using the parent node:
+	Tested at 32bbp fullscreen=0 Win32
+	Game[5]               Text: time=5293 frames=250 fps=47.2
+
+Using smart DR combining:
+	128 MAX:
+		Tested at 32bbp fullscreen=0 Win32
+		Game[2]                BEM: time=4090 frames=300 fps=73.3
+		Game[3]      Space : Fixed: time=3231 frames=150 fps=46.4
+		Game[4]   Space : Tracking: time=4400 frames=150 fps=34.1
+		Game[5]               Text: time=5228 frames=250 fps=47.8
+		Game[6]        WaveScaling: time=2740 frames=250 fps=91.2
+		Game[7]            Scaling: time=1952 frames=250 fps=128.1
+	64 MAX:
+		Tested at 32bbp fullscreen=0 Win32
+		Game[2]                BEM: time=4120 frames=300 fps=72.8
+		Game[3]      Space : Fixed: time=3253 frames=150 fps=46.1
+		Game[4]   Space : Tracking: time=4433 frames=150 fps=33.8
+		Game[5]               Text: time=5231 frames=250 fps=47.8
+		Game[6]        WaveScaling: time=2778 frames=250 fps=90.0
+		Game[7]            Scaling: time=1965 frames=250 fps=127.2
+	32 MAX:
+		Tested at 32bbp fullscreen=0 Win32
+		Game[2]                BEM: time=4182 frames=300 fps=71.7
+		Game[3]      Space : Fixed: time=3300 frames=150 fps=45.5
+		Game[4]   Space : Tracking: time=4472 frames=150 fps=33.5
+		Game[5]               Text: time=5354 frames=250 fps=46.7
+		Game[6]        WaveScaling: time=2766 frames=250 fps=90.4
+		Game[7]            Scaling: time=1962 frames=250 fps=127.4
+	4 MAX:
+		Tested at 32bbp fullscreen=0 Win32
+		Game[2]                BEM: time=4959 frames=300 fps=60.5
+		Game[3]      Space : Fixed: time=3942 frames=150 fps=38.1
+		Game[4]   Space : Tracking: time=4444 frames=150 fps=33.8
+		Game[5]               Text: time=5847 frames=250 fps=42.8
+		Game[6]        WaveScaling: time=4368 frames=250 fps=57.2
+		Game[7]            Scaling: time=3019 frames=250 fps=82.8
+
+After adding multi-windows
+	Tested at 32bbp fullscreen=0 Win32
+	Game[2]                BEM: time=4745 frames=300 fps=63.2
+	Game[3]      Space : Fixed: time=3617 frames=150 fps=41.5
+	Game[4]   Space : Tracking: time=4484 frames=150 fps=33.5
+	Game[5]               Text: time=6097 frames=250 fps=41.0
+	Game[6]        WaveScaling: time=2738 frames=250 fps=91.3
+	Game[7]            Scaling: time=2050 frames=250 fps=122.0
+
+Multi-windows happier
+	Tested at 32bbp fullscreen=0 Win32
+	Game[2]           BEM demo: time=4823 frames=300 fps=62.2
+	Game[4]      Space : Fixed: time=2804 frames=150 fps=53.5
+	Game[5]   Space : Tracking: time=3578 frames=150 fps=41.9
+	Game[6]               Text: time=5989 frames=250 fps=41.7
+	Game[7]        WaveScaling: time=2748 frames=250 fps=91.0
+	Game[8]            Scaling: time=2374 frames=250 fps=105.3
+
+Just before changing the art:
+Tested at 32bbp fullscreen=0 Win32
+Game[2]           BEM demo: time=4869 frames=300 fps=61.6
+Game[3]  BEM:Windowed demo: time=6688 frames=300 fps=44.9
+Game[4]      Space : Fixed: time=3570 frames=150 fps=42.0
+Game[5]   Space : Tracking: time=4401 frames=150 fps=34.1
+Game[6]               Text: time=6080 frames=250 fps=41.1
+Game[7]        WaveScaling: time=3291 frames=250 fps=76.0
+Game[8]            Scaling: time=2378 frames=250 fps=105.1
+
+Everything finished up for 1.4.0
+Tested at 32bbp fullscreen=0 Win32
+Game[2]           BEM demo: time=4869 frames=300 fps=61.6
+Game[3]  BEM:Windowed demo: time=6611 frames=300 fps=45.4
+Game[4]      Space : Fixed: time=3542 frames=150 fps=42.3
+Game[5]   Space : Tracking: time=4349 frames=150 fps=34.5
+Game[6]               Text: time=4677 frames=250 fps=53.5
+Game[7]        WaveScaling: time=2776 frames=250 fps=90.1
+Game[8]            Scaling: time=2367 frames=250 fps=105.6
+
+
+---- New Graphics Card: NVidea GeForce 2 ----------
+
+Tested at 16bbp fullscreen=0 Linux
+Game[2]           BEM demo: time=5410 frames=300 fps=55.5
+Game[3]  BEM:Windowed demo: time=7356 frames=300 fps=40.8
+Game[4]      Space : Fixed: time=3683 frames=150 fps=40.7
+Game[5]   Space : Tracking: time=4440 frames=150 fps=33.8
+Game[6]               Text: time=3762 frames=250 fps=66.5
+Game[7]        WaveScaling: time=2933 frames=250 fps=85.2
+Game[8]            Scaling: time=2446 frames=250 fps=102.2
+
+
+Optimizing again, after Omar noted the performance slowdown
+as well.
+
+baseline:
+v1.5.2 16bbp Fullscreen=0 Linux Software render
+Game[0]        TitleScreen: time=730 frames=150 fps=205.5
+Game[1]           BEM demo: time=4555 frames=300 fps=65.9
+Game[2]  BEM:Windowed demo: time=6464 frames=300 fps=46.4
+Game[3]      Space : Fixed: time=3045 frames=150 fps=49.3
+Game[4]   Space : Tracking: time=3515 frames=150 fps=42.7
+Game[5]               Text: time=3251 frames=250 fps=76.9
+Game[6]        WaveScaling: time=2599 frames=250 fps=96.2
+Game[7]            Scaling: time=2086 frames=250 fps=119.8
+
+same baseline:
+v1.5.2 16bbp Fullscreen=0 Linux Software render
+Game[0]        TitleScreen: time=729 frames=150 fps=205.8
+Game[1]           BEM demo: time=4551 frames=300 fps=65.9
+Game[2]  BEM:Windowed demo: time=6445 frames=300 fps=46.5
+Game[3]      Space : Fixed: time=2910 frames=150 fps=51.5
+Game[4]   Space : Tracking: time=3533 frames=150 fps=42.5
+Game[5]               Text: time=3261 frames=250 fps=76.7
+Game[6]        WaveScaling: time=2535 frames=250 fps=98.6
+Game[7]            Scaling: time=2076 frames=250 fps=120.4
+
+Added some code to not do extra work in "composite". Verified
+inlining is...but does nothing.
+
+v1.5.2 16bbp Fullscreen=0 Linux Software render
+Game[0]        TitleScreen: time=737 frames=150 fps=203.5
+Game[1]           BEM demo: time=4597 frames=300 fps=65.3
+Game[2]  BEM:Windowed demo: time=6575 frames=300 fps=45.6
+Game[3]      Space : Fixed: time=2916 frames=150 fps=51.4
+Game[4]   Space : Tracking: time=3465 frames=150 fps=43.3
+Game[5]               Text: time=3238 frames=250 fps=77.2
+Game[6]        WaveScaling: time=2513 frames=250 fps=99.5
+Game[7]            Scaling: time=2169 frames=250 fps=115.3
+
+Adding some basic stuff, but it isn't getting big gains. Looking
+at the text example in detail implies there may be some gains
+there, but certainly not the scope desired.
+
+v1.5.2 16bbp Fullscreen=0 Linux Software render
+Game[0]        TitleScreen: time=726 frames=150 fps=206.6
+Game[1]           BEM demo: time=4598 frames=300 fps=65.2
+Game[2]  BEM:Windowed demo: time=6536 frames=300 fps=45.9
+Game[3]      Space : Fixed: time=2908 frames=150 fps=51.6
+Game[4]   Space : Tracking: time=3569 frames=150 fps=42.0
+Game[5]               Text: time=3200 frames=250 fps=78.1
+Game[6]        WaveScaling: time=2523 frames=250 fps=99.1
+Game[7]            Scaling: time=2148 frames=250 fps=116.4
+
+Hmm. Actually need the text to be slower in opengl mode. Adding boxes.
+From 5 to 12 panes.
+
+v1.5.2 32bbp Fullscreen=0 Win32 OpenGL render: Vendor: 'NVIDIA Corporation'  Renderer: 'GeForce2 GTS/AGP/SSE'  Version: '1.3.0'
+Game[5]               Text: time=6804 frames=250 fps=36.7
+
+	Breaking it down with glperformance:
+	TreeWalk:	11.81	45%
+	other Draw:	14.61	55%
+
+	Tried precombining the rectangles in "FlushInvalid" with a caching rectangle. Effectively
+	halves the number of calls to "AddDRRect".
+	With caching:
+	Game[5]               Text: time=6630 frames=250 fps=37.7
+	Without about 36.6 or so. Not too much code, but somewhat minor gains.
+
+	Full compare:
+	Caching:
+	v1.5.2 32bbp Fullscreen=0 Win32 Software render
+	Game[0]        TitleScreen: time=803 frames=150 fps=186.8
+	Game[1]           BEM demo: time=4381 frames=300 fps=68.5
+	Game[2]  BEM:Windowed demo: time=6371 frames=300 fps=47.1
+	Game[3]      Space : Fixed: time=3378 frames=150 fps=44.4
+	Game[4]   Space : Tracking: time=4454 frames=150 fps=33.7
+	Game[5]               Text: time=9097 frames=250 fps=27.5
+	Game[6]        WaveScaling: time=2648 frames=250 fps=94.4
+	Game[7]            Scaling: time=2369 frames=250 fps=105.5
+
+	v1.5.2 32bbp Fullscreen=0 Win32 Software render
+	Game[0]        TitleScreen: time=815 frames=150 fps=184.0
+	Game[1]           BEM demo: time=4396 frames=300 fps=68.2
+	Game[2]  BEM:Windowed demo: time=6419 frames=300 fps=46.7
+	Game[3]      Space : Fixed: time=3379 frames=150 fps=44.4
+	Game[4]   Space : Tracking: time=4409 frames=150 fps=34.0
+	Game[5]               Text: time=9158 frames=250 fps=27.3
+	Game[6]        WaveScaling: time=2678 frames=250 fps=93.4
+	Game[7]            Scaling: time=2345 frames=250 fps=106.6
+
+	Not enough to make it worth it. Pulling.
+
+	36.5 fps typical.
+	42 without flush.
+	43 without add rectangle. <-- key point!
+	37 without is visible.
+	37.5 with switch around 64 bit math in Composite. Helps a little.
+	38.2 pulling out GlFixed calls in Composite.
+	40.2-40.8 pulling out GlFixed calls in Composite. Initial DR work.
+	44.9 Dirty Rectangle cleanup.
+	
+
+	With all opt, general test:
+	v1.5.2 32bbp Fullscreen=0 Win32 Software render
+	Game[0]        TitleScreen: time=802 frames=150 fps=187.0
+	Game[1]           BEM demo: time=4369 frames=300 fps=68.7
+	Game[2]  BEM:Windowed demo: time=6352 frames=300 fps=47.2
+	Game[3]      Space : Fixed: time=3355 frames=150 fps=44.7
+	Game[4]   Space : Tracking: time=4388 frames=150 fps=34.2
+	Game[5]               Text: time=8272 frames=250 fps=30.2
+	Game[6]        WaveScaling: time=2649 frames=250 fps=94.4
+	Game[7]            Scaling: time=2315 frames=250 fps=108.0
+
+The collision stuff has been added, extraneous text DR's removed.
+
+	With text bounding:
+	v1.5.2 32bbp Fullscreen=0 Win32 Software render
+	Game[0]        TitleScreen: time=656 frames=150 fps=228.7
+	Game[1]           BEM demo: time=4383 frames=300 fps=68.4
+	Game[2]  BEM:Windowed demo: time=6582 frames=300 fps=45.6
+	Game[3]      SimpleShooter: time=3742 frames=600 fps=160.3
+	Game[4]      WindowShooter: time=2959 frames=600 fps=202.8
+	Game[5]      Space : Fixed: time=3411 frames=150 fps=44.0
+	Game[6]   Space : Tracking: time=4455 frames=150 fps=33.7
+	Game[7]               Text: time=3592 frames=250 fps=69.6
+	Game[8]        WaveScaling: time=2871 frames=250 fps=87.1
+	Game[9]            Scaling: time=2346 frames=250 fps=106.6
+
+	without:
+	v1.5.2 32bbp Fullscreen=0 Win32 Software render
+	Game[0]        TitleScreen: time=852 frames=150 fps=176.1
+	Game[1]           BEM demo: time=4379 frames=300 fps=68.5
+	Game[2]  BEM:Windowed demo: time=6590 frames=300 fps=45.5
+	Game[3]      SimpleShooter: time=3737 frames=600 fps=160.6
+	Game[4]      WindowShooter: time=2958 frames=600 fps=202.8
+	Game[5]      Space : Fixed: time=3408 frames=150 fps=44.0
+	Game[6]   Space : Tracking: time=4447 frames=150 fps=33.7
+	Game[7]               Text: time=3548 frames=250 fps=70.5
+	Game[8]        WaveScaling: time=2863 frames=250 fps=87.3
+	Game[9]            Scaling: time=2346 frames=250 fps=106.6
+
+Well, apparently I haven't wasted enough time on DRs yet.
+	
+	Baseline: (actually 1.6.0, but the version only is updated on Linux)
+
+	v1.5.2 32bbp Fullscreen=0 Win32 Software render
+	Game[0]        TitleScreen: time=684 frames=150 fps=219.3
+	Game[1]           BEM demo: time=4442 frames=300 fps=67.5
+	Game[2]  BEM:Windowed demo: time=6587 frames=300 fps=45.5
+	Game[3]      SimpleShooter: time=2275 frames=400 fps=175.8
+	Game[4]      WindowShooter: time=1831 frames=400 fps=218.5
+	Game[5]      Space : Fixed: time=3512 frames=150 fps=42.7
+	Game[6]   Space : Tracking: time=4649 frames=150 fps=32.3
+	Game[7]               Text: time=3703 frames=250 fps=67.5
+	Game[8]        WaveScaling: time=2867 frames=250 fps=87.2
+	Game[9]            Scaling: time=2373 frames=250 fps=105.4
+
+	Added faster DR intersection code. Seems to help generally 
+	across the board. Not much, but consistent.
+
+	v1.5.2 32bbp Fullscreen=0 Win32 Software render
+	Game[0]        TitleScreen: time=661 frames=150 fps=226.9
+	Game[1]           BEM demo: time=4377 frames=300 fps=68.5
+	Game[2]  BEM:Windowed demo: time=6572 frames=300 fps=45.6
+	Game[3]      SimpleShooter: time=2233 frames=400 fps=179.1
+	Game[4]      WindowShooter: time=1818 frames=400 fps=220.0
+	Game[5]      Space : Fixed: time=3409 frames=150 fps=44.0
+	Game[6]   Space : Tracking: time=4451 frames=150 fps=33.7
+	Game[7]               Text: time=3689 frames=250 fps=67.8
+	Game[8]        WaveScaling: time=2861 frames=250 fps=87.4
+	Game[9]            Scaling: time=2351 frames=250 fps=106.3
+
+	Playing around with banded DR composition again. Doesn't help.
+	I think it just adds to many DRs to the computation.
+
+	v1.5.2 32bbp Fullscreen=0 Win32 Software render
+	Game[0]        TitleScreen: time=689 frames=150 fps=217.7
+	Game[1]           BEM demo: time=4811 frames=300 fps=62.4
+	Game[2]  BEM:Windowed demo: time=7448 frames=300 fps=40.3
+	Game[3]      SimpleShooter: time=2025 frames=400 fps=197.5
+	Game[4]      WindowShooter: time=1906 frames=400 fps=209.9
+	Game[5]      Space : Fixed: time=2977 frames=150 fps=50.4
+	Game[6]   Space : Tracking: time=4504 frames=150 fps=33.3
+	Game[7]               Text: time=4018 frames=250 fps=62.2
+	Game[8]        WaveScaling: time=2912 frames=250 fps=85.9
+	Game[9]            Scaling: time=2395 frames=250 fps=104.4
+
+Oooh! Back to DRs. Just implemented the "using bitmask to collapse
+the out of DR" case. Good breakthrough on the whole thing, I hope.
+Note that this is a new version of the text test.
+
+	Baseline, old way, 128 rects.
+	v1.6.1 32bbp Fullscreen=0 Win32 Software render
+	Game[0]        TitleScreen: time=662 frames=150 fps=226.6
+	Game[1]           BEM demo: time=4390 frames=300 fps=68.3
+	Game[2]  BEM:Windowed demo: time=6310 frames=300 fps=47.5
+	Game[3]      SimpleShooter: time=2307 frames=400 fps=173.4
+	Game[4]      WindowShooter: time=1783 frames=400 fps=224.3
+	Game[5]      Space : Fixed: time=3398 frames=150 fps=44.1
+	Game[6]   Space : Tracking: time=4434 frames=150 fps=33.8
+	Game[7]               Text: time=5860 frames=250 fps=42.7
+	Game[8]        WaveScaling: time=2692 frames=250 fps=92.9
+	Game[9]            Scaling: time=2350 frames=250 fps=106.4
+
+	New way, 128 rects. 
+	Text is yet faster!
+
+	v1.6.1 32bbp Fullscreen=0 Win32 Software render
+	Game[0]        TitleScreen: time=676 frames=150 fps=221.9
+	Game[1]           BEM demo: time=4398 frames=300 fps=68.2
+	Game[2]  BEM:Windowed demo: time=6387 frames=300 fps=47.0
+	Game[3]      SimpleShooter: time=2227 frames=400 fps=179.6
+	Game[4]      WindowShooter: time=1784 frames=400 fps=224.2
+	Game[5]      Space : Fixed: time=3397 frames=150 fps=44.2
+	Game[6]   Space : Tracking: time=4442 frames=150 fps=33.8
+	Game[7]               Text: time=5348 frames=250 fps=46.7
+	Game[8]        WaveScaling: time=2692 frames=250 fps=92.9
+	Game[9]            Scaling: time=2353 frames=250 fps=106.2
+
+	Hmm. Dropping the rects doesn't really help. Keeping
+	at 128.
+
+	v1.6.1 32bbp Fullscreen=0 Win32 Software render
+	Game[0]        TitleScreen: time=677 frames=150 fps=221.6
+	Game[1]           BEM demo: time=4393 frames=300 fps=68.3
+	Game[2]  BEM:Windowed demo: time=6376 frames=300 fps=47.1
+	Game[3]      SimpleShooter: time=2227 frames=400 fps=179.6
+	Game[4]      WindowShooter: time=1780 frames=400 fps=224.7
+	Game[5]      Space : Fixed: time=3402 frames=150 fps=44.1
+	Game[6]   Space : Tracking: time=4435 frames=150 fps=33.8
+	Game[7]               Text: time=5423 frames=250 fps=46.1
+	Game[8]        WaveScaling: time=2694 frames=250 fps=92.8
+	Game[9]            Scaling: time=2348 frames=250 fps=106.5
+
+About to embark on speeding up the RLE drawing time. Very exciting,
+hope it works. Should be better code regardless.
+
+	---- Baseline ----
+	v1.6.2 32bbp Fullscreen=0 Win32 Software render
+	Game[0]        TitleScreen: time=667 frames=100 fps=149.9
+	Game[1]           BEM demo: time=4502 frames=300 fps=66.6
+	Game[2]  BEM:Windowed demo: time=6692 frames=300 fps=44.8
+	Game[3]      SimpleShooter: time=2232 frames=400 fps=179.2
+	Game[4]      WindowShooter: time=1778 frames=400 fps=225.0
+	Game[5]      Space : Fixed: time=3425 frames=150 fps=43.8
+	Game[6]   Space : Tracking: time=4532 frames=150 fps=33.1
+	Game[7]               Text: time=5490 frames=250 fps=45.5
+	Game[8]        WaveScaling: time=2674 frames=250 fps=93.5
+	Game[9]            Scaling: time=2351 frames=250 fps=106.3
+
+	v1.6.2 32bbp Fullscreen=0 Win32 Software render
+	Game[0]        TitleScreen: time=657 frames=100 fps=152.2
+	Game[1]           BEM demo: time=4449 frames=300 fps=67.4
+	Game[2]  BEM:Windowed demo: time=6492 frames=300 fps=46.2
+	Game[3]      SimpleShooter: time=2214 frames=400 fps=180.7
+	Game[4]      WindowShooter: time=1757 frames=400 fps=227.7
+	Game[5]      Space : Fixed: time=3379 frames=150 fps=44.4
+	Game[6]   Space : Tracking: time=4438 frames=150 fps=33.8
+	Game[7]               Text: time=5292 frames=250 fps=47.2
+	Game[8]        WaveScaling: time=2714 frames=250 fps=92.1
+	Game[9]            Scaling: time=2354 frames=250 fps=106.2
+
+*sigh* Marginally faster. I'll leave the changes -- they're simpler
+to read -- but not the results hoped for.
+
+Addidng .DAT compression. Don't really care to speed this up, don't
+want to break.
+
+	Performance: 
+		LoadDatFileFromMemory calls=      16 time/call=     95.80 percent=100.0%
+
+	08/09/2002  10:06 PM           158,557 title.dat
+	08/09/2002  10:06 PM           234,723 space.dat
+	08/09/2002  10:06 PM           675,645 bem.dat
+	08/09/2002  10:06 PM            70,420 standardtest.dat
+	08/09/2002  10:06 PM            78,059 font.dat
+				   5 File(s)      1,217,404 bytes
+
+	After .DAT compression:
+	not too much slower....
+	Performance: 
+		LoadDatFileFromMemory calls=      16 time/call=    102.91 percent=100.0%
+
+	...but not too much smaller. More images cross the 128/128/128 barrier than
+	I expeced. That said, its better code than the current klugey system, and
+	font compression is first rate, for mono-chromatic fonts. Keeping the code.
+
+	08/10/2002  04:48 PM           158,076 title.dat
+	08/10/2002  04:48 PM           232,705 space.dat
+	08/10/2002  04:48 PM           649,017 bem.dat
+	08/10/2002  04:48 PM            49,123 standardtest.dat
+	08/10/2002  04:49 PM            55,185 font.dat
+				   5 File(s)      1,144,106 bytes
+
+I'm sick of the "no tile scaling" restriction. Decided to eat up memory caching those things:
+	Baseline.
+	v1.6.4 32bbp Fullscreen=0 Win32 Software render
+	Game[0]        TitleScreen: time=663 frames=100 fps=150.8
+	Game[1]           BEM demo: time=4477 frames=300 fps=67.0
+	Game[2]  BEM:Windowed demo: time=6532 frames=300 fps=45.9
+	Game[3]      SimpleShooter: time=2214 frames=400 fps=180.7
+	Game[4]      WindowShooter: time=1762 frames=400 fps=227.0
+	Game[5]      Space : Fixed: time=3389 frames=150 fps=44.3
+	Game[6]   Space : Tracking: time=4451 frames=150 fps=33.7
+	Game[7]               Text: time=5434 frames=250 fps=46.0
+	Game[8]        WaveScaling: time=2736 frames=250 fps=91.4
+	Game[9]            Scaling: time=2359 frames=250 fps=106.0
+
+	Somewhat faster too. Of course, its burning up more memory.
+	v1.6.4 32bbp Fullscreen=0 Win32 Software render
+	Game[0]        TitleScreen: time=665 frames=100 fps=150.4
+	Game[1]           BEM demo: time=4276 frames=300 fps=70.2
+	Game[2]  BEM:Windowed demo: time=6324 frames=300 fps=47.4
+	Game[3]      SimpleShooter: time=2220 frames=400 fps=180.2
+	Game[4]      WindowShooter: time=1773 frames=400 fps=225.6
+	Game[5]      Space : Fixed: time=3246 frames=150 fps=46.2
+	Game[6]   Space : Tracking: time=4318 frames=150 fps=34.7
+	Game[7]               Text: time=5426 frames=250 fps=46.1
+	Game[8]        WaveScaling: time=2673 frames=250 fps=93.5
+	Game[9]            Scaling: time=2359 frames=250 fps=106.0
+
+Another baseline:
+	v1.6.4 32bbp Fullscreen=0 Win32 Software render
+	Game[0]        TitleScreen: time=680 frames=100 fps=147.1
+	Game[1]           BEM demo: time=4328 frames=300 fps=69.3
+	Game[2]  BEM:Windowed demo: time=5409 frames=300 fps=55.5
+	Game[3]      SimpleShooter: time=2797 frames=400 fps=143.0
+	Game[4]      WindowShooter: time=1906 frames=400 fps=209.9
+	Game[5]      Space : Fixed: time=3358 frames=150 fps=44.7
+	Game[6]   Space : Tracking: time=4359 frames=150 fps=34.4
+	Game[7]               Text: time=5384 frames=250 fps=46.4
+	Game[8]        WaveScaling: time=2582 frames=250 fps=96.8
+	Game[9]            Scaling: time=2356 frames=250 fps=106.1
+	Game[10]        Sprite Test: time=112 frames=200 fps=1785.7
+	Game[11]          Tile Test: time=3721 frames=240 fps=64.5
+
+	New memory stuff actuall speeds it up. Cool.
+	v1.6.4 32bbp Fullscreen=0 Win32 Software render
+	Game[0]        TitleScreen: time=652 frames=100 fps=153.4
+	Game[1]           BEM demo: time=4166 frames=300 fps=72.0
+	Game[2]  BEM:Windowed demo: time=5307 frames=300 fps=56.5
+	Game[3]      SimpleShooter: time=2744 frames=400 fps=145.8
+	Game[4]      WindowShooter: time=1887 frames=400 fps=212.0
+	Game[5]      Space : Fixed: time=3315 frames=150 fps=45.2
+	Game[6]   Space : Tracking: time=4307 frames=150 fps=34.8
+	Game[7]               Text: time=5323 frames=250 fps=47.0
+	Game[8]        WaveScaling: time=2561 frames=250 fps=97.6
+	Game[9]            Scaling: time=2334 frames=250 fps=107.1
+	Game[10]        Sprite Test: time=81 frames=200 fps=2469.1
+	Game[11]          Tile Test: time=3695 frames=240 fps=65.0
+
+	With ASM code in 32B:
+	Doesn't help at all.
+
+v2.0.0 32bbp Fullscreen=0 Win32 Software render
+Game[0]        TitleScreen: time=785 frames=100 fps=127.4
+Game[1]           BEM demo: time=4312 frames=300 fps=69.6
+Game[2]  BEM:Windowed demo: time=5531 frames=300 fps=54.2
+Game[3]      SimpleShooter: time=2878 frames=400 fps=139.0
+Game[4]      WindowShooter: time=1933 frames=400 fps=206.9
+Game[5]      Space : Fixed: time=3419 frames=150 fps=43.9
+Game[6]   Space : Tracking: time=4528 frames=150 fps=33.1
+Game[7]               Text: time=5383 frames=250 fps=46.4
+Game[8]        WaveScaling: time=2561 frames=250 fps=97.6
+Game[9]            Scaling: time=2343 frames=250 fps=106.7
+Game[10]        Sprite Test: time=168 frames=200 fps=1190.5
+Game[11]          Tile Test: time=3737 frames=240 fps=64.2
+
+v2.0.0 16bbp Fullscreen=0 Win32 Software render
+Game[0]        TitleScreen: time=720 frames=100 fps=138.9
+Game[1]           BEM demo: time=7761 frames=300 fps=38.7
+Game[2]  BEM:Windowed demo: time=8681 frames=300 fps=34.6
+Game[3]      SimpleShooter: time=3745 frames=400 fps=106.8
+Game[4]      WindowShooter: time=2420 frames=400 fps=165.3
+Game[5]      Space : Fixed: time=5429 frames=150 fps=27.6
+Game[6]   Space : Tracking: time=7071 frames=150 fps=21.2
+Game[7]               Text: time=6161 frames=250 fps=40.6
+Game[8]        WaveScaling: time=4187 frames=250 fps=59.7
+Game[9]            Scaling: time=3333 frames=250 fps=75.0
+Game[10]        Sprite Test: time=96 frames=200 fps=2083.3
+Game[11]          Tile Test: time=5027 frames=240 fps=47.7
