@@ -13,9 +13,9 @@
  *
  * There has currently been three libraries tested:
  *
- * SDL_mixer - Turned out to not play certain modules (\ref BrainSoundSDL)
- * BASSMOD   - Plays modules fine but not sound effects (\ref BrainSoundBASS)
- * FMOD      - Plays both modules and effects fine :) (\ref BrainSoundFMOD)
+ * - SDL_mixer - Turned out to not play certain modules (\ref BrainSoundSDL)
+ * - BASSMOD   - Plays modules fine but not sound effects (\ref BrainSoundBASS)
+ * - FMOD      - Plays both modules and effects fine :) (\ref BrainSoundFMOD)
  */
 class BrainSound
 {
