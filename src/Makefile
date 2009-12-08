@@ -26,11 +26,14 @@ KRENCODER = ../kyra2_1_3/Kyra/encoder/krencoder
 
 all: brainblast
 
-$(IMAGES)/bb.h: ../images/bricks.xml 
+$(KRENCODER):
+	cd ../kyra2_1_3/Kyra && ./autogen && make
+
+$(IMAGES)/bb.h: ../images/bricks.xml $(KRENCODER) 
 	cd $(IMAGES) && \
 	$(KRENCODER) -pBB_ bb.h bricks.xml
 
-$(IMAGES)/bb_bg.h: ../images/bg.xml
+$(IMAGES)/bb_bg.h: ../images/bg.xml $(KRENCODER)
 	cd $(IMAGES) && \
 	$(KRENCODER) -pBB_BG_ bb_bg.h bg.xml
 
