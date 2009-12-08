@@ -156,6 +156,8 @@ void BrainPlayWait::init()
 	game()->playMusic();
 	
 	game()->addPlayers();
+
+	time(&m_start_time);
 }
 
 void BrainPlayWait::cleanup()
@@ -170,9 +172,14 @@ void BrainPlayWait::handleEvent(SDL_Event& event)
 		if( event.key.keysym.sym == SDLK_SPACE || 
 			event.key.keysym.sym == SDLK_RETURN )
 		{
-			game()->finishInitialWait();
+			changeState(BrainPlaying::instance());
 		}
 	}
+
+	game()->writeScoreAndTime(secondsLeft());
+
+	if( difftime(time(0),m_start_time) > m_wait_time )
+		changeState(BrainPlaying::instance());
 }
 
 void BrainPlayWait::update()
@@ -181,4 +188,33 @@ void BrainPlayWait::update()
 
 void BrainPlayWait::draw()
 {
+}
+
+unsigned int BrainPlayWait::secondsLeft() const
+{
+	time_t now = time(0);
+	int sec = static_cast<int>(m_wait_time - difftime(now,m_start_time));
+	assert(sec <= m_wait_time);
+	return sec;
+}
+
+void BrainPlaying::init()
+{
+	game()->hideSolutions();
+	game()->text().write(BrainText::CENTER,"",0);
+	time(&m_start_time);
+}
+
+void BrainPlaying::handleEvent(SDL_Event& event)
+{
+	game()->writeScoreAndTime(secondsLeft());
+}
+
+unsigned int BrainPlaying::secondsLeft() const
+{
+	time_t now = time(0);
+	int sec = static_cast<int>(m_play_time - difftime(now,m_start_time));
+	assert(sec <= m_play_time);
+	bool game_over = sec <= 0;
+	return game_over ? 0 : sec;
 }

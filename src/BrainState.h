@@ -113,7 +113,7 @@ private:
 class BrainPlayWait : public BrainState
 {
 public:
-	virtual ~BrainPlayWait(){}
+	virtual ~BrainPlayWait() {}
 
 	void init();
 	void cleanup();
@@ -130,7 +130,45 @@ public:
 
 private:
 
-	BrainPlayWait(){assert(s_mgr);}
+	time_t m_start_time;
+	const double m_wait_time;
+
+	BrainPlayWait() : BrainState(),
+					  m_start_time(0),
+					  m_wait_time(10.0)
+		{assert(s_mgr);}
+
+	unsigned int secondsLeft() const;
+};
+
+class BrainPlaying : public BrainState
+{
+public:
+	virtual ~BrainPlaying() {}
+
+	void init();
+	void cleanup(){}
+	void handleEvent(SDL_Event& event);
+	void update(){}
+	void draw(){}
+	string name() const { return "BrainPlaying"; }
+
+	static BrainPlaying& instance() 
+		{
+			static BrainPlaying instance;
+			return instance;
+		}
+
+private:
+
+	time_t m_start_time;
+	const double m_play_time;
+
+	BrainPlaying() : m_start_time(0),
+					 m_play_time(60.0) 
+		{assert(s_mgr);}
+
+	unsigned int secondsLeft() const;
 };
 
 #endif // BRAINSTATE_H

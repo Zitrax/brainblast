@@ -165,9 +165,7 @@ public:
 
 	vector<BrainSprite*>& getAllSprites() { return m_sprites; }
 
-	unsigned int secondsLeft() const;
-
-	void writeScoreAndTime();
+	void writeScoreAndTime(int sec);
 
 	/**
 	 * Perform a select for the player at lvl.
@@ -204,11 +202,7 @@ public:
 
 	// < FIXME: Should move into state code >
 
-	/** 
-	 * Called when the initial wait where the solution is shown
-	 * should end.
-	 **/
-	void finishInitialWait();
+	void hideSolutions();
     bool addPlayers();
 	BrainPlayerManager& playerManager() const { return *m_player_manager; }
 	int getHumanPlayers() const { return m_human_players; }
@@ -312,8 +306,6 @@ private:
 	};
 
 	OldBrainState m_gamestate;
-
-	time_t m_start_time;
 
 	static void allowNavigation(Puzzle* lvl) { lvl->allowNavigation(true); }
 	static void forbidNavigation(Puzzle* lvl) { lvl->allowNavigation(false); }

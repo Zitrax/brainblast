@@ -24,10 +24,8 @@ using namespace std;
 // Statics
 Brainblast* Brainblast::s_instance;
 int TextListener::m_text_id = 0;
-const double Brainblast::WAITTIME = 10.0;
 
 Brainblast::Brainblast() : m_gamestate(*this,OldBrainState::TITLE),
-						   m_start_time(0),
 						   m_sound(new BrainSoundFMOD),
 						   m_level_data(7,8),  // 7x8 is maximum size if you want to avoid overlappings
 						   m_current_levels(),
@@ -362,8 +360,6 @@ Brainblast::changeLevel(int lvl)
 
 	clearFloor();
 
-	time(&m_start_time);
-
 	m_gamestate.setState(OldBrainState::PLAY_WAIT);
 
 	return true;
@@ -578,8 +574,10 @@ void Brainblast::handleEvents()
 			else if( event.key.keysym.sym == SDLK_f )
 				SDL_WM_ToggleFullScreen(m_screen);
 
+			break;
+
         case SDL_DRAW_EVENT:
-        {
+
 			vector<BrainSprite*>::iterator it  = m_sprites.begin();
 			vector<BrainSprite*>::iterator end = m_sprites.end();
 			while(it!=end)
@@ -600,20 +598,14 @@ void Brainblast::handleEvents()
 			}
 
 			m_player_manager->move();
-
 			m_engine->Tree()->Walk();
-
-			if( m_start_time && m_gamestate==OldBrainState::PLAY_WAIT && (difftime(time(0),m_start_time) > WAITTIME) )
-				finishInitialWait();
-			
 			m_engine->Draw();
 
-        }
-        break;
-
+			break;
 		}
 
 		currentState().handleEvent(event);
+
 	}	
 }
 
@@ -1047,17 +1039,10 @@ void Brainblast::textInput(SDLKey k)
 	}
 }
 
-void Brainblast::finishInitialWait()
+void Brainblast::hideSolutions()
 {
-	if( m_gamestate == OldBrainState::GAME_OVER ||
-		m_gamestate == OldBrainState::TITLE )
-		return;
-
 	for(unsigned int i=0; i<m_current_levels.size(); ++i)
 		m_current_levels[i]->setVisibleSolution(false);
-
-	m_gamestate.setState(OldBrainState::PLAYING);
-	m_text.write(BrainText::CENTER,"",0);
 }
 
 BrainSprite* Brainblast::collisionCheck(BrainPlayer* player)
@@ -1074,19 +1059,8 @@ BrainSprite* Brainblast::collisionCheck(BrainPlayer* player)
 	return 0;
 }
 
-unsigned int Brainblast::secondsLeft() const
+void Brainblast::writeScoreAndTime(int sec)
 {
-	time_t now = time(0);
-	int basetime = m_gamestate==OldBrainState::PLAYING ? 60 : static_cast<int>(WAITTIME);
-	int sec = static_cast<int>(basetime - difftime(now,m_start_time));
-	assert(sec <= basetime);
-	bool game_over = sec <= 0;
-	return (m_gamestate==OldBrainState::PLAYING && game_over) ? 0 : sec;
-}
-
-void Brainblast::writeScoreAndTime()
-{
-	int sec = secondsLeft();
 	int min = sec/60;
 	sec -= min*60;
 	
@@ -1123,6 +1097,7 @@ void Brainblast::writeScoreAndTime()
 		m_gamestate.setState(OldBrainState::GAME_OVER);
 }
 
+// FIXME: finishInitialWait, secondsLeft
 void Brainblast::select(Puzzle& lvl, BrainPlayer& player)
 {
 	if( m_gamestate == OldBrainState::TIME_BONUS )
@@ -1132,7 +1107,7 @@ void Brainblast::select(Puzzle& lvl, BrainPlayer& player)
 	}
 	else if( m_gamestate == OldBrainState::PLAY_WAIT )
 	{
-		finishInitialWait();
+		//finishInitialWait();
 		return;
 	}
 	else if( !lvl.isSelecting() )
@@ -1157,7 +1132,7 @@ void Brainblast::select(Puzzle& lvl, BrainPlayer& player)
 			m_text.write(BrainText::CENTER,str.str(),0);
 
 			// Apply time bonus
-			int* seconds = new int(secondsLeft());
+			int* seconds = new int(60/*secondsLeft()*/);
 			player.addScore(*seconds*cscore/10);
 			if(bbc::debug) cerr << "Brainblast::select() TimeBonus (" << *seconds << "*" 
 								<< cscore/10 << "): " << *seconds*cscore/10 << "\n";
