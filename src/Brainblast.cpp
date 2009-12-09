@@ -25,7 +25,8 @@ using namespace std;
 Brainblast* Brainblast::s_instance;
 int TextListener::m_text_id = 0;
 
-Brainblast::Brainblast() : m_gamestate(*this,OldBrainState::TITLE),
+Brainblast::Brainblast() : BrainStateManager(),
+						   m_gamestate(*this,OldBrainState::TITLE),
 						   m_sound(new BrainSoundFMOD),
 						   m_level_data(7,8),  // 7x8 is maximum size if you want to avoid overlappings
 						   m_current_levels(),
@@ -549,10 +550,15 @@ void Brainblast::handleEvents()
 	SDL_Event add_sprite_event; add_sprite_event.type = SDL_ADD_SPRITE_EVENT;
 	SDL_AddTimer( 2000, TimerCallback, &add_sprite_event );	
 
+	bool keysHeld[323] = {false};
+
     while( running() && SDL_WaitEvent(&event) )
 	{
 		if ( event.type == SDL_QUIT )
 			break;
+
+		if( currentState().handleEvent(event) )
+			continue;
 
 		switch(event.type)
 		{
@@ -573,7 +579,13 @@ void Brainblast::handleEvents()
 			// F = TOGGLE FULLSCREEN
 			else if( event.key.keysym.sym == SDLK_f )
 				SDL_WM_ToggleFullScreen(m_screen);
+			else if( !m_player_manager->handleKeyDown(event.key.keysym.sym) )
+					 keysHeld[event.key.keysym.sym] = true;
 
+			break;
+
+		case SDL_KEYUP:
+			keysHeld[event.key.keysym.sym] = false;
 			break;
 
         case SDL_DRAW_EVENT:
@@ -604,8 +616,7 @@ void Brainblast::handleEvents()
 			break;
 		}
 
-		currentState().handleEvent(event);
-
+		m_player_manager->handleKeyHeld(keysHeld);
 	}	
 }
 
@@ -740,15 +751,15 @@ int Brainblast::eventLoop()
 // 			{
 // 				showHighScore();
 // 			}
-			else
-				if( !m_player_manager->handleKeyDown(event.key.keysym.sym) )
-					keysHeld[event.key.keysym.sym] = true;
+			// else
+			// 	if( !m_player_manager->handleKeyDown(event.key.keysym.sym) )
+			// 		keysHeld[event.key.keysym.sym] = true;
 
 			break;
 			
-		case SDL_KEYUP:
-			keysHeld[event.key.keysym.sym] = false;
-			break;
+		// case SDL_KEYUP:
+		// 	keysHeld[event.key.keysym.sym] = false;
+		// 	break;
 
 		case SDL_ADD_SPRITE_EVENT:
 			if( m_gamestate != OldBrainState::GAME_OVER )

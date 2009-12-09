@@ -26,6 +26,7 @@ void BrainState::changeState(BrainState& state)
 void BrainStateManager::pushState(BrainState& state)
 { 
 	if(bbc::debug) cerr << "BrainStateManager::pushState(" << state.name() << ")" << endl;
+	currentState().cleanup();
 	m_states.push_back(&state); 
 	state.init(); 
 }
@@ -48,7 +49,7 @@ void BrainMenu::cleanup()
 	game()->text().clear(BrainText::CENTER);
 }
 
-void BrainMenu::handleEvent(SDL_Event& event)
+bool BrainMenu::handleEvent(SDL_Event& event)
 {
 	switch( event.type )
 	{
@@ -60,19 +61,19 @@ void BrainMenu::handleEvent(SDL_Event& event)
 		case SDLK_SPACE:
 		case SDLK_RETURN:
 			changeState(BrainPlayWait::instance());
-			break;
+			return true;
 
 		case SDLK_F1:
 			game()->playSample(Brainblast::CLICK);
 			game()->addHumanPlayer();
 			titleScreenUpdateText();
-			break;
+			return true;
 
 		case SDLK_F2:
 			game()->playSample(Brainblast::CLICK);
 			game()->addComputerPlayer();
 			titleScreenUpdateText();
-			break;
+			return true;
 			
 		case SDLK_F3:
 			game()->playSample(Brainblast::CLICK);
@@ -86,23 +87,25 @@ void BrainMenu::handleEvent(SDL_Event& event)
 				game()->setLevelSet(NORMAL); break;
 			}
 			titleScreenUpdateText();
-			break;
+			return true;
 			
 		case SDLK_F4:
 			game()->playerManager().toggleDifficulty();
 			titleScreenUpdateText();
-			break;
+			return true;
 
 		case SDLK_F5:
 			assert(!"Not implemented");
 			//showHighScore();
-			break;
+			return true;
 
 		default:
 			// Just skip other keys
-			break;
+			return true;
 		}
 	}
+	
+	return false;
 }
 
 void BrainMenu::update()
@@ -164,8 +167,10 @@ void BrainPlayWait::cleanup()
 {
 }
 
-void BrainPlayWait::handleEvent(SDL_Event& event)
+bool BrainPlayWait::handleEvent(SDL_Event& event)
 {
+	game()->writeScoreAndTime(secondsLeft());
+
 	switch( event.type )
 	{
 	case SDL_KEYDOWN:
@@ -173,13 +178,14 @@ void BrainPlayWait::handleEvent(SDL_Event& event)
 			event.key.keysym.sym == SDLK_RETURN )
 		{
 			changeState(BrainPlaying::instance());
+			return true;
 		}
 	}
 
-	game()->writeScoreAndTime(secondsLeft());
-
 	if( difftime(time(0),m_start_time) > m_wait_time )
 		changeState(BrainPlaying::instance());
+
+	return false;
 }
 
 void BrainPlayWait::update()
@@ -205,9 +211,10 @@ void BrainPlaying::init()
 	time(&m_start_time);
 }
 
-void BrainPlaying::handleEvent(SDL_Event& event)
+bool BrainPlaying::handleEvent(SDL_Event& event)
 {
 	game()->writeScoreAndTime(secondsLeft());
+	return false;
 }
 
 unsigned int BrainPlaying::secondsLeft() const
