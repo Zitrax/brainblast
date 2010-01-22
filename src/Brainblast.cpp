@@ -25,31 +25,32 @@ using namespace std;
 Brainblast* Brainblast::s_instance;
 int TextListener::m_text_id = 0;
 
-Brainblast::Brainblast() : BrainStateManager(),
-						   m_gamestate(*this,OldBrainState::TITLE),
-						   m_sound(new BrainSoundFMOD),
-						   m_level_data(7,8),  // 7x8 is maximum size if you want to avoid overlappings
-						   m_current_levels(),
-						   m_fields(),
-						   m_current_lvl(1),
-                           m_screen( SDL_SetVideoMode( VIDEOX, VIDEOY, VIDEOBITS, SDL_HWSURFACE ) ),
-						   m_bricks(),
-						   m_engine(0),
-						   m_bgTree(0),
-						   m_fgTree(0),
-						   m_sprites(0),
-						   m_bg_vault( new KrResourceVault() ),
-						   m_bg_sprite(0),
-						   m_text(),
-						   m_player_manager(0),
-						   m_human_players(1),
-						   m_computer_players(0),
-						   m_level_set(NORMAL),
-						   m_text_listeners(),
-						   m_text_queue(),
-						   m_time_bonus_timer(0),
-						   m_time_bonus_event()
-
+Brainblast::Brainblast(string base_dir) 
+	: BrainStateManager(),
+	  m_gamestate(*this,OldBrainState::TITLE),
+	  m_sound(new BrainSoundFMOD),
+	  m_level_data(7,8),  // 7x8 is maximum size if you want to avoid overlappings
+	  m_current_levels(),
+	  m_fields(),
+	  m_current_lvl(1),
+	  m_screen( SDL_SetVideoMode( VIDEOX, VIDEOY, VIDEOBITS, SDL_HWSURFACE ) ),
+	  m_bricks(),
+	  m_engine(0),
+	  m_bgTree(0),
+	  m_fgTree(0),
+	  m_sprites(0),
+	  m_bg_vault( new KrResourceVault() ),
+	  m_bg_sprite(0),
+	  m_text(),
+	  m_player_manager(0),
+	  m_human_players(1),
+	  m_computer_players(0),
+	  m_level_set(NORMAL),
+	  m_text_listeners(),
+	  m_text_queue(),
+	  m_time_bonus_timer(0),
+	  m_time_bonus_event(),
+	  m_base_dir(base_dir)
 {
     if(bbc::debug) cerr << "Brainblast::Brainblast() Videomode(" << VIDEOX << "," << VIDEOY << ")\n";
 
@@ -224,14 +225,14 @@ Brainblast::makeLevel(int lvl)
     else 
     {
 
-        char* filename  = static_cast<char*>(malloc(128));
-      
-        const char* filebase = "/usr/share/games/brainblast/lvl/lvl%03d.txt";
-      
-        sprintf(filename, filebase, lvl);
+		ostringstream filename;
+		filename << m_base_dir << "/lvl/lvl"
+				 << setw(3) << setfill('0')
+				 << lvl << ".txt";
+		
         if( bbc::debug ) cerr << "Level file: " << filename << "\n";
       
-        ifstream in(filename);
+        ifstream in(filename.str().c_str());
         if ( !in ) { 
             cerr << "=== ERROR: Level file could not be opened... ===\n"; 
             free(filename);
@@ -438,18 +439,20 @@ Brainblast::initGameKyra()
 		return false;
 
 	// Load the dat file.
-	// The dat file was carefully created in the sprite
-	// editor.
-	if ( !m_engine->Vault()->LoadDatFile( "/usr/share/games/brainblast/images/bb.dat" ) )
+	// The dat file was created in the sprite editor.
+	AutoCStr bbdat(addBaseDir("images/bb.dat"));
+	if ( !m_engine->Vault()->LoadDatFile(bbdat) ) 
 	{
 		printf( "=== Error: Loading the sprites file. ===\n" );
 		return false;	
 	}
 
 	// Load the background vault
-	if( !m_bg_vault->LoadDatFile( "/usr/share/games/brainblast/images/bb_bg.dat" ) )
+	AutoCStr bb_bgdat(addBaseDir("images/bb_bg.dat"));
+	if( !m_bg_vault->LoadDatFile( bb_bgdat ) )
 	{
 		printf( "=== Error: Loading backgrounds. ===\n" );
+		return false;
 	}
 
 	// Add background and foreground trees
@@ -473,10 +476,15 @@ Brainblast::initGameKyra()
     createBricks();
 
 	// Start music
+	AutoCStr 
+		click(addBaseDir("sounds/click.wav")), 
+		bounce(addBaseDir("sounds/bounce.wav")), 
+		warning(addBaseDir("sounds/warning.wav"));
+
 	if( !(m_sound->initializeSound() &&
-		  m_sound->addSample("/usr/share/games/brainblast/sounds/click.wav",CLICK) &&
-		  m_sound->addSample("/usr/share/games/brainblast/sounds/bounce.wav",BOUNCE) && 
-		  m_sound->addSample("/usr/share/games/brainblast/sounds/warning.wav",WARNING)) )
+		  m_sound->addSample(click,CLICK) &&
+		  m_sound->addSample(bounce,BOUNCE) && 
+		  m_sound->addSample(warning,WARNING)) )
 		printf("=== ERROR: Sound/Music error === \n");
 
 	// Init states
@@ -993,6 +1001,14 @@ void Brainblast::addComputerPlayer()
 		m_human_players--;
 }
 
+const char* Brainblast::addBaseDir(const char* const str)
+{
+	string s = m_base_dir + str + '\0';
+	char* cs = static_cast<char*>(malloc(s.length()));
+	s.copy(cs,256,0);
+	return cs;
+}
+
 void Brainblast::textInput(SDLKey k)
 {
 	if( k == SDLK_RETURN )
@@ -1189,6 +1205,12 @@ void Brainblast::dropPlayerSprite(BrainPlayer* player, bool remove)
 	}
 	else
 		m_sprites.push_back(bs);
+}
+
+bool Brainblast::loadMusic(const char* file) 
+{
+	AutoCStr afile(addBaseDir(file));
+	return m_sound->loadMusic(afile);
 }
 
 Brainblast::LevelData::LevelData(unsigned int max_width,

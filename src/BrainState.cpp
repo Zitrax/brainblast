@@ -33,7 +33,7 @@ void BrainStateManager::pushState(BrainState& state)
 
 void BrainMenu::init()
 {
-	game()->loadMusic("/usr/share/games/brainblast/music/Acidstorm.it");
+	game()->loadMusic("music/Acidstorm.it");
 	game()->playMusic();
 
 	game()->stopPlay();
@@ -155,7 +155,7 @@ void BrainPlayWait::init()
 {
 	game()->playerManager().resetScores();
 
-	game()->loadMusic("/usr/share/games/brainblast/music/enigmatic_path.it");
+	game()->loadMusic("music/enigmatic_path.it");
 	game()->playMusic();
 	
 	game()->addPlayers();

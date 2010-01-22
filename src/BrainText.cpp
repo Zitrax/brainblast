@@ -8,6 +8,7 @@
 #include "consolefont.h"
 #include "SDL_image.h"
 #include "bbc.h"
+#include "Brainblast.h"
 
 BrainText::BrainText() :
     m_font(0),
@@ -26,8 +27,13 @@ bool BrainText::init(KrEngine& engine, int width, int height)
 	// Set up the font
  	m_font = KrEncoder::CreateFixedFontResource( "CONSOLE", CONSOLEFONT_DAT, CONSOLEFONT_SIZE );
 	
-	m_score_font = loadFont("/usr/share/games/brainblast/images/bubblemad_8x8.png",83);
-	m_title_font = loadFont("/usr/share/games/brainblast/images/goldfont.png",100);
+	Brainblast* bb = Brainblast::instance();
+
+	AutoCStr f1(bb->addBaseDir("images/bubblemad_8x8.png"));
+	AutoCStr f2(bb->addBaseDir("images/goldfont.png"));
+
+	m_score_font = loadFont(f1,83);
+	m_title_font = loadFont(f2,100);
     
 	if( !m_font || !m_score_font || !m_title_font ) 
 	{

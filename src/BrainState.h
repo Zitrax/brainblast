@@ -59,7 +59,7 @@ class NullState : public BrainState
 {
 	void    init(){}
 	void    cleanup(){}
-	bool    handleEvent(SDL_Event&){assert(false);}
+	bool    handleEvent(SDL_Event&){assert(false); return false;}
 	void    update(){assert(false);}
 	void    draw(){assert(false);}
 	string  name() const { return "NullState"; }

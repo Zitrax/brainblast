@@ -128,7 +128,7 @@ private:
 
 public:
     
-    Brainblast();
+    Brainblast(string base_dir);
     ~Brainblast();
 
 	static Brainblast* instance() { return s_instance; }
@@ -156,7 +156,12 @@ public:
 	
 	// Make sound interface reachable from the states
 	bool playSample(enum sounds sound) const { return m_sound->playSample(sound); }
-	bool loadMusic(const char* file) { return m_sound->loadMusic(file); }
+
+	/**
+	 * @param file Relative directory to the music file from the base directory
+	 */
+	bool loadMusic(const char* file);
+
 	bool playMusic() { return m_sound->playMusic(); }
 
 	BrainText& text() { return m_text; }
@@ -199,6 +204,12 @@ public:
 	 * Will add a computer player and roll around if there is one too many
 	 */
 	void addComputerPlayer();
+
+	/**
+	 * Prepend a string with the base directory
+	 * This allocates a new string that must be freed
+	 */
+	const char* addBaseDir(const char* const str);
 
 	// < FIXME: Should move into state code >
 
@@ -350,6 +361,24 @@ private:
 
 	SDL_TimerID m_time_bonus_timer;
 	SDL_Event m_time_bonus_event;
+
+	string m_base_dir;
+};
+
+/**
+ * Will free the string when it goes out of scope
+ */
+class AutoCStr
+{
+public:
+	AutoCStr(const char* s) : m_s(s) {}
+	~AutoCStr() { free(const_cast<char*>(m_s)); }
+	operator const char* () { return m_s; }
+private:
+	AutoCStr(const AutoCStr&);
+	AutoCStr& operator=(const AutoCStr&);
+
+	const char* m_s;
 };
 
 #endif

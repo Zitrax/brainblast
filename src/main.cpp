@@ -15,7 +15,8 @@ int main(int /*argc*/, char* /*argv*/ [])
 		exit( 254 );
 	}
 	
-	Brainblast* bb = new Brainblast();
+	Brainblast* bb = new Brainblast("/usr/share/games/brainblast/");
+	//Brainblast* bb = new Brainblast("/home/danielb/git/brainblast/");
     if( !bb->initGameKyra() )
 	{
 		printf("=== ERROR: Could not init kyra. ===\n");
