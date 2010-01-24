@@ -991,6 +991,16 @@ const char* Brainblast::addBaseDir(const char* const str)
 	return cs;
 }
 
+void Brainblast::allowNavigation() 
+{
+	for_each(m_current_levels.begin(),m_current_levels.end(),allowLevelNavigation);
+}
+
+void Brainblast::forbidNavigation() 
+{
+	for_each(m_current_levels.begin(),m_current_levels.end(),forbidLevelNavigation);
+}
+
 void Brainblast::textInput(SDLKey k)
 {
 	if( k == SDLK_RETURN )
@@ -1275,8 +1285,8 @@ void Brainblast::OldBrainState::setState(enum gamestate st)
 		assert(st != TIME_BONUS); // Can't finish directly from wait state
 		break;
 	case PLAYING:
-		if( st != PLAYING )
-			for_each(m_bb.m_current_levels.begin(),m_bb.m_current_levels.end(),forbidNavigation);
+		// if( st != PLAYING )
+		// 	for_each(m_bb.m_current_levels.begin(),m_bb.m_current_levels.end(),forbidNavigation);
 		assert(st != HIGH_SCORE); // Should have been in an end state first
 		assert(st != PLAY_WAIT);  // Should go through TIME_BONUS
 		break;
@@ -1309,9 +1319,9 @@ void Brainblast::OldBrainState::setState(enum gamestate st)
 		assert(!"Should not get here");
 	}
 	
-	if( st == PLAYING )
-		// Tell the levels that we can navigate
-		for_each(m_bb.m_current_levels.begin(),m_bb.m_current_levels.end(),allowNavigation);
+	// if( st == PLAYING )
+	// 	// Tell the levels that we can navigate
+	// 	for_each(m_bb.m_current_levels.begin(),m_bb.m_current_levels.end(),allowNavigation);
 	
 	m_gamestate = st; 
 }

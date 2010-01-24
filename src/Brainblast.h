@@ -213,6 +213,8 @@ public:
 
 	// < FIXME: Should move into state code >
 
+	void allowNavigation();
+	void forbidNavigation();
 	void hideSolutions();
     bool addPlayers();
 	BrainPlayerManager& playerManager() const { return *m_player_manager; }
@@ -318,8 +320,8 @@ private:
 
 	OldBrainState m_gamestate;
 
-	static void allowNavigation(Puzzle* lvl) { lvl->allowNavigation(true); }
-	static void forbidNavigation(Puzzle* lvl) { lvl->allowNavigation(false); }
+	static void allowLevelNavigation(Puzzle* lvl) { lvl->allowNavigation(true); }
+	static void forbidLevelNavigation(Puzzle* lvl) { lvl->allowNavigation(false); }
 
 	/**
 	 * Handles all the sounds (effects and music)
