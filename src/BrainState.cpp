@@ -231,7 +231,7 @@ bool BrainPlaying::handleEvent(SDL_Event& event)
 		break;
 	case SDL_ENTER_TIME_BONUS:
 		BrainPlayer* player = static_cast<BrainPlayer*>(event.user.data1);
-		changeState(BrainTimeBonus::instance(player));
+		changeState(BrainTimeBonus::instance(player,secondsLeft()));
 		break;
 	}
 
@@ -258,7 +258,7 @@ void BrainTimeBonus::init()
 
 	// Apply time bonus
 	int cscore = m_player->getLevel()->brickScore();
-	int* seconds = new int(60/*secondsLeft()*/);
+	int* seconds = new int(m_seconds_left);
 	m_player->addScore(*seconds*cscore/10);
 	if(bbc::debug) cerr << "Brainblast::select() TimeBonus (" << *seconds << "*" 
 						<< cscore/10 << "): " << *seconds*cscore/10 << "\n";
@@ -274,6 +274,12 @@ bool BrainTimeBonus::handleEvent(SDL_Event& event)
 {
 	switch(event.type)
 	{
+	case SDL_KEYDOWN:
+	{
+		if( event.key.keysym.sym == m_player->keyForAction(BrainPlayer::SELECT) )
+			speedyTimeBonus();
+		break;
+	}
 	case SDL_TIME_BONUS_EVENT:
 	{
 		int* current = static_cast<int*>(event.user.data2);

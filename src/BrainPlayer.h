@@ -11,6 +11,9 @@
 #include "BrainText.h"
 #include "Puzzle.h"
 
+#include <algorithm>
+#include <ext/functional>
+
 using namespace std;
 using namespace bbc;
 
@@ -65,9 +68,34 @@ public:
 			return it==m_actions.end() ? NONE : it->second;
 		}
 
-	keymap::const_iterator keyMapIterator() const 
+	SDLKey keyForAction(enum PlayerAction action) const
 		{
-			return m_actions.begin();
+			// I think this would be more readable with a standard
+			// iteration loop but for the purpose of using/learning 
+			// stl I'll use and explain this. This uses SGI extensions 
+			// so if this causes trouble it can easily be replaced 
+			// with a small loop.
+			//
+			// Even a written functor (Unary predicate) would probably 
+			// be more readable, sorry about this :)
+			// 
+			// compose1 : Composes two Adaptable Unary Functions
+			//            with the same return type. For example
+			//            turns the functions f(x) and g(x) to f(g(x))
+			//
+			// bind2nd  : This function constructs an unary function object 
+			//            from the binary function object op by binding its 
+			//            second parameter to the fixed value x.
+			//
+			// select2nd: Just makes sure we use the .second (the value)
+			//            in the map.
+			//
+			keymap::const_iterator it = 
+				find_if( m_actions.begin(), m_actions.end(),
+						 compose1( bind2nd(equal_to<keymap::mapped_type>(), action),
+								   __gnu_cxx::select2nd<keymap::value_type>()));
+			assert( it != m_actions.end() );
+			return it->first;
 		}
 
 	void mapAction( enum PlayerAction action, SDLKey key); 

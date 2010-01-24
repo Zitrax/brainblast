@@ -222,10 +222,13 @@ public:
 	void draw(){}
 	string name() const { return "BrainTimeBonus"; }
 
-	static BrainTimeBonus& instance(BrainPlayer* player) 
+	static BrainTimeBonus& instance(
+		BrainPlayer* player,
+		int secondsLeft) 
 		{
 			static BrainTimeBonus instance;
 			instance.setPlayer(player);
+			instance.setSecondsLeft(secondsLeft);
 			return instance;
 		}
 
@@ -233,13 +236,15 @@ private:
 
 	BrainTimeBonus() : m_time_bonus_timer(), 
 					   m_time_bonus_event(),
-					   m_player(0)
+					   m_player(0),
+					   m_seconds_left(0)
 		{assert(s_mgr);}
 
 	BrainTimeBonus(const BrainTimeBonus&);
 	BrainTimeBonus& operator=(const BrainTimeBonus&);
 
 	void setPlayer(BrainPlayer* player) { m_player = player; }
+	void setSecondsLeft(int s) { m_seconds_left = s; }
 
 	// Speeds up the timebonus timer so we count as
 	// fast as we can.
@@ -248,8 +253,7 @@ private:
 	SDL_TimerID m_time_bonus_timer;
 	SDL_Event m_time_bonus_event;
 	BrainPlayer* m_player;
-
-
+	int m_seconds_left;
 };
 
 #endif // BRAINSTATE_H

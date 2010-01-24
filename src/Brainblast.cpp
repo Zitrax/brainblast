@@ -1102,9 +1102,12 @@ void Brainblast::writeScoreAndTime(int sec)
 		m_gamestate.setState(OldBrainState::GAME_OVER);
 }
 
-// FIXME: finishInitialWait, secondsLeft
+// FIXME: would make sense to tie this to the BrainPlaying state
 void Brainblast::select(Puzzle& lvl, BrainPlayer& player)
 {
+	if( &currentState() != &BrainPlaying::instance() )
+		return;
+
 	assert(lvl.isSelecting());
 
 	BrainSprite* s = 0;
