@@ -48,8 +48,6 @@ Brainblast::Brainblast(string base_dir)
 	  m_level_set(NORMAL),
 	  m_text_listeners(),
 	  m_text_queue(),
-	  m_time_bonus_timer(0),
-	  m_time_bonus_event(),
 	  m_base_dir(base_dir)
 {
     if(bbc::debug) cerr << "Brainblast::Brainblast() Videomode(" << VIDEOX << "," << VIDEOY << ")\n";
@@ -881,18 +879,6 @@ int Brainblast::eventLoop()
     
     return 0;
 }
-
-void Brainblast::speedyTimeBonus()
-{
-	// Did not see a better way to change the timer than to delete it and
-	// create a new one.
-	
-	if( !m_time_bonus_timer )
-		return;
-
-	SDL_RemoveTimer(m_time_bonus_timer);
-	m_time_bonus_timer = SDL_AddTimer( 1, TimerCallback, &m_time_bonus_event );	
-}
 	
 void Brainblast::gameOver()
 {
@@ -1119,18 +1105,7 @@ void Brainblast::writeScoreAndTime(int sec)
 // FIXME: finishInitialWait, secondsLeft
 void Brainblast::select(Puzzle& lvl, BrainPlayer& player)
 {
-	if( m_gamestate == OldBrainState::TIME_BONUS )
-	{
-		speedyTimeBonus();
-		return;
-	}
-	else if( m_gamestate == OldBrainState::PLAY_WAIT )
-	{
-		//finishInitialWait();
-		return;
-	}
-	else if( !lvl.isSelecting() )
-		return;
+	assert(lvl.isSelecting());
 
 	BrainSprite* s = 0;
 	int cscore = lvl.brickScore();
@@ -1144,27 +1119,12 @@ void Brainblast::select(Puzzle& lvl, BrainPlayer& player)
 		if( checkSolution(&lvl) )
 		{
 			m_text.clear(BrainText::CENTER);
-			
-			ostringstream str;
-			str << "Player " << m_player_manager->getPlayerNumber(player)
-				<< " wins level " << m_current_lvl;
-			m_text.write(BrainText::CENTER,str.str(),0);
 
-			// Apply time bonus
-			int* seconds = new int(60/*secondsLeft()*/);
-			player.addScore(*seconds*cscore/10);
-			if(bbc::debug) cerr << "Brainblast::select() TimeBonus (" << *seconds << "*" 
-								<< cscore/10 << "): " << *seconds*cscore/10 << "\n";
-
-			m_time_bonus_event.type       = SDL_TIME_BONUS_EVENT;
-			m_time_bonus_event.user.data1 = static_cast<void*>(m_player_manager->getPlayer(m_player_manager->getPlayerNumber(player)-1)); // FIXME
-			m_time_bonus_event.user.data2 = static_cast<void*>(seconds);
-			m_time_bonus_timer = SDL_AddTimer( 100, TimerCallback, &m_time_bonus_event );	
-			m_gamestate.setState(OldBrainState::TIME_BONUS);
-			clearFloor();
-
+			SDL_Event tb;
+			tb.type = SDL_ENTER_TIME_BONUS;
+			tb.user.data1 = &player;
+			SDL_PushEvent( &tb );
 			// Level is changed when counting the bonus is finished
-
 		}
 	}
 	else

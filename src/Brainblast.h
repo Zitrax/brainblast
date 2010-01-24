@@ -222,6 +222,15 @@ public:
 	int getComputerPlayers() const { return m_computer_players; }
 	LEVEL_SET getLevelSet() const { return m_level_set;	}
 	void setLevelSet(LEVEL_SET s) { m_level_set = s; }
+	int getCurrentLevel() const { return m_current_lvl; }
+
+	/**
+	 * Removes all sprites on the playfield
+	 * except the players and the ones belonging
+	 * to the puzzles.
+	 */
+	void clearFloor();
+
 	// < / FIXME: Should move into state code >
 
 	//// <BrainStateManager> ////
@@ -243,22 +252,12 @@ private:
 	// Called when finished with one text
 	void nextTextInput();
 
-	// Speeds up the timebonus timer so we count as
-	// fast as we can.
-	void speedyTimeBonus();
-
 	// Should be called whenever the game ends
 	void gameOver();
 
 	void showHighScore();
 
 	bool setupFields(int players);
-	/**
-	 * Removes all sprites on the playfield
-	 * except the players and the ones belonging
-	 * to the puzzles.
-	 */
-	void clearFloor();
 
 	void deleteLevels();
 
@@ -361,9 +360,6 @@ private:
 	vector<TextListener*> m_text_listeners;
 	map<int,string> m_text_queue;
 
-	SDL_TimerID m_time_bonus_timer;
-	SDL_Event m_time_bonus_event;
-
 	string m_base_dir;
 };
 
@@ -386,6 +382,7 @@ private:
 // FIXME: Move to some better place
 #define SDL_DRAW_EVENT ( SDL_USEREVENT + 0 )
 #define SDL_ADD_SPRITE_EVENT ( SDL_USEREVENT + 1 )
-#define SDL_TIME_BONUS_EVENT ( SDL_USEREVENT + 2 )
+#define SDL_ENTER_TIME_BONUS ( SDL_USEREVENT + 2 )
+#define SDL_TIME_BONUS_EVENT ( SDL_USEREVENT + 3 )
 
 #endif // BRAINBLAST_H

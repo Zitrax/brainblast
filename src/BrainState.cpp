@@ -229,6 +229,10 @@ bool BrainPlaying::handleEvent(SDL_Event& event)
 	case SDL_ADD_SPRITE_EVENT:
 		game()->addSprite();
 		break;
+	case SDL_ENTER_TIME_BONUS:
+		BrainPlayer* player = static_cast<BrainPlayer*>(event.user.data1);
+		changeState(BrainTimeBonus::instance(player));
+		break;
 	}
 
 	return false;
@@ -241,4 +245,83 @@ unsigned int BrainPlaying::secondsLeft() const
 	assert(sec <= m_play_time);
 	bool game_over = sec <= 0;
 	return game_over ? 0 : sec;
+}
+
+void BrainTimeBonus::init()
+{
+	BrainPlayerManager* pm = &game()->playerManager();
+
+	ostringstream str;
+	str << "Player " << pm->getPlayerNumber(*m_player)
+		<< " wins level " << game()->getCurrentLevel();
+	game()->text().write(BrainText::CENTER,str.str(),0);
+
+	// Apply time bonus
+	int cscore = m_player->getLevel()->brickScore();
+	int* seconds = new int(60/*secondsLeft()*/);
+	m_player->addScore(*seconds*cscore/10);
+	if(bbc::debug) cerr << "Brainblast::select() TimeBonus (" << *seconds << "*" 
+						<< cscore/10 << "): " << *seconds*cscore/10 << "\n";
+
+	m_time_bonus_event.type       = SDL_TIME_BONUS_EVENT;
+	m_time_bonus_event.user.data1 = static_cast<void*>(pm->getPlayer(pm->getPlayerNumber(*m_player)-1)); // FIXME
+	m_time_bonus_event.user.data2 = static_cast<void*>(seconds);
+	m_time_bonus_timer = SDL_AddTimer( 100, TimerCallback, &m_time_bonus_event );	
+	game()->clearFloor();
+}
+
+bool BrainTimeBonus::handleEvent(SDL_Event& event)
+{
+	switch(event.type)
+	{
+	case SDL_TIME_BONUS_EVENT:
+	{
+		int* current = static_cast<int*>(event.user.data2);
+		
+		assert(*current < 1000);
+		if( *current <= 0 )
+		{
+			// Delete event and stop timer
+			SDL_RemoveTimer(m_time_bonus_timer);
+			m_time_bonus_timer = 0;
+			
+			delete current;
+			
+			if( !game()->changeLevel(game()->getCurrentLevel()+1) )
+			{
+				// FIXME: Switch state
+				//game()->gameOver();
+			}
+			
+			game()->text().write(BrainText::CENTER,"",1);
+		}
+		else
+		{
+			ostringstream str;
+			str << "Time Bonus: " << *current;
+			(*current)--;
+			game()->text().write(BrainText::CENTER,str.str(),1);
+			game()->playSample(Brainblast::BOUNCE);
+			BrainPlayer* player = static_cast<BrainPlayer*>(event.user.data1);
+			if( player )
+				player->addScore(player->getLevel()->brickScore()/10);
+		}
+		
+	}
+	break;
+	}
+
+	return false;
+}
+
+void BrainTimeBonus::speedyTimeBonus()
+{
+	// Did not see a better way to change the timer than to delete it and
+	// create a new one.
+	
+	if( !m_time_bonus_timer )
+		return;
+
+	SDL_RemoveTimer(m_time_bonus_timer);
+	m_time_bonus_timer = SDL_AddTimer( 1, TimerCallback, &m_time_bonus_event );	
 }

@@ -13,6 +13,7 @@
 #include <string>
 
 class Brainblast;
+class BrainPlayer;
 
 using namespace std;
 
@@ -207,6 +208,48 @@ private:
 
 	BrainPlaying(const BrainPlaying&);
 	BrainPlaying& operator=(const BrainPlaying&);
+};
+
+class BrainTimeBonus : public BrainState
+{
+public:
+	virtual ~BrainTimeBonus() {}
+	
+	void init();
+	void cleanup(){}
+	bool handleEvent(SDL_Event& event);
+	void update(){}
+	void draw(){}
+	string name() const { return "BrainTimeBonus"; }
+
+	static BrainTimeBonus& instance(BrainPlayer* player) 
+		{
+			static BrainTimeBonus instance;
+			instance.setPlayer(player);
+			return instance;
+		}
+
+private:
+
+	BrainTimeBonus() : m_time_bonus_timer(), 
+					   m_time_bonus_event(),
+					   m_player(0)
+		{assert(s_mgr);}
+
+	BrainTimeBonus(const BrainTimeBonus&);
+	BrainTimeBonus& operator=(const BrainTimeBonus&);
+
+	void setPlayer(BrainPlayer* player) { m_player = player; }
+
+	// Speeds up the timebonus timer so we count as
+	// fast as we can.
+	void speedyTimeBonus();
+
+	SDL_TimerID m_time_bonus_timer;
+	SDL_Event m_time_bonus_event;
+	BrainPlayer* m_player;
+
+
 };
 
 #endif // BRAINSTATE_H
