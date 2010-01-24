@@ -29,12 +29,29 @@ public:
 	BrainState(){};
 	virtual ~BrainState(){}
 
-	virtual void    init()								= 0;
-	virtual void    cleanup()							= 0;
-	virtual bool    handleEvent(SDL_Event& event)		= 0;
-	virtual void    update()							= 0;
-	virtual void    draw()								= 0;
-	virtual string  name() const						= 0;
+	/**
+	 * First function to run when entering the state
+	 */
+	virtual void init()	= 0;
+
+	/**
+	 * Last function to run when leaving the state
+	 */
+	virtual void cleanup() = 0;
+
+	/**
+	 * Handle events arriving during the lifetime of the state
+	 */
+	virtual bool handleEvent(SDL_Event& event) = 0;
+
+	/**
+	 * The name of this state
+	 */
+	virtual string name() const = 0;
+
+	// Currently not used
+	virtual void update() = 0;
+	virtual void draw() = 0;
 
 	void changeState(BrainState& state);
 	
@@ -161,7 +178,7 @@ public:
 	virtual ~BrainPlaying() {}
 
 	void init();
-	void cleanup(){}
+	void cleanup();
 	bool handleEvent(SDL_Event& event);
 	void update(){}
 	void draw(){}
@@ -177,12 +194,19 @@ private:
 
 	time_t m_start_time;
 	const double m_play_time;
+	SDL_Event m_add_sprite_event; 
+	SDL_TimerID m_add_sprite_timer;
 
 	BrainPlaying() : m_start_time(0),
-					 m_play_time(60.0) 
+					 m_play_time(60.0),
+					 m_add_sprite_event(),
+					 m_add_sprite_timer()
 		{assert(s_mgr);}
 
 	unsigned int secondsLeft() const;
+
+	BrainPlaying(const BrainPlaying&);
+	BrainPlaying& operator=(const BrainPlaying&);
 };
 
 #endif // BRAINSTATE_H

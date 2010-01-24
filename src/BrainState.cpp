@@ -209,11 +209,27 @@ void BrainPlaying::init()
 	game()->hideSolutions();
 	game()->text().write(BrainText::CENTER,"",0);
 	time(&m_start_time);
+
+	m_add_sprite_event.type = SDL_ADD_SPRITE_EVENT;
+	m_add_sprite_timer = SDL_AddTimer( 2000, TimerCallback, &m_add_sprite_event );	
+}
+
+void BrainPlaying::cleanup()
+{
+	SDL_RemoveTimer(m_add_sprite_timer);
 }
 
 bool BrainPlaying::handleEvent(SDL_Event& event)
 {
 	game()->writeScoreAndTime(secondsLeft());
+
+	switch( event.type )
+	{
+	case SDL_ADD_SPRITE_EVENT:
+		game()->addSprite();
+		break;
+	}
+
 	return false;
 }
 

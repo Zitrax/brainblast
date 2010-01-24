@@ -235,7 +235,6 @@ Brainblast::makeLevel(int lvl)
         ifstream in(filename.str().c_str());
         if ( !in ) { 
             cerr << "=== ERROR: Level file could not be opened... ===\n"; 
-            free(filename);
             return false;
         }
     
@@ -264,7 +263,6 @@ Brainblast::makeLevel(int lvl)
 					if( tmp > height*width )
 					{
 						cerr << "=== ERROR: Level file contain invalid brick position (" << tmp << ") ===\n";
-						free(filename);
 						return false;
 					}
 
@@ -276,7 +274,6 @@ Brainblast::makeLevel(int lvl)
         }
 
         if(bbc::debug) cerr << "\n";
-        free(filename);
         in.close();
     } 
 
@@ -505,10 +502,6 @@ void Brainblast::stopPlay()
 
 BrainSprite* Brainblast::addSprite()
 {
-	if( m_gamestate != OldBrainState::PLAYING && 
-		!(m_gamestate == OldBrainState::TITLE || m_gamestate == OldBrainState::HIGH_SCORE) )
-		return 0;
-
 	KrSpriteResource* spriteRes = 0;
 
 	vector<int> types;
@@ -539,15 +532,6 @@ BrainSprite* Brainblast::addSprite()
 	return sprite;
 }
 
-#define SDL_DRAW_EVENT ( SDL_USEREVENT + 0 )
-#define SDL_ADD_SPRITE_EVENT ( SDL_USEREVENT + 1 )
-#define SDL_TIME_BONUS_EVENT ( SDL_USEREVENT + 2 )
-Uint32 TimerCallback(Uint32 interval, void* event)
-{
-	SDL_PushEvent( static_cast<SDL_Event*>(event) );
-	return interval;
-}
-
 void Brainblast::handleEvents()
 {
 	assert(m_engine);
@@ -555,8 +539,6 @@ void Brainblast::handleEvents()
     // Start timing!
 	SDL_Event draw_event; draw_event.type = SDL_DRAW_EVENT;
 	SDL_AddTimer( 35, TimerCallback, &draw_event );	
-	SDL_Event add_sprite_event; add_sprite_event.type = SDL_ADD_SPRITE_EVENT;
-	SDL_AddTimer( 2000, TimerCallback, &add_sprite_event );	
 
 	bool keysHeld[323] = {false};
 

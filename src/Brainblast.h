@@ -381,4 +381,9 @@ private:
 	const char* m_s;
 };
 
-#endif
+// FIXME: Move to some better place
+#define SDL_DRAW_EVENT ( SDL_USEREVENT + 0 )
+#define SDL_ADD_SPRITE_EVENT ( SDL_USEREVENT + 1 )
+#define SDL_TIME_BONUS_EVENT ( SDL_USEREVENT + 2 )
+
+#endif // BRAINBLAST_H

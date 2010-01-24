@@ -83,6 +83,10 @@ namespace bbc{
 	LEVEL_SET stringToLevelSet(std::string str);
 	LEVEL_SET intToLevelSet(int i);
 
+	/** 
+	 * Used for all SDL_Timers 
+	 */
+	Uint32 TimerCallback(Uint32 interval, void* event);
 }
 
 #endif
