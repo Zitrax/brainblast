@@ -8,4 +8,4 @@ https://sourceforge.net/projects/kyra/forums/forum/149869/topic/1680697
 
 The original sources at https://sourceforge.net/projects/kyra/ does not seem to be maintained anylonger and the available package does not compile by default, therefore the fixed package has been added into the brainblast project.
 
-You should be able to compile it by entering the kyra directory and run './autogen' and then 'make'.
+You should be able to compile it by entering the kyra directory and run './autogen' and then 'make', but the brainblast Makefile is also set up to compile this for you.

@@ -2,6 +2,7 @@ GCC       = g++
 CFLAGS    = -Weffc++ -Wall -Wextra -pedantic
 
 DEBUG_BB  = YES
+SOUND    ?= YES
 
 ifeq ($(DEBUG_BB), YES)
 CFLAGS   += -D_DEBUG -g
@@ -11,14 +12,21 @@ endif
 
 CFLAGS   += -I../include -I../kyra2_1_3
 
-LIBS      = ../kyra2_1_3/Kyra/engine/.libs/libengine.a ../kyra2_1_3/Kyra/.libs/libkyra.a -L../fmod/api -lfmod-3.75 -lrt
+LIBS      = ../kyra2_1_3/Kyra/engine/.libs/libengine.a ../kyra2_1_3/Kyra/.libs/libkyra.a -lrt
 SDL_LIBS  = $(shell sdl-config --static-libs) -lSDL_image #-lSDL_mixer
 SDL_FLAGS = $(shell sdl-config --cflags)
 IMAGES    = ../images
 
 OBJECTS = bbc.o consolefont.o Brainblast.o Brick.o Puzzle.o Field.o BrainSprite.o BrainSound.o \
-          BrainPlayer.o BrainAI.o BrainPlayerManager.o main.o BrainSoundFMOD.o HighScore.o BrainText.o \
+          BrainPlayer.o BrainAI.o BrainPlayerManager.o main.o HighScore.o BrainText.o \
           BrainState.o #BrainSoundSDL.o BrainSoundBASS.o
+
+ifeq ($(SOUND), YES)
+LIBS    += -L../fmod/api -lfmod-3.75
+OBJECTS += BrainSoundFMOD.o
+else
+CFLAGS  += -DNOSOUND
+endif
 
 VERSION = $(shell perl -wne 'if(/brainblast \((.*)\)/){print "$$1";exit;}' < ../deb/debian/changelog)
 

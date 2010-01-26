@@ -89,4 +89,23 @@ protected:
 	
 };
 
+#ifdef NOSOUND
+/**
+ * Empty implementation for no sound
+ */
+class BrainSoundNULL : public BrainSound
+{
+	bool initializeSound() { return m_initialized = true; };
+	bool isInitialized() const { return m_initialized == true; }
+	bool loadMusic(const char*) { return true; };
+	bool playMusic() { return true; };
+	bool stopMusic() { return true; };
+	bool pauseMusic() { return true; };
+	bool resumeMusic() { return true; };
+	bool toggleMusic() { return true; };
+	bool addSample(const char*,int) { return true; };
+	bool playSample(int) const { return true; };	
+};
+#endif // NOSOUND
+
 #endif

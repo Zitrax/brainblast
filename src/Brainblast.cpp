@@ -9,8 +9,13 @@
 #include "../images/bb.h"
 #include "../images/bb_bg.h"
 #include "grinliz/glrandom.h"
-#include "BrainSoundFMOD.h"
 #include "BrainPlayerManager.h"
+
+#ifdef NOSOUND
+# include "BrainSound.h"
+#else
+# include "BrainSoundFMOD.h"
+#endif // NOSOUND
 
 #include <assert.h>
 #include <sstream>   // ostringstream
@@ -28,7 +33,11 @@ int TextListener::m_text_id = 0;
 Brainblast::Brainblast(string base_dir) 
 	: BrainStateManager(),
 	  m_gamestate(*this,OldBrainState::TITLE),
+#ifdef NOSOUND
+	  m_sound(new BrainSoundNULL),
+#else
 	  m_sound(new BrainSoundFMOD),
+#endif // NOSOUND
 	  m_level_data(7,8),  // 7x8 is maximum size if you want to avoid overlappings
 	  m_current_levels(),
 	  m_fields(),
