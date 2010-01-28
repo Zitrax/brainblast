@@ -129,7 +129,8 @@ void BrainText::write(enum Box box, const string& text, int line)
 void BrainText::read(enum Box box, string* text, int line)
 {
 	assert( box != UNKNOWN );
-	assert(text);
+	assert( text );
+	assert( getBox(box) );
 
     getBox(box)->GetTextChar(text,line);
 }

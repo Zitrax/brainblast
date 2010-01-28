@@ -60,7 +60,7 @@ bool BrainMenu::handleEvent(SDL_Event& event)
 			
 		case SDLK_SPACE:
 		case SDLK_RETURN:
-			changeState(BrainPlayWait::instance());
+			changeState(BrainPlayWait::instance(true));
 			return true;
 
 		case SDLK_F1:
@@ -153,12 +153,15 @@ void BrainMenu::titleScreenUpdateText()
 
 void BrainPlayWait::init()
 {
-	game()->playerManager().resetScores();
-
-	game()->loadMusic("music/enigmatic_path.it");
-	game()->playMusic();
-	
-	game()->addPlayers();
+	if(m_first_level)
+	{
+		game()->playerManager().resetScores();
+		
+		game()->loadMusic("music/enigmatic_path.it");
+		game()->playMusic();
+		
+		game()->addPlayers();
+	}
 
 	time(&m_start_time);
 }
@@ -235,6 +238,9 @@ bool BrainPlaying::handleEvent(SDL_Event& event)
 		break;
 	}
 
+	if( !secondsLeft() )
+		changeState(BrainGameOver::instance());
+
 	return false;
 }
 
@@ -297,9 +303,12 @@ bool BrainTimeBonus::handleEvent(SDL_Event& event)
 			{
 				// FIXME: Switch state
 				//game()->gameOver();
+				assert(!"game over");
 			}
 			
 			game()->text().write(BrainText::CENTER,"",1);
+
+			changeState(BrainPlayWait::instance(false));
 		}
 		else
 		{
@@ -330,4 +339,125 @@ void BrainTimeBonus::speedyTimeBonus()
 
 	SDL_RemoveTimer(m_time_bonus_timer);
 	m_time_bonus_timer = SDL_AddTimer( 1, TimerCallback, &m_time_bonus_event );	
+}
+
+BrainGameOver::BrainGameOver() : 
+	m_text_listeners(),
+	m_text_queue()
+{
+	assert(s_mgr);
+	m_text_listeners.push_back(&game()->playerManager());	
+}
+
+
+void BrainGameOver::init()
+{
+	game()->text().write(BrainText::CENTER,"Game Over",0);
+	game()->playerManager().gameOver();
+ 	game()->clearFloor();
+}
+
+bool BrainGameOver::handleEvent(SDL_Event& event)
+{
+	switch(event.type)
+	{
+	case SDL_KEYDOWN:
+		
+		if( bbc::debug )
+			printf( "%s\n", SDL_GetKeyName(event.key.keysym.sym));
+		
+		if( !m_text_queue.empty() )
+		{
+			textInput(event.key.keysym.sym);
+		}
+		break;
+	}
+
+	return false;
+}
+
+void BrainGameOver::textInput(SDLKey k)
+{
+	if( k == SDLK_RETURN )
+	{
+		// We are always working on the lowest key
+		// and maps are sorted by key.
+		int id = m_text_queue.begin()->first;
+		m_text_queue.erase(id);
+		
+		string s;
+		game()->text().read(BrainText::CENTER,&s,4);
+		if( s.size() )
+		{
+			for_each(m_text_listeners.begin(),m_text_listeners.end(),text_ready(s,id));
+			game()->text().clear(BrainText::CENTER);
+			nextTextInput();
+		}
+		else
+		{
+			game()->playSample(Brainblast::WARNING);
+		}
+		return;
+	}
+
+	// For now only letters and numbers
+	else if( (k >= SDLK_0 && k <= SDLK_9) ||
+			 (k >= SDLK_a && k <= SDLK_z) )
+	{
+		string s;
+		game()->text().read(BrainText::CENTER,&s,4);
+		
+		if( s.size() == 8 ) 
+		{
+			game()->playSample(Brainblast::WARNING);
+			return;
+		}
+
+		s += k;
+		game()->text().write(BrainText::CENTER,s,4);
+		game()->playSample(Brainblast::CLICK);
+	}
+
+	else if( k == SDLK_BACKSPACE )
+	{
+		string s;
+		game()->text().read(BrainText::CENTER,&s,4);
+		if( s.size() )
+		{
+			s.resize(s.size()-1);
+			game()->text().write(BrainText::CENTER,s,4);
+			game()->playSample(Brainblast::CLICK);
+		}
+		else
+			game()->playSample(Brainblast::WARNING);
+	}
+}
+
+void BrainGameOver::nextTextInput()
+{
+	if( m_text_queue.empty() )
+	{
+		//showHighScore();
+		assert(!"Highscore");
+		return;
+	}
+	
+	game()->text().write(BrainText::CENTER,m_text_queue.begin()->second.c_str(),3);
+	game()->text().write(BrainText::CENTER,"",4);
+}
+
+int BrainGameOver::startTextInput(string label)
+{
+	int id = TextListener::id();
+	m_text_queue[id] = label;
+
+	// If we filled an empty queue
+	// we clear and start a new text
+	// If not it will just lie in the queue
+	// until the next string is about to 
+	// be entered.
+	if( m_text_queue.size() == 1 ) 
+		nextTextInput();
+
+	return id;
 }

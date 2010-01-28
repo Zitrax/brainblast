@@ -19,7 +19,7 @@ IMAGES    = ../images
 
 OBJECTS = bbc.o consolefont.o Brainblast.o Brick.o Puzzle.o Field.o BrainSprite.o BrainSound.o \
           BrainPlayer.o BrainAI.o BrainPlayerManager.o main.o HighScore.o BrainText.o \
-          BrainState.o #BrainSoundSDL.o BrainSoundBASS.o
+          BrainState.o TextListener.o #BrainSoundSDL.o BrainSoundBASS.o
 
 ifeq ($(SOUND), YES)
 LIBS    += -L../fmod/api -lfmod-3.75

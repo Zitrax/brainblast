@@ -154,9 +154,10 @@ public:
 	void draw();
 	string name() const { return "BrainPlayWait"; }
 
-	static BrainPlayWait& instance() 
+	static BrainPlayWait& instance(bool first_level)
 		{
 			static BrainPlayWait instance;
+			instance.m_first_level = first_level;
 			return instance;
 		}
 
@@ -164,10 +165,12 @@ private:
 
 	time_t m_start_time;
 	const double m_wait_time;
+	bool m_first_level;
 
 	BrainPlayWait() : BrainState(),
 					  m_start_time(0),
-					  m_wait_time(10.0)
+					  m_wait_time(10.0),
+					  m_first_level(true)
 		{assert(s_mgr);}
 
 	unsigned int secondsLeft() const;
@@ -254,6 +257,47 @@ private:
 	SDL_Event m_time_bonus_event;
 	BrainPlayer* m_player;
 	int m_seconds_left;
+};
+
+#include "BrainText.h"
+#include "TextListener.h"
+
+class BrainGameOver : public BrainState
+{
+public:
+	virtual ~BrainGameOver() {}
+	
+	void init();
+	void cleanup(){}
+	bool handleEvent(SDL_Event& event);
+	void update(){}
+	void draw(){}
+	string name() const { return "BrainGameOver"; }
+
+	/**
+	 * Enter text input mode
+	 * Returns an id of the string to be returned
+	 */
+	int startTextInput(string label);
+
+	static BrainGameOver& instance()
+		{
+			static BrainGameOver instance;
+			return instance;
+		}
+
+private:
+
+	BrainGameOver();
+		
+	// Called for every key when we are supposed to write text
+	void textInput(SDLKey k);
+	// Called when finished with one text
+	void nextTextInput();
+	
+	vector<TextListener*> m_text_listeners;
+	map<int,string> m_text_queue;
+
 };
 
 #endif // BRAINSTATE_H

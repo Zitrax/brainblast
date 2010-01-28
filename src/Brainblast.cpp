@@ -28,7 +28,6 @@ using namespace std;
 
 // Statics
 Brainblast* Brainblast::s_instance;
-int TextListener::m_text_id = 0;
 
 Brainblast::Brainblast(string base_dir) 
 	: BrainStateManager(),
@@ -55,8 +54,6 @@ Brainblast::Brainblast(string base_dir)
 	  m_human_players(1),
 	  m_computer_players(0),
 	  m_level_set(NORMAL),
-	  m_text_listeners(),
-	  m_text_queue(),
 	  m_base_dir(base_dir)
 {
     if(bbc::debug) cerr << "Brainblast::Brainblast() Videomode(" << VIDEOX << "," << VIDEOY << ")\n";
@@ -475,7 +472,6 @@ Brainblast::initGameKyra()
 	m_bg_sprite->SetZDepth(-20);
 
 	m_player_manager = new BrainPlayerManager();
-	m_text_listeners.push_back(m_player_manager);
 	
     createBricks();
 
@@ -565,13 +561,8 @@ void Brainblast::handleEvents()
 			if( bbc::debug )
 				printf( "%s\n", SDL_GetKeyName(event.key.keysym.sym));
 
-			if( !m_text_queue.empty() )
-			{
-				textInput(event.key.keysym.sym);
-			}
-
 			// M = TOGGLE SOUND
-			else if( event.key.keysym.sym == SDLK_m )
+			if( event.key.keysym.sym == SDLK_m )
 				m_sound->toggleMusic();
 			// F = TOGGLE FULLSCREEN
 			else if( event.key.keysym.sym == SDLK_f )
@@ -889,14 +880,6 @@ int Brainblast::eventLoop()
     return 0;
 }
 	
-void Brainblast::gameOver()
-{
-// 	m_gamestate.setState(OldBrainState::GAME_OVER);
-// 	m_center_text_box->SetTextChar("Game Over",0);
-// 	m_player_manager->gameOver();
-// 	clearFloor();
-}
-
 void Brainblast::showHighScore()
 {
 // 	m_gamestate.setState(OldBrainState::HIGH_SCORE);
@@ -930,34 +913,6 @@ void Brainblast::showHighScore()
 // 	}
 // 	for(int i=len; i<=8; i++)
 // 		m_high_score_text_box->SetTextChar("",i+2);
-}
-
-void Brainblast::nextTextInput()
-{
-	if( m_text_queue.empty() )
-	{
-		showHighScore();
-		return;
-	}
-	
-	m_text.write(BrainText::CENTER,m_text_queue.begin()->second.c_str(),3);
-	m_text.write(BrainText::CENTER,"",4);
-}
-
-int Brainblast::startTextInput(string label)
-{
-	int id = TextListener::id();
-	m_text_queue[id] = label;
-
-	// If we filled an empty queue
-	// we clear and start a new text
-	// If not it will just lie in the queue
-	// until the next string is about to 
-	// be entered.
-	if( m_text_queue.size() == 1 ) 
-		nextTextInput();
-
-	return id;
 }
 
 void Brainblast::addHumanPlayer()
@@ -994,63 +949,6 @@ void Brainblast::allowNavigation()
 void Brainblast::forbidNavigation() 
 {
 	for_each(m_current_levels.begin(),m_current_levels.end(),forbidLevelNavigation);
-}
-
-void Brainblast::textInput(SDLKey k)
-{
-	if( k == SDLK_RETURN )
-	{
-		// We are always working on the lowest key
-		// and maps are sorted by key.
-		int id = m_text_queue.begin()->first;
-		m_text_queue.erase(id);
-		
-		string s;
-		m_text.read(BrainText::CENTER,&s,4);
-		if( s.size() )
-		{
-			for_each(m_text_listeners.begin(),m_text_listeners.end(),text_ready(s,id));
-			m_text.clear(BrainText::CENTER);
-			nextTextInput();
-		}
-		else
-		{
-			playSample(WARNING);
-		}
-		return;
-	}
-
-	// For now only letters and numbers
-	else if( (k >= SDLK_0 && k <= SDLK_9) ||
-			 (k >= SDLK_a && k <= SDLK_z) )
-	{
-		string s;
-		m_text.read(BrainText::CENTER,&s,4);
-		
-		if( s.size() == 8 ) 
-		{
-			playSample(WARNING);
-			return;
-		}
-
-		s += k;
-		m_text.write(BrainText::CENTER,s,4);
-		m_sound->playSample(CLICK);
-	}
-
-	else if( k == SDLK_BACKSPACE )
-	{
-		string s;
-		m_text.read(BrainText::CENTER,&s,4);
-		if( s.size() )
-		{
-			s.resize(s.size()-1);
-			m_text.write(BrainText::CENTER,s,4);
-			m_sound->playSample(CLICK);
-		}
-		else
-			playSample(WARNING);
-	}
 }
 
 void Brainblast::hideSolutions()
@@ -1114,10 +1012,9 @@ void Brainblast::writeScoreAndTime(int sec)
 // FIXME: would make sense to tie this to the BrainPlaying state
 void Brainblast::select(Puzzle& lvl, BrainPlayer& player)
 {
-	if( &currentState() != &BrainPlaying::instance() )
+	if( (&currentState() != &BrainPlaying::instance()) ||
+		!lvl.isSelecting() )
 		return;
-
-	assert(lvl.isSelecting());
 
 	BrainSprite* s = 0;
 	int cscore = lvl.brickScore();
