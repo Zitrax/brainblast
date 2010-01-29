@@ -202,7 +202,7 @@ private:
 	SDL_TimerID m_add_sprite_timer;
 
 	BrainPlaying() : m_start_time(0),
-					 m_play_time(60.0),
+					 m_play_time(10.0),
 					 m_add_sprite_event(),
 					 m_add_sprite_timer()
 		{assert(s_mgr);}
@@ -299,5 +299,29 @@ private:
 	map<int,string> m_text_queue;
 
 };
+
+class BrainHighScore : public BrainState
+{
+public:
+	virtual ~BrainHighScore() {}
+	
+	void init();
+	void cleanup(){}
+	bool handleEvent(SDL_Event& event);
+	void update(){}
+	void draw(){}
+	string name() const { return "BrainHighScore"; }
+
+	static BrainHighScore& instance()
+		{
+			static BrainHighScore instance;
+			return instance;
+		}
+
+private:
+
+	BrainHighScore() {assert(s_mgr);}
+};
+
 
 #endif // BRAINSTATE_H

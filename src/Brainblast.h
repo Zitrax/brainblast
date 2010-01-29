@@ -211,8 +211,6 @@ private:
     Brainblast(const Brainblast& bb);
     Brainblast& operator=(const Brainblast& bb);
 
-	void showHighScore();
-
 	bool setupFields(int players);
 
 	void deleteLevels();

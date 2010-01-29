@@ -880,41 +880,6 @@ int Brainblast::eventLoop()
     return 0;
 }
 	
-void Brainblast::showHighScore()
-{
-// 	m_gamestate.setState(OldBrainState::HIGH_SCORE);
-
-// 	clearTextBox(m_center_text_box);
-
-// 	unsigned int max = m_player_manager->hs_max_entries();
-
-// 	vector<HighScore::Entry> entries = m_player_manager->getHighScoreEntries();
-	
-// 	int len = (entries.size() > max) ? max : entries.size();
-
-// 	ostringstream str;
-
-// 	m_high_score_text_box->SetTextChar("Highscores",0);
-
-// 	str << setw(12) << "Name" << setw(8) << "Score" << setw(6) << "Level" << setw(6) << "Mode";
-// 	m_high_score_text_box->SetTextChar(str.str(),1);
-	
-// 	str.str("");
-// 	for(int i=0; i<len; ++i)
-// 	{
-// 		str << setw(2)  << setfill('0') << i+1 << setfill(' ') 
-// 			<< setw(10) << entries[i].name
-// 			<< setw(8)  << entries[i].score
-// 			<< setw(6)  << entries[i].level << " "
-// 			<< setw(6)  << levelSetToString(entries[i].level_set);
-			
-// 		m_high_score_text_box->SetTextChar(str.str(),i+2);
-// 		str.str("");
-// 	}
-// 	for(int i=len; i<=8; i++)
-// 		m_high_score_text_box->SetTextChar("",i+2);
-}
-
 void Brainblast::addHumanPlayer()
 {
 	m_human_players++;

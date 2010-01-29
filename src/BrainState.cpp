@@ -95,8 +95,13 @@ bool BrainMenu::handleEvent(SDL_Event& event)
 			return true;
 
 		case SDLK_F5:
-			assert(!"Not implemented");
-			//showHighScore();
+			changeState(BrainHighScore::instance());
+			return true;
+
+		case SDLK_ESCAPE:
+			SDL_Event tb;
+			tb.type = SDL_QUIT;
+			SDL_PushEvent( &tb );
 			return true;
 
 		default:
@@ -362,13 +367,10 @@ bool BrainGameOver::handleEvent(SDL_Event& event)
 	switch(event.type)
 	{
 	case SDL_KEYDOWN:
-		
-		if( bbc::debug )
-			printf( "%s\n", SDL_GetKeyName(event.key.keysym.sym));
-		
 		if( !m_text_queue.empty() )
 		{
 			textInput(event.key.keysym.sym);
+			return true;
 		}
 		break;
 	}
@@ -380,23 +382,22 @@ void BrainGameOver::textInput(SDLKey k)
 {
 	if( k == SDLK_RETURN )
 	{
+		string s;
+		game()->text().read(BrainText::CENTER,&s,4);
+		if( !s.size() )
+		{
+			game()->playSample(Brainblast::WARNING);
+			return;
+		}
+
 		// We are always working on the lowest key
 		// and maps are sorted by key.
 		int id = m_text_queue.begin()->first;
 		m_text_queue.erase(id);
 		
-		string s;
-		game()->text().read(BrainText::CENTER,&s,4);
-		if( s.size() )
-		{
-			for_each(m_text_listeners.begin(),m_text_listeners.end(),text_ready(s,id));
-			game()->text().clear(BrainText::CENTER);
-			nextTextInput();
-		}
-		else
-		{
-			game()->playSample(Brainblast::WARNING);
-		}
+		for_each(m_text_listeners.begin(),m_text_listeners.end(),text_ready(s,id));
+		game()->text().clear(BrainText::CENTER);
+		nextTextInput();
 		return;
 	}
 
@@ -437,8 +438,7 @@ void BrainGameOver::nextTextInput()
 {
 	if( m_text_queue.empty() )
 	{
-		//showHighScore();
-		assert(!"Highscore");
+		changeState(BrainHighScore::instance());
 		return;
 	}
 	
@@ -460,4 +460,58 @@ int BrainGameOver::startTextInput(string label)
 		nextTextInput();
 
 	return id;
+}
+
+#include <iomanip> // setw, setfill
+
+void BrainHighScore::init()
+{
+	game()->text().clear(BrainText::CENTER);
+
+	BrainPlayerManager& pm = game()->playerManager();
+	unsigned int max = pm.hs_max_entries();
+	vector<HighScore::Entry> entries = pm.getHighScoreEntries();
+	int len = (entries.size() > max) ? max : entries.size();
+
+	game()->text().write(BrainText::HIGH_SCORE, "Highscores", 0);
+
+	ostringstream str;
+	str << setw(12) << "Name" << setw(8) << "Score" << setw(6) << "Level" << setw(6) << "Mode";
+	game()->text().write(BrainText::HIGH_SCORE, str.str(), 1);
+	
+	str.str("");
+	for(int i=0; i<len; ++i)
+	{
+		str << setw(2)  << setfill('0') << i+1 << setfill(' ') 
+			<< setw(10) << entries[i].name
+			<< setw(8)  << entries[i].score
+			<< setw(6)  << entries[i].level << " "
+			<< setw(6)  << levelSetToString(entries[i].level_set);
+			
+		game()->text().write(BrainText::HIGH_SCORE, str.str(), i+2);
+		str.str("");
+	}
+
+	for(int i=len; i<=8; i++)
+		game()->text().write(BrainText::HIGH_SCORE, "", i+2);
+}
+
+bool BrainHighScore::handleEvent(SDL_Event& event)
+{
+	switch(event.type)
+	{
+	case SDL_KEYDOWN:
+
+		if( event.key.keysym.sym == SDLK_SPACE  ||
+			event.key.keysym.sym == SDLK_ESCAPE || 
+			event.key.keysym.sym == SDLK_RETURN )
+		{
+			changeState(BrainMenu::instance());
+			return true;
+		}
+		break;
+	}
+	
+
+	return false;
 }
