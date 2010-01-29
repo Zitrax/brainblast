@@ -241,38 +241,6 @@ private:
 	 */
 	static const double WAITTIME;
 	
-	/**
-	 * This class will track the state and statechanges
-	 * such that we can track illegal state changes.
-	 */
-	class OldBrainState
-	{
-	public:
-		
-		enum gamestate
-		{
-			PLAY_WAIT, // Waiting while showing solution
-			PLAYING,   // Playing the game
-			TITLE,     // Showing the title screen
-			GAME_OVER, // 
-			HIGH_SCORE,
-			TIME_BONUS
-		};
-
-		OldBrainState(Brainblast& bb, enum gamestate st) : m_bb(bb), m_gamestate(st) {}
-		
-		/** Used for easier comparisons */
-		operator enum gamestate() const { return m_gamestate; }
-
-		void setState(enum gamestate st);
-
-	private:
-		Brainblast& m_bb;
-		enum gamestate m_gamestate;
-	};
-
-	OldBrainState m_gamestate;
-
 	static void allowLevelNavigation(Puzzle* lvl) { lvl->allowNavigation(true); }
 	static void forbidLevelNavigation(Puzzle* lvl) { lvl->allowNavigation(false); }
 

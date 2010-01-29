@@ -31,7 +31,6 @@ Brainblast* Brainblast::s_instance;
 
 Brainblast::Brainblast(string base_dir) 
 	: BrainStateManager(),
-	  m_gamestate(*this,OldBrainState::TITLE),
 #ifdef NOSOUND
 	  m_sound(new BrainSoundNULL),
 #else
@@ -363,8 +362,6 @@ Brainblast::changeLevel(int lvl)
 
 	clearFloor();
 
-	m_gamestate.setState(OldBrainState::PLAY_WAIT);
-
 	return true;
 }
 
@@ -607,278 +604,6 @@ void Brainblast::handleEvents()
 		m_player_manager->handleKeyHeld(keysHeld);
 	}	
 }
-
-int Brainblast::eventLoop()
-{
-#if 0
-	// There all sort of things that can be
-	// optimized in this loop. But lets get it
-	// working properly first.
-
-	assert(m_engine);
-
-    SDL_Event event;
-	bool done = false;
-    // Start timing!
-	SDL_Event draw_event; draw_event.type = SDL_DRAW_EVENT;
-	SDL_AddTimer( 35, TimerCallback, &draw_event );	
-	SDL_Event add_sprite_event; add_sprite_event.type = SDL_ADD_SPRITE_EVENT;
-	SDL_AddTimer( 2000, TimerCallback, &add_sprite_event );	
-
-	bool keysHeld[323] = {false};
-
-    while( !done && SDL_WaitEvent(&event) )
-	{
-		if ( event.type == SDL_QUIT )
-			break;
-        
-		switch(event.type)
-		{
-        case SDL_KEYDOWN:
-
-			if( bbc::debug )
-				printf( "%s\n", SDL_GetKeyName(event.key.keysym.sym));
-
-			if( !m_text_queue.empty() )
-			{
-				textInput(event.key.keysym.sym);
-			}
-
-			// M = TOGGLE SOUND
-			else if( event.key.keysym.sym == SDLK_m )
-				m_sound->toggleMusic();
-			// F = TOGGLE FULLSCREEN
-			else if( event.key.keysym.sym == SDLK_f )
-				SDL_WM_ToggleFullScreen(m_screen);
-			else if( event.key.keysym.sym == SDLK_SPACE || 
-					 event.key.keysym.sym == SDLK_RETURN )
-			{
-				switch(m_gamestate)
-				{
-				case OldBrainState::TITLE:
-					m_player_manager->resetScores();
-					if( !startGame() )
-					{
-						printf("=== ERROR: Could not start game ===\n");
-						done = true; // Just abort if we could not start the game
-					}
-					break;
-				case OldBrainState::GAME_OVER: 
-				case OldBrainState::HIGH_SCORE:
-					titleScreen(); break;
-				case OldBrainState::PLAY_WAIT:
-					finishInitialWait(); break;
-				case OldBrainState::TIME_BONUS:
-					speedyTimeBonus(); break;
-				case OldBrainState::PLAYING:
-					break;
-				}
-			}
-			else if( event.key.keysym.sym == SDLK_ESCAPE )
-			{
-				switch(m_gamestate)
-				{
-				case OldBrainState::TITLE:
-					done = true; break;
-				case OldBrainState::PLAY_WAIT:
-				case OldBrainState::PLAYING:
-				{
-					// If no one had any points, go directly to title screen
-					m_player_manager->allScoresNull() ? titleScreen() : gameOver();
-					clearFloor();
-				}
-				break;
-				case OldBrainState::GAME_OVER: 
-				case OldBrainState::HIGH_SCORE:
-					titleScreen();
-					break;
-				case OldBrainState::TIME_BONUS:
-					break;
-				}
-			}
-// 			else if( m_gamestate==OldBrainState::TITLE && event.key.keysym.sym == SDLK_F1 )
-// 			{
-// 				m_sound->playSample(CLICK);
-// 				m_human_players++;
-// 				if( m_human_players > 2 )
-// 					m_human_players = 1;
-// 				if( (m_human_players + m_computer_players) > 2 )
-// 					m_computer_players--;
-// 				titleScreenUpdateText();
-// 			}
-// 			else if( m_gamestate==OldBrainState::TITLE && event.key.keysym.sym == SDLK_F2 )
-// 			{
-// 				m_sound->playSample(CLICK);
-// 				m_computer_players++;
-// 				if( m_computer_players > 2 )
-// 					m_computer_players = 1;
-// 				if( (m_human_players + m_computer_players) > 2 )
-// 					m_human_players--;
-// 				titleScreenUpdateText();
-// 			}
-// 			else if( m_gamestate==OldBrainState::TITLE && event.key.keysym.sym == SDLK_F3 )
-// 			{
-// 				m_sound->playSample(CLICK);
-// 				switch( m_level_set )
-// 				{
-// 				case NORMAL:
-// 					m_level_set = RANDOM; break;
-// 				case RANDOM:
-// 					m_level_set = NORMAL; break;
-// 				default:
-// 					m_level_set = NORMAL; break;
-// 				}
-// 				titleScreenUpdateText();
-// 			}
-// 			else if( m_gamestate==OldBrainState::TITLE && event.key.keysym.sym == SDLK_F4 )
-// 			{
-// 				m_player_manager->toggleDifficulty();
-// 				titleScreenUpdateText();
-// 			}
-// 			else if( m_gamestate==OldBrainState::TITLE && event.key.keysym.sym == SDLK_F5 )
-// 			{
-// 				showHighScore();
-// 			}
-			// else
-			// 	if( !m_player_manager->handleKeyDown(event.key.keysym.sym) )
-			// 		keysHeld[event.key.keysym.sym] = true;
-
-			break;
-			
-		// case SDL_KEYUP:
-		// 	keysHeld[event.key.keysym.sym] = false;
-		// 	break;
-
-		case SDL_ADD_SPRITE_EVENT:
-			if( m_gamestate != OldBrainState::GAME_OVER )
-				addSprite();
-			break;
-			
-		case SDL_TIME_BONUS_EVENT:
-		{
-			int* current = static_cast<int*>(event.user.data2);
- 
-			assert(*current < 1000);
-			if( *current <= 0 )
-			{
-				// Delete event and stop timer
-				SDL_RemoveTimer(m_time_bonus_timer);
-				m_time_bonus_timer = 0;
-
-				delete current;
-
-				if( !changeLevel(m_current_lvl+1) )
-				{
-					gameOver();
-				}
-
-				m_center_text_box->SetTextChar("",1);
-			}
-			else
-			{
-				ostringstream str;
-				str << "Time Bonus: " << *current;
-				(*current)--;
-				m_center_text_box->SetTextChar(str.str(),1);
-				m_sound->playSample(BOUNCE);
-				BrainPlayer* player = static_cast<BrainPlayer*>(event.user.data1);
-				if( player )
-					player->addScore(player->getLevel()->brickScore()/10);
-			}
-
-		}
-		break;
-
-        case SDL_DRAW_EVENT:
-        {
-			vector<BrainSprite*>::iterator it  = m_sprites.begin();
-			vector<BrainSprite*>::iterator end = m_sprites.end();
-			while(it!=end)
-			{
-				// First check if we should delete this sprite after a timeout
-				if( (*it)->temporary() && (difftime(time(0),(*it)->creationTime()) > 30) )
-				{
-					m_engine->Tree()->DeleteNode(*it);
-					// Set it to the next valid element after erasing
-					it = m_sprites.erase(it);
-					end = m_sprites.end(); // Only recalculate this when we might be invalidated
-				}
-				else
-				{
-// 					// <Collision between bricks experiment>
-// 					double x1 = (*it)->speedX();
-// 					double y1 = (*it)->speedY();
-
-// 					if( (x1>=15) || (y1>=0.15) )
-// 					{ 
-
-// 						vector<KrImage*> collides;
-// 						if( ((*it) != m_player1) && m_engine->Tree()->CheckAllCollision(*it,&collides) )
-// 						{
-// 							BrainSprite* c = dynamic_cast<BrainSprite*>(*collides.begin());
-// 							if( c && (c != m_player1) ) {
-								
-// 								double x2 = c->speedX();
-// 								double y2 = c->speedY();
-								
-// 								if( (x2 < 5) && (y2 < 5) )
-// 									(*it)->setSpeed(-0.5*x1,-0.5*y1);
-// 								else
-// 								{
-									
-// 									(*it)->setSpeed(x2,y2);
-// 									c->setSpeed(x1,y1);
-									
-// 								}
-// 							}
-// 						}
-// 					}
-// 					// </Collision between bricks experiment>
-
-					(*it)->move();
-					++it;
-				}
-			}
-
-			m_player_manager->move();
-
-			m_engine->Tree()->Walk();
-
-			if( m_start_time && m_gamestate==OldBrainState::PLAY_WAIT && (difftime(time(0),m_start_time) > WAITTIME) )
-				finishInitialWait();
-			
-			m_engine->Draw();
-
-        }
-        break;
-	
-        default:
-            break;
-		}
-
-		// The following section checks for keys that are held down
-		// and should continuosly do something.
-
-		if( keysHeld[SDLK_F1] )
-			addSprite();
-		else
-			m_player_manager->handleKeyHeld(keysHeld);
-
-		if( m_gamestate != OldBrainState::TITLE )
-		{
-			bool was_game_over = m_gamestate == OldBrainState::GAME_OVER;
-			writeScoreAndTime();
-			
-			if( m_gamestate==OldBrainState::GAME_OVER && !was_game_over )
-				gameOver();
-		}
-		
-	}
-
-#endif
-    
-    return 0;
-}
 	
 void Brainblast::addHumanPlayer()
 {
@@ -936,24 +661,20 @@ BrainSprite* Brainblast::collisionCheck(BrainPlayer* player)
 	return 0;
 }
 
+// FIXME: Should probably move
 void Brainblast::writeScoreAndTime(int sec)
 {
 	int min = sec/60;
 	sec -= min*60;
 	
 	ostringstream score_str;
-
-	if( m_gamestate == OldBrainState::PLAYING ||
-		m_gamestate == OldBrainState::PLAY_WAIT )
-	{
-		score_str << "       "
-				  << setw(2) << setfill('0') << min << ":" 
-				  << setw(2) << setfill('0') << sec;
-		
-		m_text.write(BrainText::TOP_CENTER,score_str.str(),0);
-		score_str.str("");
-	}
-
+	score_str << "       "
+			  << setw(2) << setfill('0') << min << ":" 
+			  << setw(2) << setfill('0') << sec;
+	
+	m_text.write(BrainText::TOP_CENTER,score_str.str(),0);
+	score_str.str("");
+	
 	for(unsigned int i=0; i<m_player_manager->playerCount(); ++i)
 	{
 		// When we are done with the last level 
@@ -969,9 +690,6 @@ void Brainblast::writeScoreAndTime(int sec)
 
 		score_str.str("");
 	}
-	
-	if( (m_gamestate == OldBrainState::PLAYING) && !sec && !min )
-		m_gamestate.setState(OldBrainState::GAME_OVER);
 }
 
 // FIXME: would make sense to tie this to the BrainPlaying state
@@ -1102,62 +820,6 @@ void Brainblast::LevelData::reset()
 	m_height = 2;
 	m_bricks = 1;
 	m_types	 = 1;
-}
-
-void Brainblast::OldBrainState::setState(enum gamestate st) 
-{
-	// 
-	// Using many asserts to see exactly which 
-	// transition that was triggered.
-	//
-	// Going to state we are already in is considered safe
-	//
-	switch( m_gamestate )
-	{
-	case PLAY_WAIT:
-		assert(st != HIGH_SCORE); // Should have been in an end state first
-		assert(st != TIME_BONUS); // Can't finish directly from wait state
-		break;
-	case PLAYING:
-		// if( st != PLAYING )
-		// 	for_each(m_bb.m_current_levels.begin(),m_bb.m_current_levels.end(),forbidNavigation);
-		assert(st != HIGH_SCORE); // Should have been in an end state first
-		assert(st != PLAY_WAIT);  // Should go through TIME_BONUS
-		break;
-	case TITLE:
-		assert(st != PLAYING);    // Must go through PLAY_WAIT
-		assert(st != GAME_OVER);  // Well, quite obviously :)
-		assert(st != TIME_BONUS); //         --"--
-		break;
-	case GAME_OVER:
-		// Only going to highscore or title is allowed
-		assert(st != PLAY_WAIT);  
-		assert(st != PLAYING);    
-		assert(st != TIME_BONUS); 
-		break;
-	case HIGH_SCORE:
-		// Only going to title is allowed
-		assert(st != PLAY_WAIT);  
-		assert(st != PLAYING);    
-		assert(st != GAME_OVER); 
-		assert(st != TIME_BONUS); 
-		break;
-	case TIME_BONUS:
-		// Only going to PLAYING is allowed
-		assert(st != TITLE);  
-		assert(st != PLAYING);    
-		assert(st != GAME_OVER); 
-		assert(st != HIGH_SCORE); 
-		break;
-	default:
-		assert(!"Should not get here");
-	}
-	
-	// if( st == PLAYING )
-	// 	// Tell the levels that we can navigate
-	// 	for_each(m_bb.m_current_levels.begin(),m_bb.m_current_levels.end(),allowNavigation);
-	
-	m_gamestate = st; 
 }
 
 /* Definition of a level file ...
