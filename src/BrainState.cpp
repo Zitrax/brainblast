@@ -188,6 +188,12 @@ bool BrainPlayWait::handleEvent(SDL_Event& event)
 			changeState(BrainPlaying::instance());
 			return true;
 		}
+		else if( event.key.keysym.sym == SDLK_ESCAPE )
+		{
+			changeState(BrainGameOver::instance());
+			return true;
+		}
+		break;
 	}
 
 	if( difftime(time(0),m_start_time) > m_wait_time )
@@ -238,8 +244,17 @@ bool BrainPlaying::handleEvent(SDL_Event& event)
 		game()->addSprite();
 		break;
 	case SDL_ENTER_TIME_BONUS:
+	{
 		BrainPlayer* player = static_cast<BrainPlayer*>(event.user.data1);
 		changeState(BrainTimeBonus::instance(player,secondsLeft()));
+		break;
+	}
+	case SDL_KEYDOWN:
+		if( event.key.keysym.sym == SDLK_ESCAPE )
+		{
+			changeState(BrainGameOver::instance());
+			return true;
+		}
 		break;
 	}
 
@@ -306,14 +321,13 @@ bool BrainTimeBonus::handleEvent(SDL_Event& event)
 			
 			if( !game()->changeLevel(game()->getCurrentLevel()+1) )
 			{
-				// FIXME: Switch state
-				//game()->gameOver();
-				assert(!"game over");
+				changeState(BrainGameOver::instance());
 			}
-			
-			game()->text().write(BrainText::CENTER,"",1);
-
-			changeState(BrainPlayWait::instance(false));
+			else
+			{
+				game()->text().write(BrainText::CENTER,"",1);
+				changeState(BrainPlayWait::instance(false));
+			}
 		}
 		else
 		{
@@ -325,6 +339,7 @@ bool BrainTimeBonus::handleEvent(SDL_Event& event)
 			BrainPlayer* player = static_cast<BrainPlayer*>(event.user.data1);
 			if( player )
 				player->addScore(player->getLevel()->brickScore()/10);
+			game()->writeScoreAndTime(0);
 		}
 		
 	}
@@ -367,7 +382,12 @@ bool BrainGameOver::handleEvent(SDL_Event& event)
 	switch(event.type)
 	{
 	case SDL_KEYDOWN:
-		if( !m_text_queue.empty() )
+		if( event.key.keysym.sym == SDLK_ESCAPE )
+		{
+			changeState(BrainMenu::instance());
+			return true;
+		}
+		else if( !m_text_queue.empty() )
 		{
 			textInput(event.key.keysym.sym);
 			return true;

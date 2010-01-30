@@ -202,7 +202,7 @@ private:
 	SDL_TimerID m_add_sprite_timer;
 
 	BrainPlaying() : m_start_time(0),
-					 m_play_time(10.0),
+					 m_play_time(60.0),
 					 m_add_sprite_event(),
 					 m_add_sprite_timer()
 		{assert(s_mgr);}
