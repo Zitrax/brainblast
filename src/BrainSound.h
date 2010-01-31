@@ -13,9 +13,9 @@
  *
  * There has currently been three libraries tested:
  *
- * SDL_mixer - Turned out to not play certain modules (\ref BrainSoundSDL)
- * BASSMOD   - Plays modules fine but not sound effects (\ref BrainSoundBASS)
- * FMOD      - Plays both modules and effects fine :) (\ref BrainSoundFMOD)
+ * - SDL_mixer - Turned out to not play certain modules (\ref BrainSoundSDL)
+ * - BASSMOD   - Plays modules fine but not sound effects (\ref BrainSoundBASS)
+ * - FMOD      - Plays both modules and effects fine :) (\ref BrainSoundFMOD)
  */
 class BrainSound
 {
@@ -88,5 +88,24 @@ protected:
 	bool m_initialized;
 	
 };
+
+#ifdef NOSOUND
+/**
+ * Empty implementation for no sound
+ */
+class BrainSoundNULL : public BrainSound
+{
+	bool initializeSound() { return m_initialized = true; };
+	bool isInitialized() const { return m_initialized == true; }
+	bool loadMusic(const char*) { return true; };
+	bool playMusic() { return true; };
+	bool stopMusic() { return true; };
+	bool pauseMusic() { return true; };
+	bool resumeMusic() { return true; };
+	bool toggleMusic() { return true; };
+	bool addSample(const char*,int) { return true; };
+	bool playSample(int) const { return true; };	
+};
+#endif // NOSOUND
 
 #endif

@@ -1,0 +1,41 @@
+<Map datfile="square.dat">
+    <Source>
+        <Layer name="background" behavior="tile">
+            <Tile name="GROUND" />
+            <Tile name="FLOWER" />
+            <Sprite name="GROUND" />
+        </Layer>
+    </Source>
+    <MapData>
+        <Loc x="0" y="0" tile="GROUND" rotation="0" />
+        <Loc x="0" y="1" tile="GROUND" rotation="0" />
+        <Loc x="0" y="2" tile="GROUND" rotation="0" />
+        <Loc x="0" y="3" tile="GROUND" rotation="0" />
+        <Loc x="0" y="4" tile="GROUND" rotation="0" />
+        <Loc x="0" y="5" tile="GROUND" rotation="0" />
+        <Loc x="1" y="0" tile="GROUND" rotation="0" />
+        <Loc x="2" y="0" tile="GROUND" rotation="0" />
+        <Loc x="4" y="0" tile="GROUND" rotation="0" />
+        <Loc x="4" y="1" tile="GROUND" rotation="0" />
+        <Loc x="4" y="2" tile="GROUND" rotation="0" />
+        <Loc x="4" y="3" tile="GROUND" rotation="0" />
+        <Loc x="4" y="4" tile="GROUND" rotation="0" />
+        <Loc x="5" y="0" tile="GROUND" rotation="0" />
+        <Loc x="5" y="2" tile="GROUND" rotation="0" />
+        <Loc x="5" y="4" tile="GROUND" rotation="0" />
+        <Loc x="5" y="6" sprite="GROUND" action="DARK" />
+        <Loc x="5" y="7" sprite="GROUND" action="LIGHT" />
+        <Loc x="7" y="0" tile="GROUND" rotation="0" />
+        <Loc x="7" y="1" tile="GROUND" rotation="0" />
+        <Loc x="7" y="2" tile="GROUND" rotation="0" />
+        <Loc x="7" y="3" tile="GROUND" rotation="0" />
+        <Loc x="7" y="4" tile="GROUND" rotation="0" />
+        <Loc x="7" y="6" tile="FLOWER" rotation="4" />
+        <Loc x="7" y="7" tile="FLOWER" rotation="0" />
+        <Loc x="8" y="0" tile="GROUND" rotation="0" />
+        <Loc x="8" y="2" tile="GROUND" rotation="0" />
+        <Loc x="8" y="4" tile="GROUND" rotation="0" />
+        <Loc x="8" y="6" tile="FLOWER" rotation="4" />
+        <Loc x="8" y="7" tile="FLOWER" rotation="0" />
+    </MapData>
+</Map>

@@ -1,0 +1,5 @@
+*.lo
+*.la
+.libs
+krencoder
+krspriteed

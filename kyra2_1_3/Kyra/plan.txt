@@ -1,0 +1,28 @@
+Current ToDo list:
+
+1.6.1
+
+o Verify autotools
+o autotools autobuild
+o contact dev-C++
+o Make & build fixes
+o test isotiles
+x isotile rotation (in encoder)
+
+Doc:
+o isotiles. How they work. Isotiles are not tiles.
+o new win build info
+o new *nix build info
+o pass through tools doc
+o pass through general doc
+
+
+Next:
+o OpenGL / Root level invalidate
+o .dat compression
+o general rotation (in encoder)
+o swap out tinyxml for higher rev?
+o vector optimized blitters
+
+1.7
+o Map building mini-app

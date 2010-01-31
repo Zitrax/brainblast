@@ -1,0 +1,17 @@
+<Isogen sprite="dungeon" ambient="0.6 0.6 0.7" diffuse="0.5 0.5 0.5" width="800" height="600" 
+		isoWidth="132" wallInset="8" >
+
+	<Set action="FLOOR" drawAll="false" drawBasic="true" floor="floor.bmp" wall="wall.bmp" />
+	<Set action="GOO_FLOOR" drawAll="false" drawBasic="true" floor="floor.bmp" wall="wall.bmp" >
+		<FloorOverlay name="water.tga" alpha='0.6'/>
+		<WallOverlay name="crud.bmp" alpha="0.5" />
+	</Set>
+	<Set action="PLAIN_WALL" drawAll="false" drawBasic="false" drawWall="true" drawJoin="true" floor="wall.bmp" wall="wall.bmp" />
+	<Set action="SHIELD_WALL" drawAll="false" drawWall="true" drawWallJoin="true" floor="wall.bmp" wall="wall.bmp">
+		<WallOverlay name="shield.pcx" />
+	</Set>
+	<Set action="LIGHTED_WALL" drawAll="false" drawWall="true" floor="wall.bmp" wall="wall.bmp">
+		<WallOverlay name="wallLighted.tga" emit="true"/>
+	</Set>
+
+</Isogen>

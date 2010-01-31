@@ -14,3 +14,16 @@ Graphics: Daniel Bengtsson <daniel@bengtssons.info>
 	  *        Goldfont from the game KoboDeluxe by David Olofson
           * Sprites: lostgarden.com
 	  Thanks for providing :)
+
+BUILDING:
+---------
+
+Packages that you might need to build. This section is based on 
+a debian based system. And there might be more packages needed
+that I have missed as I already had them installed.
+
+* libc6-dev-i386
+* automake
+* autoconf
+* libtool
+* libsdl-image1.2-dev

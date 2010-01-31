@@ -1,0 +1,23 @@
+<Definition filename="smallmedship.bmp" Transparent0="#000000">
+    <Sprite name="BUTTON">
+        <Action name="NONE">
+            <Frame x="125" y="49" width="142" height="36" hotspotx="121" hotspoty="49" deltax="0" deltay="0" />
+            <Frame x="125" y="4" width="142" height="36" hotspotx="121" hotspoty="3" deltax="0" deltay="0" />
+            <Frame x="125" y="94" width="141" height="37" hotspotx="122" hotspoty="91" deltax="0" deltay="0" />
+            <Frame x="157" y="23" width="4" height="3" hotspotx="157" hotspoty="23" deltax="0" deltay="0" />
+        </Action>
+    </Sprite>
+    <Sprite name="MED">
+        <Action name="INSIGNIA">
+            <Frame x="91" y="24" width="21" height="22" hotspotx="102" hotspoty="35" deltax="0" deltay="0" />
+        </Action>
+        <Action name="NONE">
+            <Frame x="11" y="66" width="106" height="65" hotspotx="88" hotspoty="98" deltax="0" deltay="0" />
+        </Action>
+    </Sprite>
+    <Sprite name="SMALL">
+        <Action name="NONE">
+            <Frame x="2" y="4" width="87" height="63" hotspotx="57" hotspoty="35" deltax="0" deltay="0" />
+        </Action>
+    </Sprite>
+</Definition>

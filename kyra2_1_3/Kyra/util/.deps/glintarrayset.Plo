@@ -1,0 +1,8 @@
+glintarrayset.lo: glintarrayset.cpp glintarrayset.h gllist.h \
+ ../../grinliz/gldebug.h
+
+glintarrayset.h:
+
+gllist.h:
+
+../../grinliz/gldebug.h:

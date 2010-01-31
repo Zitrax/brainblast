@@ -1,0 +1,3 @@
+CONSOLEFONT.o: ../spriteed/CONSOLEFONT.cpp ../spriteed/CONSOLEFONT.h
+
+../spriteed/CONSOLEFONT.h:

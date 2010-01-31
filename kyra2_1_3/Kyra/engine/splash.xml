@@ -1,0 +1,9 @@
+<Direct>
+	<File filename="splash.gif">
+		<Image sprite="splash" />
+	</File>
+
+	<File filename="splashText.gif">
+		<Image sprite="splashText" />
+	</File>
+</Direct>

@@ -140,12 +140,21 @@ void BrainPlayerManager::playerCheckScore::operator() (BrainPlayer* player)
 	{
 		ostringstream ss;
 		ss << "Player " << m_manager.getPlayerNumber(*player) << " enter name: ";
-		int id = Brainblast::instance()->startTextInput(ss.str());
-		HighScore::Entry hs;
-		hs.score = player->getScore();
-		hs.level = player->getLevelCount();
-		hs.level_set = player->getLevelSet();
-		m_manager.m_high_scores[id] = hs;
+
+		// We should be in gameover state now
+		assert( &Brainblast::instance()->currentState() == 
+				&BrainGameOver::instance() );
+		
+		if( &Brainblast::instance()->currentState() == 
+			&BrainGameOver::instance() )
+		{
+			int id = BrainGameOver::instance().startTextInput(ss.str());
+			HighScore::Entry hs;
+			hs.score = player->getScore();
+			hs.level = player->getLevelCount();
+			hs.level_set = player->getLevelSet();
+			m_manager.m_high_scores[id] = hs;
+		}
 	}
 }
 

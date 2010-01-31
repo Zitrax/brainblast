@@ -1,0 +1,44 @@
+#### Builds the linux binary and (all versions) source release.
+
+#### Make the docs.
+rm ./docs/*
+doxygen dox
+
+#patch the end of lines
+unix2dos *.dsw
+unix2dos ./engine/*.dsp
+unix2dos ./guitest/*.dsp
+unix2dos ./spriteed/*.dsp
+unix2dos ./encoder/*.dsp
+unix2dos ./tests/*.dsp
+unix2dos ./tutorial1/*.dsw
+unix2dos ./tutorial1/*.dsp
+unix2dos ./isogen/*.dsp
+unix2dos ../tinyxml/*.dsw
+unix2dos ../tinyxml/*.dsp
+
+cd ..
+rm manifest
+
+python ./lilith/cvsmanifest.py kyra/gui kyra/guiExtended kyra/guitest kyra/encoder kyra/engine kyra/spriteed kyra/tests kyra/util kyra/tutorial1 tinyxml grinliz > manifest
+ls -1 ./kyra/docs/* >> manifest
+python ./lilith/cvsmanifest.py -r kyra >> manifest
+
+#### Zip it all up
+rm kyra_src_2_1_3.zip
+zip -9 -@ kyra_src_2_1_3.zip < manifest
+cd kyra
+
+#patch the end of lines
+dos2unix *.dsw
+dos2unix ./engine/*.dsp
+dos2unix ./guitest/*.dsp
+dos2unix ./spriteed/*.dsp
+dos2unix ./encoder/*.dsp
+dos2unix ./tests/*.dsp
+dos2unix ./tutorial1/*.dsw
+dos2unix ./tutorial1/*.dsp
+dos2unix ./isogen/*.dsp
+dos2unix ../tinyxml/*.dsw
+dos2unix ../tinyxml/*.dsp
+

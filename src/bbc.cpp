@@ -436,8 +436,15 @@ namespace bbc {
 		return static_cast<LEVEL_SET>(i);
 	}
 
+	Uint32 TimerCallback(Uint32 interval, void* event)
+	{
+		SDL_PushEvent( static_cast<SDL_Event*>(event) );
+		return interval;
+	}
+
 }
 
 // Smarter(more common/intuitive) way of doing this ?
 void generator() { bbc::round(0.5); }
+
 

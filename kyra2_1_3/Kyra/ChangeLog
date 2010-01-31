@@ -1,0 +1,79 @@
+Changes between versions:
+
+http://www.grinninglizard.com/kyra/changes.html
+
+
+Release notes are current at:
+
+http://www.grinninglizard.com/kyra/releasenotes.html
+
+
+For 1.6 --> 2.0 Conversion:
+
+- KrWidget interface changed.
+- KrConsole --> KrConsoleWidget
+- Compression has been implemented in .dat files.
+- The rendering loop for sprites is improved.
+- Tiles can be real time scaled.
+- GUI toolkit.
+- New widget implementation.
+- Rle, RleLine, RleSegment memory management
+- Tile caching
+- KrBox changes. (KrBoxResource optional.)
+
+For 2.0.2
+- Button decals
+- Better gui example.
+- fixed crash in Event Manager that could happen if the widget with mouse focus
+  got deleted.
+- Syntax error causing compilation issues.
+
+For 2.0.3
+- Added KrImageListBox
+- Added new (LGPL) license.
+- Fixed bug where changing actions would allow frames to be out of range.
+
+For 2.0.4
+- Added API support for right and middle mouse buttons in widgets. Only code
+  for left mouse button written.
+
+2.1.0
+- Tim at "Evil Genius Games" subbmitted a huge, and great, patch with fixes,
+  improvements, and Darwin code resulting form using Kyra in "Rise of the
+  Nile". Nice patch; lots of good stuff.
+- At first, coverted GUI widgets to use 'siglot' rather than inherit and modify.
+  After using it a while, I decided this had as many problems as benefits; switched
+  back to the old HandleEvent system, except this time using KrWidgetEvent to
+  mimic the SDL system rather than many confusing parameters. This seems to be a much
+  better system with less change to the code.
+- Switched Encoder over to console application. It will now run in text mode,
+  but create BMP files that can be used to verify that the graphics were
+  created correctly. This is both easier for the developer, and allows the
+  encoder to be shipped to create mods.
+- Removed console.cpp/.h from encoder.
+- Removed "odd" TinyXml (1.x) version and converted to current shipping TinyXml (2.3)
+- Added x, y, width, height support to "Image" and "Direct"
+- Re-structured the gui test to be simpler. Cleaned up widget code.
+- Toggle buttons will now automatically group with their siblings.
+- Removed GlDynArray and replaced it with std::vector. In 1999, there may have been
+  reasons to not use std::vector...but not now.
+- Pulled out grinning lizard utilities to namespace "grinliz"
+- Changed GLOUTPUT to guarentee to be removed in release builds. Syntax now requires
+  double parens: GLOUTPUT(( "Hello World" ));
+- Remove run time link to SDL_Image. It is now dynamically loaded.
+- Cleaned up the demos and upped the frame rate, to resolve general confusion that Kyra
+  is "slow" because the demo is at a low frame rate.
+- Changed the license to LGPL
+- Removed the built in Splash Screen but added splash assets to the root directory.
+- The tutorials are now generated from tutorialMaster (the same system Lilith3D uses)
+
+2.1.1 
+- Added isogen
+- Standard make system, now works on mingw and linux (and MacX, but there are Kyra bugs on Mac)
+- Simplified build
+- Improvements in the grinning lizard utilities and tinyxml
+
+2.1.2
+- fixed a bug in the Rectangle class that breaks the drag in the Sprite Editor
+- fixed a GlIsoMath bug posted by winston
+

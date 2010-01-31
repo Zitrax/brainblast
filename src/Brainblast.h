@@ -18,6 +18,8 @@
 #include "Brick.h"
 #include "BrainSprite.h"
 #include "BrainSound.h"
+#include "BrainState.h"
+#include "BrainText.h"
 
 class BrainAI;
 class BrainPlayerManager;
@@ -42,41 +44,11 @@ namespace brain
 }
 
 /**
- * This class is used to report back when a string
- * input is done which was requested using
- * Brainblast::startTextInput()
- *
- * When a string is ready textReady() will be
- * called with the string and it's id.
- */
-class TextListener
-{
-public:
-	virtual ~TextListener(){}
-
-	virtual void textReady(string s,int id) = 0;
-
-	static int id() { return m_text_id++; }
-
-private:
-	static int m_text_id;
-};
-
-/** Functor for use in for_each iterations */
-struct text_ready
-{
-	text_ready(string s, int id) : m_s(s), m_id(id) {}
-	void operator() (TextListener* tl) { tl->textReady(m_s,m_id); }
-	string m_s;
-	int m_id;
-};
-
-/**
  * Starting a Brainblast game:
  * 1. Call initGameKyra()
  * 2. Start the event loop: eventLoop()
  */
-class Brainblast
+class Brainblast : public BrainStateManager
 {
 
 private:
@@ -126,7 +98,7 @@ private:
 
 public:
     
-    Brainblast();
+    Brainblast(string base_dir);
     ~Brainblast();
 
 	static Brainblast* instance() { return s_instance; }
@@ -138,14 +110,8 @@ public:
 
     bool initGameKyra();
 
-	void titleScreen();
-	void titleScreenUpdateText();
+	void stopPlay();
 	
-	/**
-	 * Load a font from a bitmap
-	 */
-	KrFontResource* loadFont(const char* file, int glyphs);
-
 	BrainSprite* addSprite();
 
 	BrainSprite* reparentSprite(BrainSprite* bs, KrImNode* parent);
@@ -158,15 +124,23 @@ public:
 		WARNING
 	};
 	
+	// Make sound interface reachable from the states
 	bool playSample(enum sounds sound) const { return m_sound->playSample(sound); }
+
+	/**
+	 * @param file Relative directory to the music file from the base directory
+	 */
+	bool loadMusic(const char* file);
+
+	bool playMusic() { return m_sound->playMusic(); }
+
+	BrainText& text() { return m_text; }
 
 	bool changeLevel(int lvl);
 
 	vector<BrainSprite*>& getAllSprites() { return m_sprites; }
 
-	unsigned int secondsLeft() const;
-
-	void writeScoreAndTime();
+	void writeScoreAndTime(int sec);
 
 	/**
 	 * Perform a select for the player at lvl.
@@ -186,48 +160,58 @@ public:
 	BrainSprite* collisionCheck(BrainPlayer* player);
 
 	/**
-	 * Enter text input mode
-	 * Returns an id of the string to be returned
+	 * Will add a human player and roll around if there is one too many
 	 */
-	int startTextInput(string label);
+	void addHumanPlayer();
 
-private:
+	/**
+	 * Will add a computer player and roll around if there is one too many
+	 */
+	void addComputerPlayer();
 
-    Brainblast(const Brainblast& bb);
-    Brainblast& operator=(const Brainblast& bb);
+	/**
+	 * Prepend a string with the base directory
+	 * This allocates a new string that must be freed
+	 */
+	const char* addBaseDir(const char* const str);
 
-	// Called for every key when we are supposed to write text
-	void textInput(SDLKey k);
-	// Called when finished with one text
-	void nextTextInput();
+	// < FIXME: Should move into state code >
 
-	// Speeds up the timebonus timer so we count as
-	// fast as we can.
-	void speedyTimeBonus();
+	void allowNavigation();
+	void forbidNavigation();
+	void hideSolutions();
+    bool addPlayers();
+	BrainPlayerManager& playerManager() const { return *m_player_manager; }
+	int getHumanPlayers() const { return m_human_players; }
+	int getComputerPlayers() const { return m_computer_players; }
+	LEVEL_SET getLevelSet() const { return m_level_set;	}
+	void setLevelSet(LEVEL_SET s) { m_level_set = s; }
+	int getCurrentLevel() const { return m_current_lvl; }
 
-	// Should be called whenever the game ends
-	void gameOver();
-
-	void clearTextBox( KrTextBox* tb );
-
-	void showHighScore();
-
-	/** 
-	 * Called when the initial wait where the solution is shown
-	 * should end.
-	 **/
-	void finishInitialWait();
-
-    //! Start a new game
-    bool startGame();
-
-	bool setupFields(int players);
 	/**
 	 * Removes all sprites on the playfield
 	 * except the players and the ones belonging
 	 * to the puzzles.
 	 */
 	void clearFloor();
+
+	// < / FIXME: Should move into state code >
+
+	//// <BrainStateManager> ////
+
+	void handleEvents();
+	void update(){}
+	void draw(){}
+
+	//// </BrainStateManager> ////
+
+
+private:
+
+    Brainblast(const Brainblast& bb);
+    Brainblast& operator=(const Brainblast& bb);
+
+	bool setupFields(int players);
 
 	void deleteLevels();
 
@@ -256,43 +240,9 @@ private:
 	 * the solution and the game starts.
 	 */
 	static const double WAITTIME;
-
-	/**
-	 * This class will track the state and statechanges
-	 * such that we can track illegal state changes.
-	 */
-	class BrainState
-	{
-	public:
-		
-		enum gamestate
-		{
-			PLAY_WAIT, // Waiting while showing solution
-			PLAYING,   // Playing the game
-			TITLE,     // Showing the title screen
-			GAME_OVER, // 
-			HIGH_SCORE,
-			TIME_BONUS
-		};
-
-		BrainState(Brainblast& bb, enum gamestate st) : m_bb(bb), m_gamestate(st) {}
-		
-		/** Used for easier comparisons */
-		operator enum gamestate() const { return m_gamestate; }
-
-		void setState(enum gamestate st);
-
-	private:
-		Brainblast& m_bb;
-		enum gamestate m_gamestate;
-	};
-
-	BrainState m_gamestate;
-
-	time_t m_start_time;
-
-	static void allowNavigation(Puzzle* lvl) { lvl->allowNavigation(true); }
-	static void forbidNavigation(Puzzle* lvl) { lvl->allowNavigation(false); }
+	
+	static void allowLevelNavigation(Puzzle* lvl) { lvl->allowNavigation(true); }
+	static void forbidLevelNavigation(Puzzle* lvl) { lvl->allowNavigation(false); }
 
 	/**
 	 * Handles all the sounds (effects and music)
@@ -319,16 +269,7 @@ private:
 	KrResourceVault* m_bg_vault;
 	KrSprite*        m_bg_sprite;
 
-	// Text
-	KrFontResource* m_font;
-	KrFontResource* m_score_font;
-	KrFontResource* m_title_font;
-
-	KrTextBox*      m_left_score_text_box;
-	KrTextBox*      m_right_score_text_box;
-	KrTextBox*      m_center_text_box;
-	KrTextBox*      m_top_center_text_box;
-	KrTextBox*      m_high_score_text_box;
+	BrainText m_text;
 
 	BrainPlayerManager* m_player_manager;
 
@@ -338,11 +279,29 @@ private:
 	int m_computer_players;
 	LEVEL_SET m_level_set;
 
-	vector<TextListener*> m_text_listeners;
-	map<int,string> m_text_queue;
-
-	SDL_TimerID m_time_bonus_timer;
-	SDL_Event m_time_bonus_event;
+	string m_base_dir;
 };
 
-#endif
+/**
+ * Will free the string when it goes out of scope
+ */
+class AutoCStr
+{
+public:
+	AutoCStr(const char* s) : m_s(s) {}
+	~AutoCStr() { free(const_cast<char*>(m_s)); }
+	operator const char* () { return m_s; }
+private:
+	AutoCStr(const AutoCStr&);
+	AutoCStr& operator=(const AutoCStr&);
+
+	const char* m_s;
+};
+
+// FIXME: Move to some better place
+#define SDL_DRAW_EVENT ( SDL_USEREVENT + 0 )
+#define SDL_ADD_SPRITE_EVENT ( SDL_USEREVENT + 1 )
+#define SDL_ENTER_TIME_BONUS ( SDL_USEREVENT + 2 )
+#define SDL_TIME_BONUS_EVENT ( SDL_USEREVENT + 3 )
+
+#endif // BRAINBLAST_H

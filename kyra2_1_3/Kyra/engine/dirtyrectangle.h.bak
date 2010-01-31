@@ -1,0 +1,137 @@
+#ifndef DIRTY_RECTANGLE_INCLUDED
+#define DIRTY_RECTANGLE_INCLUDED
+
+
+#include "../util/glmath.h"
+
+#ifdef DEBUG
+	#include "SDL.h"
+	#include "../util/dynarray.h"
+#endif
+
+
+class KrDirtyRectangle;
+class KrDRIterator;
+struct SDL_Surface;
+
+
+/**	DirtyRectangle manages the rectangle made invalid when Images
+	move or change. A movement typically generates 2 dirty rects:
+	the old and new location.
+
+	Managing and merging these rectangles is potentially a tricky
+	problem. The current solution merges any overlaps. 
+
+	Generally speaking, this is used solely by the engine and
+	does not need to be directly used.
+
+	OPT: better DR management.
+*/
+class KrDirtyRectangle
+{
+	friend class KrDRIterator;
+
+  public:
+	KrDirtyRectangle();
+	~KrDirtyRectangle();
+
+	/// Turn on clipping bounds. All subsequent rectangles will be clipped to rect.
+	void SetClipping( const KrRect& rect )		{ clippingRect = rect; clipping = true; }
+	/// Returns true if clipping has been set.
+	bool IsClipping()							{ return clipping; }
+
+	/// Adds an invalid rectangle.
+	void AddRectangle( const KrRect& rect );
+	/// Clear the object
+	void Clear();
+
+	// Used by the engine. Tells the DR to get ready to walk down the screen.
+	void StartWalk();
+	// Gets the dirty rectangles in a range of y values.
+	KrDRIterator GetIterator( int y0, int y1 );
+
+	// The DR maintains both a blit list and a dirty rectangle list.
+	// The blit rects are >= the dirty rectangle list. 
+	// This blits the blit rects to the screen.
+	void UpdateScreen( SDL_Surface* screen );
+
+	#ifdef DEBUG
+		void DrawAllRects( SDL_Surface* surface );
+		void DrawBlitRects( SDL_Surface* surface );
+		void DrawRects( SDL_Surface* surface );
+		void DrawWindow( int y0, int y1 );
+	#endif
+
+	enum 
+	{
+		#ifdef DEBUG
+			MAX_DIRTY_RECTANGLES = 16,
+			MAX_BLIT_RECTANGLES  = 8
+		#else
+   			MAX_DIRTY_RECTANGLES = 128,
+   			MAX_BLIT_RECTANGLES  = 16
+		#endif
+	};
+
+  private:
+	struct KrRectNode 
+	{
+		KrRect		rect;
+		KrRectNode* next;
+
+ 		bool operator< (const KrRectNode& lhs ) const { return ( lhs.rect.ymin >  rect.ymin ); }
+ 		bool operator> (const KrRectNode& lhs ) const { return ( lhs.rect.ymin <  rect.ymin ); }
+ 		bool operator==(const KrRectNode& lhs ) const { return ( lhs.rect.ymin == rect.ymin ); }
+	};
+
+	void Remove( int index );
+	void RemoveBlt( int index );
+	
+	void AddDRRect( const KrRect& r );
+	void AddBlitRect( const KrRect& r );
+
+	KrRectNode rectArray[ MAX_DIRTY_RECTANGLES ];
+	KrRectNode blitArray[ MAX_BLIT_RECTANGLES ];
+	KrRectNode* root;
+	
+	KrRect	clippingRect;
+	bool	clipping;
+
+	int nRect;
+	int nBlitRect;
+
+	#ifdef DEBUG
+		KrDynArray<KrRect> allRects;
+	#endif
+};
+
+
+class KrDRIterator
+{
+	friend class KrDirtyRectangle;
+ 
+  public:
+	KrDRIterator()				{ node = 0; y0 = 0; y1 = 0; }
+	
+	bool Done()	const			{ return node == 0; }
+	void Begin()				{ NextNode(); }
+	void Next()					{ node = node->next; NextNode(); }
+	const KrRect& Rectangle() const	{ return node->rect; }
+
+	#ifdef DEBUG
+		void DebugDump();
+	#endif
+
+  private:
+	void NextNode();
+
+	KrDRIterator( KrDirtyRectangle::KrRectNode* root,
+				  int _y0, int _y1 )
+		: node( root ), y0( _y0 ), y1( _y1 )	{}
+
+	KrDirtyRectangle::KrRectNode* node;
+	int y0, y1;
+};
+
+
+#endif

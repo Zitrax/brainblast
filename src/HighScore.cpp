@@ -25,6 +25,9 @@ void HighScore::reloadCache()
 
 bool HighScore::highEnough(int score)
 {
+	if( !score )
+		return false;
+
 	// Read current file (if not cached)
 	if( m_cached_entries.empty() )
 		reloadCache();
