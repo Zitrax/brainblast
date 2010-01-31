@@ -1,7 +1,7 @@
 GCC       = g++
 CFLAGS    = -Weffc++ -Wall -Wextra -pedantic
 
-DEBUG_BB  = YES
+DEBUG_BB ?= YES
 SOUND    ?= YES
 
 ifeq ($(DEBUG_BB), YES)
@@ -29,6 +29,7 @@ CFLAGS  += -DNOSOUND
 endif
 
 VERSION = $(shell perl -wne 'if(/brainblast \((.*)\)/){print "$$1";exit;}' < ../deb/debian/changelog)
+ARCH    = $(shell dpkg-architecture -qDEB_HOST_ARCH)
 
 KRENCODER = ../kyra2_1_3/Kyra/encoder/krencoder
 
@@ -45,6 +46,8 @@ $(IMAGES)/bb_bg.h: ../images/bg.xml $(KRENCODER)
 	cd $(IMAGES) && \
 	$(KRENCODER) -pBB_BG_ bb_bg.h bg.xml
 
+
+
 # How to avoid hardcoding the static libraries ? Using -l just makes it find the .so it seems
   #/usr/local/lib/libengine.a /usr/local/lib/libkyra.a
   #-static-libgcc -Wl,-static -lengine -lkyra
@@ -59,7 +62,7 @@ package: all
 	make -C ../deb
 
 install: package
-	sudo dpkg -i ../deb/brainblast_${VERSION}_i386.deb
+	sudo dpkg -i ../deb/brainblast_${VERSION}_$(ARCH).deb
 
 remake: 
 	make clean; make

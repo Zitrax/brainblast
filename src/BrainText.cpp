@@ -169,4 +169,5 @@ KrTextBox* BrainText::getBox(enum Box box) const
     }
 
     assert(!"Should not get here");
+	return 0;
 }

@@ -5,7 +5,7 @@ Priority: optional
 Standards-Version: 3.7.3.0
 
 Package: brainblast
-Architecture: i386
+Architecture: amd64
 Priority: optional
 Depends: ${shlibs:Depends}
 Description: A multiplayer puzzle game

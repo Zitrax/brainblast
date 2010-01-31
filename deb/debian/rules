@@ -1,10 +1,14 @@
 #!/usr/bin/make -f
 
-PACKAGE=brainblast
+PACKAGE = brainblast
+ARCH    = $(shell dpkg-architecture -qDEB_HOST_ARCH)
+
+arch:
+	perl -p -i -e "s/^Architecture:.*/Architecture: ${ARCH}/g" debian/control
 
 build:
 
-binary: clean
+binary: clean arch
 	@ install -v -d debian/tmp/DEBIAN \
 		-d debian/tmp/usr/games \
 		-d debian/tmp/usr/share/games/$(PACKAGE)/images \
