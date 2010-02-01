@@ -126,7 +126,7 @@ void BrainMenu::titleScreenUpdateText()
 	game()->text().clear(BrainText::CENTER);
 	game()->text().clear(BrainText::HIGH_SCORE); // Should not be needed, that mode should clear it
 
-	game()->text().write(BrainText::CENTER,"BRAINBLAST 0.2",0);
+	game()->text().write(BrainText::CENTER,"BRAINBLAST 0.3",0);
 	game()->text().write(BrainText::CENTER,"",1);
 
 	ostringstream str;
