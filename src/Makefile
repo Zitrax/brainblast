@@ -58,6 +58,9 @@ brainblast: $(OBJECTS)
 $(OBJECTS): %.o: %.cpp
 	$(GCC) $(CFLAGS) $(SDL_FLAGS) -c $<
 
+rpm: package
+	sudo alien --to-rpm ../deb/brainblast_${VERSION}_i386.deb
+
 package: all
 	make -C ../deb
 
