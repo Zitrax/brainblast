@@ -3,12 +3,13 @@
 PACKAGE = brainblast
 ARCH    = $(shell dpkg-architecture -qDEB_HOST_ARCH)
 
-arch:
-	perl -p -i -e "s/^Architecture:.*/Architecture: ${ARCH}/g" debian/control
+debian/control: debian/control_template
+	cp $? $@
+	perl -p -i -e "s/^Architecture:.*/Architecture: ${ARCH}/g" $@
 
 build:
 
-binary: clean arch
+binary: clean debian/control
 	@ install -v -d debian/tmp/DEBIAN \
 		-d debian/tmp/usr/games \
 		-d debian/tmp/usr/share/games/$(PACKAGE)/images \
