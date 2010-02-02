@@ -13,3 +13,8 @@ deb/debian/substvars
 deb/debian/tmp/
 src/Makefile.bak
 *.rpm
+
+*.gcda
+*.gcno
+*.gcov
+src/coverage
