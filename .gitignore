@@ -7,3 +7,9 @@
 images/bb.h
 images/bb_bg.h
 src/brainblast
+
+deb/debian/files
+deb/debian/substvars
+deb/debian/tmp/
+src/Makefile.bak
+*.rpm
