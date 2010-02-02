@@ -3,11 +3,17 @@ CFLAGS    = -Weffc++ -Wall -Wextra -pedantic
 
 DEBUG_BB ?= YES
 SOUND    ?= YES
+COVERAGE ?= YES
 
 ifeq ($(DEBUG_BB), YES)
 CFLAGS   += -D_DEBUG -g
 else
 CFLAGS   += -O3 -DNDEBUG
+endif
+
+ifeq ($(COVERAGE), YES)
+CFLAGS   += -fprofile-arcs -ftest-coverage
+LDFLAGS  += -fprofile-arcs
 endif
 
 CFLAGS   += -I../include -I../kyra2_1_3
@@ -35,6 +41,10 @@ KRENCODER = ../kyra2_1_3/Kyra/encoder/krencoder
 
 all: brainblast
 
+lcov:
+	lcov --directory . --capture --output-file app.info
+	genhtml -o coverage app.info
+
 $(KRENCODER):
 	cd ../kyra2_1_3/Kyra && ./autogen && make
 
@@ -53,7 +63,7 @@ $(IMAGES)/bb_bg.h: ../images/bg.xml $(KRENCODER)
   #-static-libgcc -Wl,-static -lengine -lkyra
   # -L../bassmod -lbassmod
 brainblast: $(IMAGES)/bb.h $(IMAGES)/bb_bg.h $(OBJECTS) 
-	$(GCC) -o $@ $(OBJECTS) $(SDL_LIBS) $(LIBS)
+	$(GCC) -o $@ $(OBJECTS) $(LDFLAGS)  $(SDL_LIBS) $(LIBS)
 
 $(OBJECTS): %.o: %.cpp
 	$(GCC) $(CFLAGS) $(SDL_FLAGS) -c $<
@@ -73,6 +83,7 @@ remake:
 clean:
 	rm -rfv *.o brainblast *~ \
 	$(IMAGES)/bb.h $(IMAGES)/bb.dat $(IMAGES)/bb_bg.h $(IMAGES)/bb_bg.dat 
+	rm -rvf src/app.info src/coverage src/*.gcda src/*.gcno
 
 depend:
 	makedepend *.cpp *.h
