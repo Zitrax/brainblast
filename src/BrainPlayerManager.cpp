@@ -13,7 +13,8 @@ using namespace brain;
 
 BrainPlayerManager::BrainPlayerManager()
 	: m_players(), 
-	  m_player_count(0),
+	  m_human_players(0),
+	  m_computer_players(0),
 	  m_difficulty(BrainAI::MEDIUM),
 	  m_highscore(0),
 	  m_high_scores()
@@ -40,7 +41,8 @@ bool BrainPlayerManager::addPlayers(int human_players, int computer_players)
 	//        and thus remove the old ones here.
 	assert( m_players.size() == 0 );
 
-	m_player_count = human_players + computer_players;
+	m_human_players = human_players;
+	m_computer_players = computer_players;
 
     KrSpriteResource* wizardRes = 
         Brainblast::instance()->engine()->Vault()->GetSpriteResource( BB_WIZARD );
@@ -97,12 +99,13 @@ void BrainPlayerManager::removePlayers()
 {
 	for_each(m_players.begin(),m_players.end(),playerDeleteNode);
 	m_players.clear();
-	m_player_count = 0;
+	m_human_players = 0;
+	m_computer_players = 0;
 }
 
 int BrainPlayerManager::spacing() const
 {
-	return m_player_count>1 ? 30 + m_players.size()*(VIDEOX-60)/(m_player_count-1) : VIDEOX/2;
+	return playerCount()>1 ? 30 + m_players.size()*(VIDEOX-60)/(playerCount()-1) : VIDEOX/2;
 }
 
 void BrainPlayerManager::move()
@@ -170,6 +173,14 @@ int BrainPlayerManager::getPlayerNumber(BrainPlayer& player) const
 	if( it != m_players.end() )
 		return it - m_players.begin() + 1;
 	return -1;
+}
+
+bool BrainPlayerManager::isKeyForAction(SDLKey key, enum BrainPlayer::PlayerAction action) const
+{
+	for(unsigned int i=0; i<playerCount(); ++i)
+		if( getPlayer(i)->keyForAction(action) == key )
+			return true;
+	return false;
 }
 
 void BrainPlayerManager::textReady(string str, int id)

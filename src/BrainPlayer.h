@@ -58,6 +58,8 @@ public:
 	BrainText::Box getScoreBox() const { return m_score_box; }
 	void setScoreBox(BrainText::Box box)  { m_score_box = box; }
 
+	virtual bool isComputerPlayer() const { return false; }
+
 	/**
 	 * Return the action that this player maps 
 	 * to a certain key.

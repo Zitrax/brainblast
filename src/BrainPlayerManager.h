@@ -60,7 +60,14 @@ public:
 	BrainPlayer* getPlayer(unsigned int idx) const;
 	int getPlayerNumber(BrainPlayer& player) const;
 
-	unsigned int playerCount() const { return m_player_count; }
+	/**
+	 * Return true if any player use a key for a certain action
+	 */
+	bool isKeyForAction(SDLKey key, enum BrainPlayer::PlayerAction action) const;
+
+	unsigned int playerCount() const { return m_human_players + m_computer_players; }
+	unsigned int humanPlayers() const { return m_human_players; }
+	unsigned int computerPlayers() const { return m_computer_players; }
 
 	vector<HighScore::Entry> getHighScoreEntries() const { return m_highscore->getEntries(); }
 	unsigned int hs_max_entries() const { return m_highscore->max_entries(); }
@@ -97,7 +104,8 @@ private:
 	int spacing() const;
 
 	vector<BrainPlayer*> m_players;
-	unsigned int m_player_count;
+	unsigned int m_human_players;
+	unsigned int m_computer_players;
 	enum BrainAI::Difficulty m_difficulty;
 	HighScore* m_highscore;
 

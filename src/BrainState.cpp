@@ -302,8 +302,20 @@ bool BrainTimeBonus::handleEvent(SDL_Event& event)
 	{
 	case SDL_KEYDOWN:
 	{
-		if( event.key.keysym.sym == m_player->keyForAction(BrainPlayer::SELECT) )
+		if( game()->playerManager().computerPlayers() )
+		{
+			for(unsigned int i=0; i<game()->playerManager().playerCount(); ++i)
+			{
+				BrainPlayer* p = game()->playerManager().getPlayer(i);
+				if( (p->isComputerPlayer() || p == m_player) &&
+					game()->playerManager().isKeyForAction(event.key.keysym.sym, BrainPlayer::SELECT) )
+					speedyTimeBonus();
+			}
+		}
+			
+		else if( event.key.keysym.sym == m_player->keyForAction(BrainPlayer::SELECT) )
 			speedyTimeBonus();
+
 		break;
 	}
 	case SDL_TIME_BONUS_EVENT:

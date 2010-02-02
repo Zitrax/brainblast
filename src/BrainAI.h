@@ -38,6 +38,8 @@ public:
 				m_needed_ids = lvl->getSolutionTypes();
 		}
 
+	virtual bool isComputerPlayer() const { return true; }
+
 private:
 
 	BrainAI(const BrainAI& bb);
