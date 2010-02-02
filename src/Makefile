@@ -52,7 +52,7 @@ $(IMAGES)/bb_bg.h: ../images/bg.xml $(KRENCODER)
   #/usr/local/lib/libengine.a /usr/local/lib/libkyra.a
   #-static-libgcc -Wl,-static -lengine -lkyra
   # -L../bassmod -lbassmod
-brainblast: $(OBJECTS)
+brainblast: $(IMAGES)/bb.h $(IMAGES)/bb_bg.h $(OBJECTS) 
 	$(GCC) -o $@ $(OBJECTS) $(SDL_LIBS) $(LIBS)
 
 $(OBJECTS): %.o: %.cpp
