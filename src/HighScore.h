@@ -52,7 +52,7 @@ public:
 	 * Will return true if the provided score is high enough
 	 * to enter the highscore list.
 	 *
-	 * The function operates on the exisint list read in 
+	 * The function operates on the existing list read in 
 	 * reloadCache().
 	 */
 	bool highEnough(int score);
