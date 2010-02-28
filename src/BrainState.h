@@ -142,7 +142,26 @@ private:
 
 };
 
-class BrainPlayWait : public BrainState
+/**
+ * Abstract base class for all states that shows the play field, thus
+ * not the main menu, highscores and such...
+ */
+class BrainPlayArea : public BrainState
+{
+public:
+	virtual ~BrainPlayArea() {}
+
+	// Just to make it abstract
+	virtual void init() = 0;
+
+	/**
+	 * Update the score boxes with the current scores
+	 */
+	void writeScoreAndTime(int sec);
+	
+};
+
+class BrainPlayWait : public BrainPlayArea
 {
 public:
 	virtual ~BrainPlayWait() {}
@@ -167,7 +186,7 @@ private:
 	const double m_wait_time;
 	bool m_first_level;
 
-	BrainPlayWait() : BrainState(),
+	BrainPlayWait() : BrainPlayArea(),
 					  m_start_time(0),
 					  m_wait_time(10.0),
 					  m_first_level(true)
@@ -176,7 +195,7 @@ private:
 	unsigned int secondsLeft() const;
 };
 
-class BrainPlaying : public BrainState
+class BrainPlaying : public BrainPlayArea
 {
 public:
 	virtual ~BrainPlaying() {}
@@ -213,7 +232,7 @@ private:
 	BrainPlaying& operator=(const BrainPlaying&);
 };
 
-class BrainTimeBonus : public BrainState
+class BrainTimeBonus : public BrainPlayArea
 {
 public:
 	virtual ~BrainTimeBonus() {}

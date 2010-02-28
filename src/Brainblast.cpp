@@ -661,37 +661,6 @@ BrainSprite* Brainblast::collisionCheck(BrainPlayer* player)
 	return 0;
 }
 
-// FIXME: Should probably move
-void Brainblast::writeScoreAndTime(int sec)
-{
-	int min = sec/60;
-	sec -= min*60;
-	
-	ostringstream score_str;
-	score_str << "       "
-			  << setw(2) << setfill('0') << min << ":" 
-			  << setw(2) << setfill('0') << sec;
-	
-	m_text.write(BrainText::TOP_CENTER,score_str.str(),0);
-	score_str.str("");
-	
-	for(unsigned int i=0; i<m_player_manager->playerCount(); ++i)
-	{
-		// When we are done with the last level 
-		// we will have no level to look at.
-		if( !(m_current_levels.size()>i && m_current_levels[i]) )
-			continue;
-		
-		score_str << "SCORE: " << m_player_manager->getPlayer(i)->getScore()
-				  << " BRICKS: " << m_current_levels[i]->correctBricks()
-				  << "/" << m_current_levels[i]->totalSolutionBricks();
-		
-		m_text.write(m_player_manager->getPlayer(i)->getScoreBox(),score_str.str(),0);
-
-		score_str.str("");
-	}
-}
-
 // FIXME: would make sense to tie this to the BrainPlaying state
 void Brainblast::select(Puzzle& lvl, BrainPlayer& player)
 {

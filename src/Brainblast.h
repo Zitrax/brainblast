@@ -140,8 +140,6 @@ public:
 
 	vector<BrainSprite*>& getAllSprites() { return m_sprites; }
 
-	void writeScoreAndTime(int sec);
-
 	/**
 	 * Perform a select for the player at lvl.
 	 */
@@ -174,6 +172,11 @@ public:
 	 * This allocates a new string that must be freed
 	 */
 	const char* addBaseDir(const char* const str);
+
+	/**
+	 * This vector contain one puzzle per player
+	 */
+	const vector<Puzzle*>& getCurrentLevels() { return m_current_levels; }
 
 	// < FIXME: Should move into state code >
 

@@ -156,6 +156,37 @@ void BrainMenu::titleScreenUpdateText()
 	game()->text().write(BrainText::TOP_CENTER,"",0);
 }
 
+#include <iomanip>   // setw
+
+void BrainPlayArea::writeScoreAndTime(int sec)
+{
+	int min = sec/60;
+	sec -= min*60;
+	
+	ostringstream score_str;
+	score_str << "       "
+			  << setw(2) << setfill('0') << min << ":" 
+			  << setw(2) << setfill('0') << sec;
+	
+	game()->text().write(BrainText::TOP_CENTER,score_str.str(),0);
+	score_str.str("");
+	
+	const vector<Puzzle*> levels = game()->getCurrentLevels();
+
+	for(unsigned int i=0; i<game()->playerManager().playerCount(); ++i)
+	{
+		assert( game()->playerManager().playerCount() == levels.size() );
+		
+		score_str << "SCORE: " << game()->playerManager().getPlayer(i)->getScore()
+				  << " BRICKS: " << levels[i]->correctBricks()
+				  << "/" << levels[i]->totalSolutionBricks();
+		
+		game()->text().write(game()->playerManager().getPlayer(i)->getScoreBox(),score_str.str(),0);
+
+		score_str.str("");
+	}
+}
+
 void BrainPlayWait::init()
 {
 	if(m_first_level)
@@ -177,7 +208,7 @@ void BrainPlayWait::cleanup()
 
 bool BrainPlayWait::handleEvent(SDL_Event& event)
 {
-	game()->writeScoreAndTime(secondsLeft());
+	writeScoreAndTime(secondsLeft());
 
 	switch( event.type )
 	{
@@ -236,7 +267,7 @@ void BrainPlaying::cleanup()
 
 bool BrainPlaying::handleEvent(SDL_Event& event)
 {
-	game()->writeScoreAndTime(secondsLeft());
+	writeScoreAndTime(secondsLeft());
 
 	switch( event.type )
 	{
@@ -351,7 +382,7 @@ bool BrainTimeBonus::handleEvent(SDL_Event& event)
 			BrainPlayer* player = static_cast<BrainPlayer*>(event.user.data1);
 			if( player )
 				player->addScore(player->getLevel()->brickScore()/10);
-			game()->writeScoreAndTime(0);
+			writeScoreAndTime(0);
 		}
 		
 	}
