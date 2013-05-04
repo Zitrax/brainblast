@@ -1,0 +1,20 @@
+# Generated patterns
+####################
+*.Po
+*.Plo
+*.log
+Makefile
+Makefile.in
+
+# Various other generated files
+###############################
+aclocal.m4
+autom4te.cache/
+config.status
+configure
+kyra-config
+libtool
+ltmain.sh
+tests/aclocal.m4
+tests/autom4te.cache/
+tests/configure
