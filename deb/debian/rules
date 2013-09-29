@@ -41,7 +41,8 @@ binary: clean debian/control
 	gzip -9 debian/tmp/usr/share/doc/$(PACKAGE)/changelog
 	@ cp -v debian/copyright debian/tmp/usr/share/doc/$(PACKAGE)/
 #	@ cp -v ../bassmod/libbassmod.so debian/tmp/usr/lib/
-	@ cp -v ../fmod/api/libfmod-3.75.so debian/tmp/usr/lib/
+#	@ cp -v ../fmod/api/libfmod-3.75.so debian/tmp/usr/lib/
+	@ cp -v ../fmod/fmodex/api/lib/libfmodex64.so debian/tmp/usr/lib/
 	pod2man debian/usr/share/man/$(PACKAGE).pod > debian/tmp/usr/share/man/man6/$(PACKAGE).6
 	gzip -9 debian/tmp/usr/share/man/man6/$(PACKAGE).6
 	dpkg-shlibdeps debian/tmp/usr/games/$(PACKAGE)

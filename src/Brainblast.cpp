@@ -14,7 +14,7 @@
 #ifdef NOSOUND
 # include "BrainSound.h"
 #else
-# include "BrainSoundFMOD.h"
+# include "BrainSoundFMODEX.h"
 #endif // NOSOUND
 
 #include <assert.h>
@@ -34,7 +34,7 @@ Brainblast::Brainblast(string base_dir)
 #ifdef NOSOUND
 	  m_sound(new BrainSoundNULL),
 #else
-	  m_sound(new BrainSoundFMOD),
+	  m_sound(new BrainSoundFMODEX),
 #endif // NOSOUND
 	  m_level_data(7,8),  // 7x8 is maximum size if you want to avoid overlappings
 	  m_current_levels(),
