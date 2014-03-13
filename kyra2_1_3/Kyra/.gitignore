@@ -11,10 +11,17 @@ Makefile.in
 aclocal.m4
 autom4te.cache/
 config.status
+config.guess
+config.sub
 configure
+depcomp
+install-sh
 kyra-config
 libtool
 ltmain.sh
+missing
 tests/aclocal.m4
 tests/autom4te.cache/
 tests/configure
+tests/COPYING
+tests/INSTALL
