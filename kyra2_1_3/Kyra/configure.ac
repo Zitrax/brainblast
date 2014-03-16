@@ -5,7 +5,7 @@ AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 
 dnl Check for automake
-AM_INIT_AUTOMAKE(Kyra, 2.1.3)
+AM_INIT_AUTOMAKE
 
 dnl Set the verion of Kyra here too
 KYRA_MAJOR_VERSION=2
