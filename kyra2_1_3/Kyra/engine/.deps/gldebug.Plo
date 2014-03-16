@@ -1,3 +1,0 @@
-gldebug.lo: ../../grinliz/gldebug.cpp ../../grinliz/gldebug.h
-
-../../grinliz/gldebug.h:
