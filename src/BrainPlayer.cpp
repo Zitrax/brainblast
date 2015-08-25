@@ -7,10 +7,9 @@
 #include "BrainPlayer.h"
 
 BrainPlayer::BrainPlayer(KrSpriteResource* res, std::string name) :
-    BrainSprite(res,"Player",false),
+    BrainSprite(res,name,false),
 	m_level(0),
     m_score(0),
-    m_name(name),
 	m_level_count(0),
 	m_actions(),
 	m_keys(),

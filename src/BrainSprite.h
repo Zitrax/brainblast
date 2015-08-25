@@ -87,6 +87,10 @@ public:
 
     KrImNode* Clone();
 
+protected:
+	std::string getName() const { return m_name; }
+	void setName(std::string name) { m_name = name; }
+
 private:
 
     std::string m_name;

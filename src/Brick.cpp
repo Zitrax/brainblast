@@ -47,6 +47,9 @@ Brick&
 Brick::operator=(const Brick& br)
 {
     if(bbc::debug) std::cerr << "Brick::operator=(const Brick& br)\n";
+
+	if( &br == this )
+		return *this;
   
     m_brickID = br.m_brickID;
 

@@ -42,9 +42,6 @@ public:
 	int addScore(int score)   { m_score+=score; if(m_score<0) m_score=0; return m_score; }
 	void setScore(int score)  { m_score = score; }
 
-	string getName() const    { return m_name; }
-	void setName(string name) { m_name = name; }
-
 	virtual Puzzle* getLevel() const      { return m_level;}
 	virtual void setLevel(Puzzle* lvl)    { m_level = lvl; if(lvl) m_level_count++; }
 	int getLevelCount() const             { return m_level_count; }
@@ -113,7 +110,6 @@ private:
     BrainPlayer& operator=(const BrainPlayer&);
 
 	int m_score;
-	string m_name;
 	int m_level_count;
 
 	keymap m_actions;

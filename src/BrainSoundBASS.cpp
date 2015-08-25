@@ -17,7 +17,7 @@ BrainSoundBASS::~BrainSoundBASS()
 
 void BrainSoundBASS::error(const char* text)
 {
-	printf("ERROR/BASSMOD - %s (%u)\n",text,BASSMOD_ErrorGetCode());
+	printf("ERROR/BASSMOD - %s (%lu)\n",text,BASSMOD_ErrorGetCode());
 }
 
 bool BrainSoundBASS::initializeSound()

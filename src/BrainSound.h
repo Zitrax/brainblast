@@ -95,6 +95,7 @@ protected:
  */
 class BrainSoundNULL : public BrainSound
 {
+public:
 	bool initializeSound() { return m_initialized = true; };
 	bool isInitialized() const { return m_initialized == true; }
 	bool loadMusic(const char*) { return true; };

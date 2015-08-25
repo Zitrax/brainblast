@@ -19,7 +19,7 @@ endif
 CFLAGS   += -I../include -I../kyra2_1_3
 
 LIBS      = ../kyra2_1_3/Kyra/engine/.libs/libengine.a ../kyra2_1_3/Kyra/.libs/libkyra.a -lrt
-SDL_LIBS  = $(shell sdl-config --static-libs) -lSDL_image #-lSDL_mixer
+SDL_LIBS  = $(shell sdl-config --libs) -lSDL_image #-lSDL_mixer
 SDL_FLAGS = $(shell sdl-config --cflags)
 IMAGES    = ../images
 
