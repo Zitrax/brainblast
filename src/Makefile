@@ -47,7 +47,7 @@ lcov:
 	genhtml -o coverage app.info
 
 $(KRENCODER):
-	cd ../kyra2_1_3/Kyra && ./autogen && make
+	cd ../kyra2_1_3/Kyra && ./autogen && $(MAKE)
 
 $(IMAGES)/bb.h: ../images/bricks.xml $(KRENCODER) 
 	cd $(IMAGES) && \
@@ -79,7 +79,7 @@ install: package
 	sudo dpkg -i ../deb/brainblast_${VERSION}_$(ARCH).deb
 
 remake: 
-	make clean; make
+	make clean; $(MAKE)
 
 clean:
 	rm -rfv *.o brainblast *~ \
