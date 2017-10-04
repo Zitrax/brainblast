@@ -1,4 +1,4 @@
-GCC       = clang++-5.0
+CXX       = clang++-5.0
 CFLAGS    = -Weffc++ -Wall -Wextra -pedantic --std=c++1z
 
 DEBUG_BB ?= YES
@@ -64,10 +64,10 @@ $(IMAGES)/bb_bg.h: ../images/bg.xml $(KRENCODER)
   #-static-libgcc -Wl,-static -lengine -lkyra
   # -L../bassmod -lbassmod
 brainblast: $(IMAGES)/bb.h $(IMAGES)/bb_bg.h $(OBJECTS) 
-	$(GCC) -o $@ $(OBJECTS) $(LDFLAGS)  $(SDL_LIBS) $(LIBS)
+	$(CXX) -o $@ $(OBJECTS) $(LDFLAGS)  $(SDL_LIBS) $(LIBS)
 
 $(OBJECTS): %.o: %.cpp
-	$(GCC) $(CFLAGS) $(SDL_FLAGS) -c $<
+	$(CXX) $(CFLAGS) $(SDL_FLAGS) -c $<
 
 rpm: package
 	sudo alien --to-rpm ../deb/brainblast_${VERSION}_i386.deb
@@ -78,8 +78,11 @@ package: all
 install: package
 	sudo dpkg -i ../deb/brainblast_${VERSION}_$(ARCH).deb
 
-remake: 
-	make clean; $(MAKE)
+remake:
+	make clean && $(MAKE)
+
+analyze: brainblast
+	make clean && scan-build $(MAKE)
 
 clean:
 	rm -rfv *.o brainblast *~ \
