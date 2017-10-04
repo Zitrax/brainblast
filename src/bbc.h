@@ -34,7 +34,7 @@ namespace bbc{
 
 	struct error{
 		std::string msg;
-		error(std::string s) : msg(s){}
+		explicit error(std::string s) : msg(s){}
 	};
 
 	/**

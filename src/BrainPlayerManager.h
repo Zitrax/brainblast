@@ -94,7 +94,7 @@ private:
 	struct playerCheckScore
 	{
 		friend class BrainPlayerManager;
-		playerCheckScore(BrainPlayerManager& manager) : m_manager(manager) {}
+		explicit playerCheckScore(BrainPlayerManager& manager) : m_manager(manager) {}
 		void operator() (BrainPlayer* player);
 		BrainPlayerManager& m_manager;
 	};

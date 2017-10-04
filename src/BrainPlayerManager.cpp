@@ -55,8 +55,8 @@ bool BrainPlayerManager::addPlayers(int human_players, int computer_players)
     for(int i=0;i<human_players;++i)
     {
 		if(bbc::debug) cerr << "BrainPlayerManager() Adding human player " << i << "\n";
-        BrainPlayer* player = new BrainPlayer( m_players.size()%2 ? wizardRes2 : wizardRes, "wizard" );
-        player->SetNodeId(m_players.size()%2 ? BB_WIZARD2 : BB_WIZARD);
+        BrainPlayer* player = new BrainPlayer( (m_players.size() % 2) ? wizardRes2 : wizardRes, "wizard" );
+        player->SetNodeId((m_players.size() % 2) ? BB_WIZARD2 : BB_WIZARD);
         player->SetPos( spacing(), 0);
         Brainblast::instance()->engine()->Tree()->AddNode( 0, player );
         m_players.push_back(player);
@@ -65,8 +65,8 @@ bool BrainPlayerManager::addPlayers(int human_players, int computer_players)
     for(int i=0;i<computer_players;++i)
     {
 		if(bbc::debug) cerr << "BrainPlayerManager() Adding computer player " << i << "\n";
-        BrainPlayer* player = new BrainAI( m_players.size()%2 ? wizardRes2 : wizardRes, "computer", m_difficulty );
-        player->SetNodeId(m_players.size()%2 ? BB_WIZARD2 : BB_WIZARD);
+        BrainPlayer* player = new BrainAI((m_players.size() % 2) ? wizardRes2 : wizardRes, "computer", m_difficulty );
+        player->SetNodeId((m_players.size() % 2) ? BB_WIZARD2 : BB_WIZARD);
         player->SetPos( spacing(), 0);
         Brainblast::instance()->engine()->Tree()->AddNode( 0, player );
         m_players.push_back(player);

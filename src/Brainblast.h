@@ -98,7 +98,7 @@ private:
 
 public:
     
-    Brainblast(string base_dir);
+    explicit Brainblast(string base_dir);
     ~Brainblast();
 
 	static Brainblast* instance() { return s_instance; }
@@ -291,7 +291,7 @@ private:
 class AutoCStr
 {
 public:
-	AutoCStr(const char* s) : m_s(s) {}
+	explicit AutoCStr(const char* s) : m_s(s) {}
 	~AutoCStr() { free(const_cast<char*>(m_s)); }
 	operator const char* () { return m_s; }
 private:

@@ -103,7 +103,7 @@ private:
 	class SelectCoord
 	{
 	public:
-		SelectCoord(const Puzzle* const p) : m_x(0), m_y(0), m_p(p) {}
+		explicit SelectCoord(const Puzzle* const p) : m_x(0), m_y(0), m_p(p) {}
 		
 		int x() const { return m_x; }
 		int y() const { return m_y; }
