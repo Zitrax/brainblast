@@ -233,7 +233,7 @@ Brainblast::makeLevel(int lvl)
 				 << setw(3) << setfill('0')
 				 << lvl << ".txt";
 		
-        if( bbc::debug ) cerr << "Level file: " << filename << "\n";
+        if( bbc::debug ) cerr << "Level file: " << filename.str() << "\n";
       
         ifstream in(filename.str().c_str());
         if ( !in ) { 
@@ -260,7 +260,7 @@ Brainblast::makeLevel(int lvl)
 					map<int,Brick*>::iterator it = m_bricks.find(val);
 					if( it == m_bricks.end() )
 					{
-						cerr << "=== WARNING: Level file '" << filename << "' contain invalid brick type (" << val << ") will use another one ===\n";
+						cerr << "=== WARNING: Level file '" << filename.str() << "' contain invalid brick type (" << val << ") will use another one ===\n";
 						it = m_bricks.begin();
 					}
 					if( tmp > height*width )

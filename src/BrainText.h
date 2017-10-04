@@ -7,8 +7,6 @@
 #ifndef BRAINTEXT_H
 #define BRAINTEXT_H
 
-using namespace std;
-
 #include <string>
 #include <wkyra.h>
 
@@ -43,8 +41,8 @@ public:
 	 */
 	KrFontResource* loadFont(const char* file, int glyphs);
 
-    void write(enum Box box, const string& text, int line);
-	void read(enum Box box, string* text, int line);
+    void write(enum Box box, const std::string& text, int line);
+	void read(enum Box box, std::string* text, int line);
     void clear(enum Box box);
     void clearAll();
 

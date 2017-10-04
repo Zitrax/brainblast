@@ -4,6 +4,9 @@
  * @author danielb
  */
 #include "Brick.h"
+#include <string>
+
+using namespace std;
 
 Brick::Brick(char* file, int id) : 
     m_brickID(id), 
@@ -12,12 +15,14 @@ Brick::Brick(char* file, int id) :
     m_sprite(0)
 {
     if(bbc::debug) std::cerr << "Brick::Brick(" << file << "," << id << ")\n";
-    
+
     if( m_pixmap == 0 ) 
     {
-        fprintf(stderr, "Couldn't load %s: %s\n", file, SDL_GetError());
+		const auto err = "Couldn't load "s + file + ": " + SDL_GetError();
+		cerr << err << "\n";
+		throw runtime_error(err);
     }
-    
+
     SDL_SetColorKey(m_pixmap, SDL_SRCCOLORKEY, SDL_MapRGB(m_pixmap->format, 0xff, 0xff, 0xff));
 }
 

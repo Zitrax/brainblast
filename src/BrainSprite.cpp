@@ -131,7 +131,7 @@ int BrainSprite::nextBounce()
 			}
 			m_b->SetPos(x,VIDEOY-10);
 #endif // _DEBUG
-			if( fabs(ys) < 4.0 )
+			if( abs(ys) < 4.0 )
 			{
 				m_next_bounce_cache = x;
 				return x;
