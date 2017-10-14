@@ -1,5 +1,5 @@
 CXX       = clang++-5.0
-CFLAGS    = -Weffc++ -Wall -Wextra -pedantic --std=c++1z
+CFLAGS   += -Weffc++ -Wall -Wextra -pedantic --std=c++1z
 
 DEBUG_BB ?= YES
 SOUND    ?= YES
