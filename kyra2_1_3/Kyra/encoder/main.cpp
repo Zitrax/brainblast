@@ -122,10 +122,12 @@ int main( int argc, char* argv[] )
 		firstIndex++;
 	}
 
+#if 0 // To support headless compile
 	if ( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER|SDL_INIT_NOPARACHUTE) < 0 ) {
 		fprintf(stderr, "Couldn't initialize SDL: %s\n",SDL_GetError());
 		exit(255);
 	}
+#endif
 
 	int major, minor, patch;
 	KrEngine::Version( &major, &minor, &patch );
