@@ -44,6 +44,26 @@ add_custom_command(
   DEPENDS ${KRENCODER} ${CMAKE_SOURCE_DIR}/images/bg.xml
   )
 
+add_compile_options(-Wall -Werror)
+
+find_program(CMAKE_CXX_CPPCHECK NAMES cppcheck)
+if (CMAKE_CXX_CPPCHECK)
+  list(
+    APPEND CMAKE_CXX_CPPCHECK
+    "--enable=all"
+    "--force"
+    "--quiet"
+    "--inline-suppr"
+    "--error-exitcode=1"
+    "--suppressions-list=${CMAKE_SOURCE_DIR}/.cppcheck.sup"
+     )
+else()
+  message(WARNING "cppcheck not found - analysis will not run")
+  set(CMAKE_CXX_CPPCHECK "")
+endif()
+
+message(STATUS "cppcheck:${CMAKE_CXX_CPPCHECK}")
+
 add_executable(brainblast
   ${CMAKE_CURRENT_SOURCE_DIR}/BrainAI.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/BrainPlayer.cpp

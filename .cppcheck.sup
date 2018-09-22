@@ -1,0 +1,11 @@
+// External code
+*:/usr/include/SDL/*.h
+
+// Not important
+missingInclude
+
+// Since we run file-by-file this will hit all the time
+unmatchedSuppression
+
+// Also due to running file-by-file
+unusedFunction
