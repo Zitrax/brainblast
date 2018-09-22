@@ -31,20 +31,20 @@ public:
 		m_off_toggle(false) {}
 	~BrainSoundFMODEX();
 
-	bool initializeSound();
+	bool initializeSound() override;
 	bool isInitialized() const { return m_initialized == true; }
 
 	// Music functions
-	bool loadMusic(const char* file);
-	bool playMusic();
-	bool stopMusic();
-	bool pauseMusic();
-	bool resumeMusic();
-	bool toggleMusic();
+	bool loadMusic(const char* file) override;
+	bool playMusic() override;
+	bool stopMusic() override;
+	bool pauseMusic() override;
+	bool resumeMusic() override;
+	bool toggleMusic() override;
 
 	// Sound effects
-	bool addSample(const char*,int);
-	bool playSample(int) const;
+	bool addSample(const char*,int) override;
+	bool playSample(int) const override;
 
 	void error(const char* text) const;
 

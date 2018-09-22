@@ -29,16 +29,16 @@ public:
 	
     virtual ~BrainAI(){}
 	
-	virtual void move();
+	virtual void move() override;
 	
-	virtual void setLevel(Puzzle* lvl) 
+	virtual void setLevel(Puzzle* lvl) override
 		{ 
 			m_level = lvl; 
 			if(lvl)
 				m_needed_ids = lvl->getSolutionTypes();
 		}
 
-	virtual bool isComputerPlayer() const { return true; }
+	virtual bool isComputerPlayer() const override { return true; }
 
 private:
 

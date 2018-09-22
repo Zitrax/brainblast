@@ -1,6 +1,8 @@
 include(ProcessorCount)
 ProcessorCount(CORES)
 
+set(CMAKE_CXX_STANDARD 17)
+
 # Needed tools
 
 find_program(MAKE make)
@@ -45,6 +47,12 @@ add_custom_command(
   )
 
 add_compile_options(-Wall -Werror)
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  add_compile_options(-Winconsistent-missing-override)
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  add_compile_options(-Wsuggest-override)
+endif()
 
 find_program(CMAKE_CXX_CPPCHECK NAMES cppcheck)
 if (CMAKE_CXX_CPPCHECK)

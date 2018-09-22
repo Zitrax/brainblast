@@ -85,7 +85,7 @@ public:
     bool isCarrying() const {return m_child!=0;}
 	BrainSprite* carry() const { return m_child; }
 
-    KrImNode* Clone();
+    KrImNode* Clone() override;
 
 protected:
 	std::string getName() const { return m_name; }

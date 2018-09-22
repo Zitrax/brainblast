@@ -202,9 +202,9 @@ public:
 
 	//// <BrainStateManager> ////
 
-	void handleEvents();
-	void update(){}
-	void draw(){}
+	void handleEvents() override;
+	void update() override {}
+	void draw() override {}
 
 	//// </BrainStateManager> ////
 

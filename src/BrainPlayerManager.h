@@ -73,7 +73,7 @@ public:
 	unsigned int hs_max_entries() const { return m_highscore->max_entries(); }
 
 	// TextListener
-	void textReady(string str, int id);
+	void textReady(string str, int id) override;
 
 	enum BrainAI::Difficulty difficulty() const { return m_difficulty; }
 	void setDifficulty(enum BrainAI::Difficulty diff) { m_difficulty = diff; }

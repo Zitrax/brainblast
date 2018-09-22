@@ -49,8 +49,8 @@ public:
 	LEVEL_SET getLevelSet() const         { return m_level_set; }
 	void setLevelSet(LEVEL_SET level_set) { m_level_set = level_set; }
 
-    virtual void left();
-    virtual void right();
+    virtual void left() override;
+    virtual void right() override;
 
 	BrainText::Box getScoreBox() const { return m_score_box; }
 	void setScoreBox(BrainText::Box box)  { m_score_box = box; }

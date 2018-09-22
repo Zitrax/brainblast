@@ -75,12 +75,12 @@ protected:
  */
 class NullState : public BrainState
 {
-	void    init(){}
-	void    cleanup(){}
-	bool    handleEvent(SDL_Event&){assert(false); return false;}
-	void    update(){assert(false);}
-	void    draw(){assert(false);}
-	string  name() const { return "NullState"; }
+	void    init() override {}
+	void    cleanup() override {}
+	bool    handleEvent(SDL_Event&) override {assert(false); return false;}
+	void    update() override {assert(false);}
+	void    draw() override {assert(false);}
+	string  name() const override { return "NullState"; }
 };
 
 /**
@@ -121,12 +121,12 @@ class BrainMenu : public BrainState
 public:
 	virtual ~BrainMenu(){}
 
-	void init();
-	void cleanup();
-	bool handleEvent(SDL_Event& event);
-	void update();
-	void draw();
-	string name() const { return "BrainMenu"; }
+	void init() override;
+	void cleanup() override;
+	bool handleEvent(SDL_Event& event) override;
+	void update() override;
+	void draw() override;
+	string name() const  override { return "BrainMenu"; }
 
 	static BrainMenu& instance() 
 		{
@@ -152,7 +152,7 @@ public:
 	virtual ~BrainPlayArea() {}
 
 	// Just to make it abstract
-	virtual void init() = 0;
+	virtual void init() override = 0;
 
 	/**
 	 * Update the score boxes with the current scores
@@ -166,12 +166,12 @@ class BrainPlayWait : public BrainPlayArea
 public:
 	virtual ~BrainPlayWait() {}
 
-	void init();
-	void cleanup();
-	bool handleEvent(SDL_Event& event);
-	void update();
-	void draw();
-	string name() const { return "BrainPlayWait"; }
+	void init() override;
+	void cleanup() override;
+	bool handleEvent(SDL_Event& event) override;
+	void update() override;
+	void draw() override;
+	string name() const override { return "BrainPlayWait"; }
 
 	static BrainPlayWait& instance(bool first_level)
 		{
@@ -200,12 +200,12 @@ class BrainPlaying : public BrainPlayArea
 public:
 	virtual ~BrainPlaying() {}
 
-	void init();
-	void cleanup();
-	bool handleEvent(SDL_Event& event);
-	void update(){}
-	void draw(){}
-	string name() const { return "BrainPlaying"; }
+	void init() override;
+	void cleanup() override;
+	bool handleEvent(SDL_Event& event) override;
+	void update() override {}
+	void draw() override {}
+	string name() const override { return "BrainPlaying"; }
 
 	static BrainPlaying& instance() 
 		{
@@ -237,12 +237,12 @@ class BrainTimeBonus : public BrainPlayArea
 public:
 	virtual ~BrainTimeBonus() {}
 	
-	void init();
-	void cleanup(){}
-	bool handleEvent(SDL_Event& event);
-	void update(){}
-	void draw(){}
-	string name() const { return "BrainTimeBonus"; }
+	void init() override;
+	void cleanup() override{}
+	bool handleEvent(SDL_Event& event) override;
+	void update() override{}
+	void draw() override{}
+	string name() const override { return "BrainTimeBonus"; }
 
 	static BrainTimeBonus& instance(
 		BrainPlayer* player,
@@ -286,12 +286,12 @@ class BrainGameOver : public BrainState
 public:
 	virtual ~BrainGameOver() {}
 	
-	void init();
-	void cleanup(){}
-	bool handleEvent(SDL_Event& event);
-	void update(){}
-	void draw(){}
-	string name() const { return "BrainGameOver"; }
+	void init() override;
+	void cleanup() override{}
+	bool handleEvent(SDL_Event& event) override;
+	void update() override{}
+	void draw() override{}
+	string name() const override { return "BrainGameOver"; }
 
 	/**
 	 * Enter text input mode
@@ -324,12 +324,12 @@ class BrainHighScore : public BrainState
 public:
 	virtual ~BrainHighScore() {}
 	
-	void init();
-	void cleanup(){}
-	bool handleEvent(SDL_Event& event);
-	void update(){}
-	void draw(){}
-	string name() const { return "BrainHighScore"; }
+	void init() override;
+	void cleanup() override{}
+	bool handleEvent(SDL_Event& event) override;
+	void update() override{}
+	void draw() override{}
+	string name() const override { return "BrainHighScore"; }
 
 	static BrainHighScore& instance()
 		{
