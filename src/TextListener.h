@@ -20,19 +20,19 @@ class TextListener
 {
 public:
 	virtual ~TextListener(){}
-		
+
 	virtual void textReady(string s,int id) = 0;
-		
+
 	static int id() { return m_text_id++; }
-		
+
 private:
 	static int m_text_id;
 };
-	
+
 /** Functor for use in for_each iterations */
 struct text_ready
 {
-	text_ready(string s, int id) : m_s(s), m_id(id) {}
+	text_ready(const string& s, int id) : m_s(s), m_id(id) {}
 	void operator() (TextListener* tl) { tl->textReady(m_s,m_id); }
 	string m_s;
 	int m_id;
